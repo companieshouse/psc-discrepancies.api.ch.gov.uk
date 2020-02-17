@@ -1,0 +1,419 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "description" : "This is an API describing endpoints for reporting a PSC discrepancy",
+    "version" : "1.0.0-oas3",
+    "title" : "API for creating PSC Discrepancy Reports",
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "paths" : {
+    "/" : {
+      "get" : {
+        "summary" : "Get PSC Discrepancy Reports",
+        "operationId" : "getPscDiscrepancyReports",
+        "description" : "Return all PSC Discrepancy reports",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "skip",
+          "description" : "number of records to skip for pagination",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 0
+          }
+        }, {
+          "in" : "query",
+          "name" : "limit",
+          "description" : "maximum number of records to return",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 0,
+            "maximum" : 50
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DiscrepancyReport"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No PSC Discrepancy reports found"
+          }
+        }
+      }
+    },
+    "/{discrepancy-report-id}" : {
+      "get" : {
+        "summary" : "Get PSC Discrepancy Report",
+        "operationId" : "getPscDiscrepancyReport",
+        "description" : "Return PSC Discrepancy report",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "skip",
+          "description" : "number of records to skip for pagination",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 0
+          }
+        }, {
+          "in" : "query",
+          "name" : "limit",
+          "description" : "maximum number of records to return",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 0,
+            "maximum" : 50
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/DiscrepancyReport"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "bad input parameter"
+          },
+          "404" : {
+            "description" : "PSC discrepancy report not found"
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Creates a PSC discrepancy report",
+        "operationId" : "createPscDiscrepancyReport",
+        "description" : "Creates a PSC discrepancy report",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "PSC discrepancy report created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/DiscrepancyReport"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "409" : {
+            "description" : "an existing report already exists"
+          }
+        },
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/DiscrepancyReport"
+        }
+      },
+      "put" : {
+        "summary" : "Update a PSC Discrepancy Report",
+        "operationId" : "updatePscDiscrepancyReport",
+        "description" : "Updates a PSC Discrepancy Report on the system",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "PSC Discrepancy report updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/DiscrepancyReport"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          }
+        },
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/DiscrepancyReport"
+        }
+      },
+      "delete" : {
+        "summary" : "Delete a PSC Discrepancy Report",
+        "operationId" : "deletePscDiscrepancyReport",
+        "description" : "Deletes a PSC Discrepancy Report on the system",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "report deleted"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          }
+        }
+      }
+    },
+    "/{discrepancy-report-id}/discrepancies" : {
+      "get" : {
+        "summary" : "Get discrepancies for a PSC Discrepancy Report",
+        "operationId" : "getDiscrepancies",
+        "description" : "Get all discrepancies for a PSC discrepancy report",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "skip",
+          "description" : "number of records to skip for pagination",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 0
+          }
+        }, {
+          "in" : "query",
+          "name" : "limit",
+          "description" : "maximum number of records to return",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 0,
+            "maximum" : 50
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Discrepancy"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "bad input parameter"
+          }
+        }
+      },
+      "post" : {
+        "summary" : "create a discrepancy",
+        "operationId" : "createDiscrepancy",
+        "description" : "Creates a discrepancy for a PSC Discrepancy Report",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "discrepancy created"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "409" : {
+            "description" : "an existing item already exists"
+          }
+        },
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Discrepancy"
+        }
+      }
+    },
+    "/{discrepancy-report-id}/discrepancies/{discrepancy-id}" : {
+      "put" : {
+        "summary" : "update a PSC Discrepancy",
+        "operationId" : "updateDiscrepancy",
+        "description" : "Updates a discrepancy for a PSC Discrepancy",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "discrepancy-id",
+          "description" : "Id of discrepancy",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "discrepancy updated"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          }
+        },
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Discrepancy"
+        }
+      },
+      "delete" : {
+        "summary" : "Delete a discrepancy",
+        "operationId" : "deleteDiscrepancy",
+        "description" : "Deletes a discrepancy from a PSC Discrepancy Report",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "discrepancy-id",
+          "description" : "Id of discrepancy",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "discrepancy deleted"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          }
+        }
+      }
+    }
+  },
+  "servers" : [ {
+    "url" : "https://pscdiscrepancyreports"
+  } ],
+  "components" : {
+    "requestBodies" : {
+      "DiscrepancyReport" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/DiscrepancyReport"
+            }
+          }
+        },
+        "description" : "PSC Discrepancy Report"
+      },
+      "Discrepancy" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Discrepancy"
+            }
+          }
+        },
+        "description" : "Discrepancy for a PSC Discrepancy Report"
+      }
+    },
+    "schemas" : {
+      "DiscrepancyReport" : {
+        "type" : "object",
+        "required" : [ "discrepancy-report-id" ],
+        "properties" : {
+          "discrepancy-report-id" : {
+            "type" : "string"
+          },
+          "obliged-entity-name" : {
+            "type" : "string",
+            "example" : "Barclays Bank"
+          },
+          "obliged-entity-email" : {
+            "type" : "string",
+            "example" : "bob.holness@barclaysbank.com"
+          },
+          "company-number" : {
+            "type" : "string",
+            "example" : "AB export"
+          },
+          "discrepancy-report-status" : {
+            "type" : "string",
+            "example" : "AB export"
+          }
+        }
+      },
+      "Discrepancy" : {
+        "required" : [ "discrepancy-id", "discrepancy-reason" ],
+        "properties" : {
+          "discrepancy-id" : {
+            "type" : "string"
+          },
+          "discrepancy-reason" : {
+            "type" : "string",
+            "example" : "Name is incorrect"
+          }
+        }
+      }
+    }
+  }
+}
