@@ -53,6 +53,58 @@
             "description" : "No PSC Discrepancy reports found"
           }
         }
+      },
+      "post" : {
+        "summary" : "Creates a PSC discrepancy report",
+        "operationId" : "createPscDiscrepancyReport",
+        "description" : "Creates a PSC discrepancy report",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "PSC discrepancy report created",
+            "headers" : {
+              "Location\"" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "uri",
+                  "description" : "Location (URI) of the PSC discrepancy report that has been created"
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/DiscrepancyReport"
+                  }
+                }
+              }
+            },
+            "links" : {
+              "GetPscDiscrepancyReportById" : {
+                "operationId" : "getPscDiscrepancyReport",
+                "parameters" : {
+                  "discrepancy-report-id" : "$response.body#/discrepancy-report-id"
+                },
+                "description" : "The `discrepancy-report-id` value returned in the response can be used as the `discrepancy-report-id` parameter in `GET /pscdiscrepancyreports/{discrepancy-report-id}`."
+              }
+            }
+          },
+          "409" : {
+            "description" : "an existing report already exists"
+          }
+        },
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/DiscrepancyReport"
+        }
       }
     },
     "/{discrepancy-report-id}" : {
@@ -109,43 +161,6 @@
           }
         }
       },
-      "post" : {
-        "summary" : "Creates a PSC discrepancy report",
-        "operationId" : "createPscDiscrepancyReport",
-        "description" : "Creates a PSC discrepancy report",
-        "parameters" : [ {
-          "in" : "path",
-          "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "201" : {
-            "description" : "PSC discrepancy report created",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "items" : {
-                    "$ref" : "#/components/schemas/DiscrepancyReport"
-                  }
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "invalid input, object invalid"
-          },
-          "409" : {
-            "description" : "an existing report already exists"
-          }
-        },
-        "requestBody" : {
-          "$ref" : "#/components/requestBodies/DiscrepancyReport"
-        }
-      },
       "put" : {
         "summary" : "Update a PSC Discrepancy Report",
         "operationId" : "updatePscDiscrepancyReport",
@@ -160,7 +175,7 @@
           }
         } ],
         "responses" : {
-          "201" : {
+          "200" : {
             "description" : "PSC Discrepancy report updated",
             "content" : {
               "application/json" : {
@@ -194,7 +209,7 @@
           }
         } ],
         "responses" : {
-          "201" : {
+          "204" : {
             "description" : "report deleted"
           },
           "400" : {
@@ -270,7 +285,25 @@
         } ],
         "responses" : {
           "201" : {
-            "description" : "discrepancy created"
+            "description" : "discrepancy created",
+            "headers" : {
+              "Location\"" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "uri",
+                  "description" : "Location (URI) of the discrepancy that has been created for a PSC discrepancy report"
+                }
+              }
+            },
+            "links" : {
+              "GetDiscrepancyById" : {
+                "operationId" : "getDiscrepancy",
+                "parameters" : {
+                  "discrepancy-report-id" : "$response.body#/discrepancy-id"
+                },
+                "description" : "The `discrepancy-id` value returned in the response can be used as the `discrepancy-id` parameter in `GET /pscdiscrepancyreports/{discrepancy-report-id}/discrepancies/{discrepancy-id}`."
+              }
+            }
           },
           "400" : {
             "description" : "invalid input, object invalid"
@@ -285,6 +318,65 @@
       }
     },
     "/{discrepancy-report-id}/discrepancies/{discrepancy-id}" : {
+      "get" : {
+        "summary" : "Get a discrepancy for a PSC Discrepancy Report",
+        "operationId" : "getDiscrepancy",
+        "description" : "Get a discrepancy for a PSC discrepancy report",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "discrepancy-report-id",
+          "description" : "Id of PSC Discrepancy Report",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "discrepancy-id",
+          "description" : "Id of discrepancy",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "skip",
+          "description" : "number of records to skip for pagination",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 0
+          }
+        }, {
+          "in" : "query",
+          "name" : "limit",
+          "description" : "maximum number of records to return",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 0,
+            "maximum" : 50
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Discrepancy"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "bad input parameter"
+          }
+        }
+      },
       "put" : {
         "summary" : "update a PSC Discrepancy",
         "operationId" : "updateDiscrepancy",
@@ -307,8 +399,17 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "discrepancy updated"
+          "200" : {
+            "description" : "discrepancy updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Discrepancy"
+                  }
+                }
+              }
+            }
           },
           "400" : {
             "description" : "invalid input, object invalid"
@@ -340,7 +441,7 @@
           }
         } ],
         "responses" : {
-          "201" : {
+          "204" : {
             "description" : "discrepancy deleted"
           },
           "400" : {
@@ -398,7 +499,8 @@
           },
           "discrepancy-report-status" : {
             "type" : "string",
-            "example" : "AB export"
+            "enum" : [ "INCOMPLETE", "COMPLETE", "INVALID", "SUBMITTED", "DELETED" ],
+            "example" : "SUBMITTED"
           }
         }
       },
