@@ -1,0 +1,13 @@
+package uk.gov.ch.pscdiscrepancyapi;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class PscDiscrepancyApiApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
