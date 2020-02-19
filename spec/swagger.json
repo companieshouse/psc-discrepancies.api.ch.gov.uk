@@ -58,25 +58,16 @@
         "summary" : "Creates a PSC discrepancy report",
         "operationId" : "createPscDiscrepancyReport",
         "description" : "Creates a PSC discrepancy report",
-        "parameters" : [ {
-          "in" : "path",
-          "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
         "responses" : {
           "201" : {
             "description" : "PSC discrepancy report created",
             "headers" : {
-              "Location\"" : {
+              "Location" : {
                 "schema" : {
                   "type" : "string",
-                  "format" : "uri",
-                  "description" : "Location (URI) of the PSC discrepancy report that has been created"
-                }
+                  "format" : "uri"
+                },
+                "description" : "Location (URI) of the PSC discrepancy report that has been created"
               }
             },
             "content" : {
@@ -115,7 +106,7 @@
         "parameters" : [ {
           "in" : "path",
           "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
+          "description" : "ID of PSC Discrepancy Report",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -168,7 +159,7 @@
         "parameters" : [ {
           "in" : "path",
           "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
+          "description" : "ID of PSC Discrepancy Report",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -202,7 +193,7 @@
         "parameters" : [ {
           "in" : "path",
           "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
+          "description" : "ID of PSC Discrepancy Report",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -226,7 +217,7 @@
         "parameters" : [ {
           "in" : "path",
           "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
+          "description" : "ID of PSC Discrepancy Report",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -277,7 +268,7 @@
         "parameters" : [ {
           "in" : "path",
           "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
+          "description" : "ID of PSC Discrepancy Report",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -290,9 +281,9 @@
               "Location\"" : {
                 "schema" : {
                   "type" : "string",
-                  "format" : "uri",
-                  "description" : "Location (URI) of the discrepancy that has been created for a PSC discrepancy report"
-                }
+                  "format" : "uri"
+                },
+                "description" : "Location (URI) of the discrepancy that has been created for a PSC discrepancy report"
               }
             },
             "links" : {
@@ -325,7 +316,7 @@
         "parameters" : [ {
           "in" : "path",
           "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
+          "description" : "ID of PSC Discrepancy Report",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -333,7 +324,7 @@
         }, {
           "in" : "path",
           "name" : "discrepancy-id",
-          "description" : "Id of discrepancy",
+          "description" : "ID of discrepancy",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -384,7 +375,7 @@
         "parameters" : [ {
           "in" : "path",
           "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
+          "description" : "ID of PSC Discrepancy Report",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -392,7 +383,7 @@
         }, {
           "in" : "path",
           "name" : "discrepancy-id",
-          "description" : "Id of discrepancy",
+          "description" : "ID of discrepancy",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -426,7 +417,7 @@
         "parameters" : [ {
           "in" : "path",
           "name" : "discrepancy-report-id",
-          "description" : "Id of PSC Discrepancy Report",
+          "description" : "ID of PSC Discrepancy Report",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -434,7 +425,7 @@
         }, {
           "in" : "path",
           "name" : "discrepancy-id",
-          "description" : "Id of discrepancy",
+          "description" : "ID of discrepancy",
           "required" : true,
           "schema" : {
             "type" : "string"
@@ -480,11 +471,7 @@
     "schemas" : {
       "DiscrepancyReport" : {
         "type" : "object",
-        "required" : [ "discrepancy-report-id" ],
         "properties" : {
-          "discrepancy-report-id" : {
-            "type" : "string"
-          },
           "obliged-entity-name" : {
             "type" : "string",
             "example" : "Barclays Bank"
@@ -501,21 +488,53 @@
             "type" : "string",
             "enum" : [ "INCOMPLETE", "COMPLETE", "INVALID", "SUBMITTED", "DELETED" ],
             "example" : "SUBMITTED"
+          },
+          "links": {
+            "type" : "object",
+            "properties" : {
+              "self" : {
+                "type" : "string"
+              }
+            }
+          },
+          "etag" : {
+            "type" : "string",
+            "example" : ""
+          },
+          "kind" : {
+            "type" : "string",
+            "example" : ""
           }
         }
       },
       "Discrepancy" : {
-        "required" : [ "discrepancy-id", "discrepancy-reason" ],
         "properties" : {
-          "discrepancy-id" : {
-            "type" : "string"
-          },
           "discrepancy-reason" : {
             "type" : "string",
             "example" : "Name is incorrect"
+          },
+          "links": {
+            "type" : "object",
+            "properties" : {
+              "self" : {
+                "type" : "string"
+              },
+              "report" : {
+                "type" : "string"
+              }
+            }
+          },
+          "etag" : {
+            "type" : "string",
+            "example" : ""
+          },
+          "kind" : {
+            "type" : "string",
+            "example" : ""
           }
         }
       }
     }
   }
 }
+
