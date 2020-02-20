@@ -14,7 +14,7 @@ clean:
 
 .PHONY: build
 build:
-	echo build
+	mvn compile
 
 .PHONY: test
 test: test-unit
