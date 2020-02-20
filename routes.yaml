@@ -1,0 +1,5 @@
+app_name: psc-discrepancy-api
+group: api
+weight: 923
+routes:
+  1: ^/internal/psc-discrepancies.*
