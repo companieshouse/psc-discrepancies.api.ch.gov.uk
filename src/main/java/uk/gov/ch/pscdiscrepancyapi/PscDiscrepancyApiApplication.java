@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class PscDiscrepancyApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(PscDiscrepancyApiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(PscDiscrepancyApiApplication.class, args);
+    }
 
 }
