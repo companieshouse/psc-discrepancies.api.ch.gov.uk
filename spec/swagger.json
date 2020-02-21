@@ -93,8 +93,8 @@
               }
             }
           },
-          "409" : {
-            "description" : "an existing report already exists"
+          "400" : {
+            "description" : "Invalid request"
           }
         },
         "requestBody" : {
@@ -310,10 +310,7 @@
             }
           },
           "400" : {
-            "description" : "Bad input parameter"
-          },
-          "409" : {
-            "description" : "An existing item already exists"
+            "description" : "Invalid request"
           }
         },
         "requestBody" : {
