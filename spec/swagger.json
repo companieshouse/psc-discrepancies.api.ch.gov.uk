@@ -291,7 +291,7 @@
           "201" : {
             "description" : "discrepancy created",
             "headers" : {
-              "Location\"" : {
+              "Location" : {
                 "schema" : {
                   "type" : "string",
                   "format" : "uri"
