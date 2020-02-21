@@ -10,9 +10,9 @@
     }
   },
   "servers" : [ {
-    "url" : "https://psc-discrepancy-reports:18553"
+    "url" : "http://api.chs-dev.internal:18553/psc-discrepancy-reports"
   } ],
-"paths" : {
+  "paths" : {
     "/" : {
       "get" : {
         "summary" : "Get PSC Discrepancy Reports",
@@ -489,7 +489,7 @@
             "enum" : [ "INCOMPLETE", "COMPLETE", "INVALID", "SUBMITTED", "DELETED" ],
             "example" : "SUBMITTED"
           },
-          "links": {
+          "links" : {
             "type" : "object",
             "properties" : {
               "self" : {
@@ -513,7 +513,7 @@
             "type" : "string",
             "example" : "Name is incorrect"
           },
-          "links": {
+          "links" : {
             "type" : "object",
             "properties" : {
               "self" : {
@@ -537,4 +537,3 @@
     }
   }
 }
-
