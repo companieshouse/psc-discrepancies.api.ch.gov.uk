@@ -9,7 +9,10 @@
       "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "paths" : {
+  "servers" : [ {
+    "url" : "https://psc-discrepancy-reports:18553"
+  } ],
+"paths" : {
     "/" : {
       "get" : {
         "summary" : "Get PSC Discrepancy Reports",
@@ -442,9 +445,6 @@
       }
     }
   },
-  "servers" : [ {
-    "url" : "https://pscdiscrepancyreports"
-  } ],
   "components" : {
     "requestBodies" : {
       "DiscrepancyReport" : {
@@ -499,7 +499,7 @@
           },
           "etag" : {
             "type" : "string",
-            "example" : ""
+            "example" : "33a64df551425fcc55e4d42a148795d9f25f89d4"
           },
           "kind" : {
             "type" : "string",
@@ -526,7 +526,7 @@
           },
           "etag" : {
             "type" : "string",
-            "example" : ""
+            "example" : "33a64df551425fcc55e4d42a148795d9f25f89d4"
           },
           "kind" : {
             "type" : "string",
