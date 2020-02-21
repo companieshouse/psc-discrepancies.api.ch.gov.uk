@@ -152,7 +152,7 @@
             "description" : "bad input parameter"
           },
           "404" : {
-            "description" : "PSC discrepancy report not found"
+            "description" : "No discrepancy report found with the discrepancy-report-id"
           }
         }
       },
@@ -183,7 +183,10 @@
             }
           },
           "400" : {
-            "description" : "invalid input, object invalid"
+            "description" : "Bad input parameter"
+          },
+          "404" : {
+            "description" : "No discrepancy report found with the discrepancy-report-id"
           }
         },
         "requestBody" : {
@@ -208,7 +211,10 @@
             "description" : "report deleted"
           },
           "400" : {
-            "description" : "invalid input, object invalid"
+            "description" : "Bad input parameter"
+          },
+          "404" : {
+            "description" : "No discrepancy report found with the discrepancy-report-id"
           }
         }
       }
@@ -261,12 +267,15 @@
             }
           },
           "400" : {
-            "description" : "bad input parameter"
+            "description" : "Bad input parameter"
+          },
+          "404" : {
+            "description" : "No discrepancies found for discrepancy report"
           }
         }
       },
       "post" : {
-        "summary" : "create a discrepancy",
+        "summary" : "Create a discrepancy",
         "operationId" : "createDiscrepancy",
         "description" : "Creates a discrepancy for a PSC Discrepancy Report",
         "parameters" : [ {
@@ -301,10 +310,10 @@
             }
           },
           "400" : {
-            "description" : "invalid input, object invalid"
+            "description" : "Bad input parameter"
           },
           "409" : {
-            "description" : "an existing item already exists"
+            "description" : "An existing item already exists"
           }
         },
         "requestBody" : {
@@ -368,7 +377,10 @@
             }
           },
           "400" : {
-            "description" : "bad input parameter"
+            "description" : "Bad input parameter"
+          },
+          "404" : {
+            "description" : "No discrepancy found with the discrepancy-id"
           }
         }
       },
@@ -407,7 +419,10 @@
             }
           },
           "400" : {
-            "description" : "invalid input, object invalid"
+            "description" : "Bad input parameter"
+          },
+          "404" : {
+            "description" : "No discrepancy found with the discrepancy-id"
           }
         },
         "requestBody" : {
@@ -440,7 +455,10 @@
             "description" : "discrepancy deleted"
           },
           "400" : {
-            "description" : "invalid input, object invalid"
+            "description" : "Bad input parameter"
+          },
+          "404" : {
+            "description" : "No discrepancy found with the discrepancy-id"
           }
         }
       }
