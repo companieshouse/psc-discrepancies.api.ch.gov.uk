@@ -10,7 +10,8 @@
     }
   },
   "servers" : [ {
-    "url" : "http://api.chs-dev.internal:18553/psc-discrepancy-reports"
+    "url" : "http://api.chs-dev.internal:18553/psc-discrepancy-reports",
+    "description" : "Development server"
   } ],
   "paths" : {
     "/" : {
