@@ -1,4 +1,4 @@
-artifact_name       := psc-discrepancy-api
+artifact_name       := psc-discrepancies.api.ch.gov.uk
 version             := "unversioned"
 
 .PHONY: all
