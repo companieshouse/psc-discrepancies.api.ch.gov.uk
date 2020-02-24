@@ -1,4 +1,4 @@
-app_name: psc-discrepancy-api
+app_name: psc.discrepancies.api
 group: api
 weight: 923
 routes:
