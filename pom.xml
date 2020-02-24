@@ -10,9 +10,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>uk.gov.ch</groupId>
-    <artifactId>psc-discrepancy-api</artifactId>
+    <artifactId>psc-discrepancies.api.ch.gov.uk</artifactId>
     <version>unversioned</version>
-    <name>psc-discrepancy-api</name>
+    <name>psc-discrepancies.api.ch.gov.uk</name>
     <description>The Companies House API for handling PSC discrepancies</description>
 
     <properties>
