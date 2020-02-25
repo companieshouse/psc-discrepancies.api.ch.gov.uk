@@ -1,4 +1,4 @@
-package uk.gov.ch.pscdiscrepancyapi;
+package uk.gov.ch.pscdiscrepanciesapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

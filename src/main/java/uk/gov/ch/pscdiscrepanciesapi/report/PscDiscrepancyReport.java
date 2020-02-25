@@ -1,29 +1,30 @@
-package uk.gov.ch.pscdiscrepancyapi.report;
+package uk.gov.ch.pscdiscrepanciesapi.report;
 
-import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
-class PscDiscrepancyReportData {
-    @Field("kind")
+class PscDiscrepancyReport {
+
+    @JsonProperty("kind")
     private String kind;
 
-    @Field("etag")
+    @JsonProperty("etag")
     private String etag;
 
-    @Field("obliged_entity_name")
+    @JsonProperty("obliged_entity_name")
     private String obligedEntityName;
 
-    @Field("obliged_entity_email")
+    @JsonProperty("obliged_entity_email")
     private String obligedEntityEmail;
 
-    @Field("company_number")
+    @JsonProperty("company_number")
     private String companyNumber;
 
-    @Field("status")
+    @JsonProperty("status")
     private String status;
 
-    @Field("links")
+    @JsonProperty("links")
     private Map<String, String> links;
 
     public String getKind() {
