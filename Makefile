@@ -27,7 +27,7 @@ test-unit: clean
 
 .PHONY: test-integration
 test-integration: clean
-  mvn -D test=*IntegrationTest test
+	mvn -D test=*IntegrationTest test
 
 .PHONY: package
 package:
