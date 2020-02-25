@@ -9,7 +9,6 @@
         <version>1.3.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>uk.gov.ch</groupId>
     <artifactId>psc-discrepancies.api.ch.gov.uk</artifactId>
     <version>unversioned</version>
     <name>psc-discrepancies.api.ch.gov.uk</name>
@@ -17,10 +16,6 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <sonar-maven-plugin.version>3.4.0.905</sonar-maven-plugin.version>
-        <sonar.host.url>${CODE_ANALYSIS_HOST_URL}</sonar.host.url>
-        <sonar.login>${CODE_ANALYSIS_LOGIN}</sonar.login>
-        <sonar.password>${CODE_ANALYSIS_PASSWORD}</sonar.password>
         <api-helper-java.version>1.1.0-rc1</api-helper-java.version>
     </properties>
 
