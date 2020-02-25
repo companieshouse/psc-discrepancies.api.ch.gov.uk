@@ -14,7 +14,9 @@ clean:
 
 .PHONY: build
 build:
-	mvn compile
+	mvn versions:set -DnewVersion=$(version) -DgenerateBackupPoms=false
+	mvn package -DskipTests=true
+	cp ./target/$(artifact_name)-$(version).jar ./$(artifact_name).jar
 
 .PHONY: test
 test: test-unit
@@ -25,7 +27,7 @@ test-unit: clean
 
 .PHONY: test-integration
 test-integration: clean
-	mvn -D test=*IntegrationTest test
+  mvn -D test=*IntegrationTest test
 
 .PHONY: package
 package:
@@ -39,7 +41,6 @@ endif
 	cp ./start.sh $(tmpdir)
 	cp ./routes.yaml $(tmpdir)
 	cp ./target/$(artifact_name)-$(version).jar $(tmpdir)/$(artifact_name).jar
-	cp ./target/$(artifact_name)-$(version).jar ./$(artifact_name).jar
 	cd $(tmpdir); zip -r ../$(artifact_name)-$(version).zip *
 	rm -rf $(tmpdir)
 
@@ -52,4 +53,4 @@ sonar:
 
 .PHONY: sonar-pr-analysis
 sonar-pr-analysis:
-        mvn sonar:sonar -P sonar-pr-analysis
+	mvn sonar:sonar -P sonar-pr-analysis
