@@ -500,7 +500,7 @@
             "type" : "string",
             "example" : "AB export"
           },
-          "discrepancy-report-status" : {
+          "status" : {
             "type" : "string",
             "enum" : [ "INCOMPLETE", "COMPLETE", "INVALID", "SUBMITTED", "DELETED" ],
             "example" : "SUBMITTED"
