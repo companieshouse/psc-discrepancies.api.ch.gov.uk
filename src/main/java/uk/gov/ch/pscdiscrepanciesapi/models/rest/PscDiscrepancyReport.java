@@ -1,4 +1,4 @@
-package uk.gov.ch.pscdiscrepanciesapi.model;
+package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

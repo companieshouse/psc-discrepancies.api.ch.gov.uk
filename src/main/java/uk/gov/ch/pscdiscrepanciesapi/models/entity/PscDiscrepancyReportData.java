@@ -1,4 +1,4 @@
-package uk.gov.ch.pscdiscrepanciesapi.model;
+package uk.gov.ch.pscdiscrepanciesapi.models.entity;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 

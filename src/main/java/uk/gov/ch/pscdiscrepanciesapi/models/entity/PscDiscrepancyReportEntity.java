@@ -1,5 +1,6 @@
-package uk.gov.ch.pscdiscrepanciesapi.model;
+package uk.gov.ch.pscdiscrepanciesapi.models.entity;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Document(collection = "psc_discrepancy_reports")
 class PscDiscrepancyReportEntity {
+    @Id
     @Field("_id")
     private String id;
 
