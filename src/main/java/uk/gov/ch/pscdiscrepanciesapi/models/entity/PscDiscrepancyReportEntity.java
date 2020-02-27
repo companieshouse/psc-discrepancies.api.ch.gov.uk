@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.time.LocalDateTime;
 
 @Document(collection = "psc_discrepancy_reports")
-class PscDiscrepancyReportEntity {
+public class PscDiscrepancyReportEntity {
     @Id
     @Field("_id")
     private String id;
