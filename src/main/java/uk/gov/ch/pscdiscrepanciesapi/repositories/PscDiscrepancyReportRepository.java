@@ -7,5 +7,5 @@ import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntity;
 
 @Repository
 public interface PscDiscrepancyReportRepository extends MongoRepository<PscDiscrepancyReportEntity, String> {
-    List<PscDiscrepancyReportEntity> findByDataCompanyIncorporationNumber(String companyIncorporationNumber);
+    List<PscDiscrepancyReportEntity> findPscDiscrepancyReportById(String reportId);
 }
