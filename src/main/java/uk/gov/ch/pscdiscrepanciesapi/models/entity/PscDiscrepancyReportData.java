@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Map;
 
-class PscDiscrepancyReportData {
+public class PscDiscrepancyReportData {
     @Field("kind")
     private String kind;
 
