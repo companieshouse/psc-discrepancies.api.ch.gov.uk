@@ -1,4 +1,4 @@
-package uk.gov.ch.pscdiscrepanciesapi.mapper;
+package uk.gov.ch.pscdiscrepanciesapi.mappers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package uk.gov.ch.pscdiscrepanciesapi.mapper;
+package uk.gov.ch.pscdiscrepanciesapi.mappers;
 
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
