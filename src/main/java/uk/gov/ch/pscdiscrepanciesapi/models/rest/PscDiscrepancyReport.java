@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
-class PscDiscrepancyReport {
+public class PscDiscrepancyReport {
 
     @JsonProperty("kind")
     private String kind;
