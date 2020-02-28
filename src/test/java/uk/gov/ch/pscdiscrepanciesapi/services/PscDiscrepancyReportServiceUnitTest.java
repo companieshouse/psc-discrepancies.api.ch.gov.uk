@@ -45,10 +45,13 @@ public class PscDiscrepancyReportServiceUnitTest {
     @Test
     @DisplayName("Test findByPscDiscrepancyReportId is successful")
     void verifyFindByIdSuccessful() {
-        when(mockReportRepo.findById(REPORT_ID)).thenReturn(Optional.of(pscDiscrepancyReportEntity));
-        when(mockReportMapper.entityToRest(pscDiscrepancyReportEntity)).thenReturn(pscDiscrepancyReport);
+        when(mockReportRepo.findById(REPORT_ID))
+                .thenReturn(Optional.of(pscDiscrepancyReportEntity));
+        when(mockReportMapper.entityToRest(pscDiscrepancyReportEntity))
+                .thenReturn(pscDiscrepancyReport);
 
-        PscDiscrepancyReport result = pscDiscrepancyReportService.findPscDiscrepancyReportById(REPORT_ID);
+        PscDiscrepancyReport result =
+                pscDiscrepancyReportService.findPscDiscrepancyReportById(REPORT_ID);
 
         assertNotNull(pscDiscrepancyReport);
         assertEquals(pscDiscrepancyReport, result);
@@ -59,7 +62,8 @@ public class PscDiscrepancyReportServiceUnitTest {
     void verifyFindByIdUnsuccessful() {
         when(mockReportRepo.findById(REPORT_ID)).thenReturn(Optional.empty());
 
-        PscDiscrepancyReport result = pscDiscrepancyReportService.findPscDiscrepancyReportById(REPORT_ID);
+        PscDiscrepancyReport result =
+                pscDiscrepancyReportService.findPscDiscrepancyReportById(REPORT_ID);
 
         assertNull(result);
     }
