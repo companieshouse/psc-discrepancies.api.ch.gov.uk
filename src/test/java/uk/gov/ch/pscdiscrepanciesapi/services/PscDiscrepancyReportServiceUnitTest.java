@@ -53,7 +53,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         PscDiscrepancyReport result =
                 pscDiscrepancyReportService.findPscDiscrepancyReportById(REPORT_ID);
 
-        assertNotNull(pscDiscrepancyReport);
+        assertNotNull(result);
         assertEquals(pscDiscrepancyReport, result);
     }
 
