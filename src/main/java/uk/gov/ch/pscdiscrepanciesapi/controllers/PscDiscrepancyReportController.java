@@ -16,10 +16,14 @@ public class PscDiscrepancyReportController {
     @Autowired
     private PscDiscrepancyReportService pscDiscrepancyReportService;
 
-    @GetMapping("/{psc-discrepancy-report-id}")
+    @GetMapping(value = "/{psc-discrepancy-report-id}")
     public ResponseEntity get(@PathVariable("psc-discrepancy-report-id") String id) {
         PscDiscrepancyReport pscDiscrepancyReport =
                 pscDiscrepancyReportService.findPscDiscrepancyReportById(id);
+
+        if(pscDiscrepancyReport == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok(pscDiscrepancyReport);
     }
