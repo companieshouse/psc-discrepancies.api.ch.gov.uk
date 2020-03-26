@@ -55,36 +55,43 @@ public class PscDiscrepancyService {
      * @return PSC Discrepancy record that was created
      * @throws ServiceException 
      */
-    public ServiceResult<PscDiscrepancy> createPscDiscrepancy(PscDiscrepancy pscDiscrepancy, String pscDiscrepancyReportId, HttpServletRequest request)
-    		throws ServiceException {
+    public ServiceResult<PscDiscrepancy> createPscDiscrepancy(PscDiscrepancy pscDiscrepancy,
+            String pscDiscrepancyReportId, HttpServletRequest request) throws ServiceException {
 
-    	if(pscDiscrepancy.getDetails() == null || pscDiscrepancy.getDetails().isEmpty()) {
-    		Errors errData = new Errors();
-    		Err error = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS).withError(DISCREPANCY_DETAILS + " must not be null").build();
-    		errData.addError(error);
-    		return ServiceResult.invalid(errData);
-    	} else {
-	    	try {
-		        PscDiscrepancyEntity pscDiscrepancyEntity = pscDiscrepancyMapper.restToEntity(pscDiscrepancy);
-		        
-		        String pscDiscrepancyId = UUID.randomUUID().toString(); 
-		        pscDiscrepancyEntity.setId(pscDiscrepancyId); 
-		        pscDiscrepancyEntity.setCreatedAt(LocalDateTime.now());
-		        pscDiscrepancyEntity.getData().setKind(Kind.PSC_DISCREPANCY);
-		        pscDiscrepancyEntity.getData().setEtag(createEtag());
-		        pscDiscrepancyEntity.getData().setLinks(linksForCreation(pscDiscrepancyId, pscDiscrepancyReportId));
-		        
-		        PscDiscrepancyEntity createdPscDiscrepancyEntity = pscDiscrepancyRepository.insert(pscDiscrepancyEntity);
-		        
-		        PscDiscrepancy createdPscDiscrepancy = pscDiscrepancyMapper.entityToRest(createdPscDiscrepancyEntity);
-		        
-		        return ServiceResult.created(createdPscDiscrepancy);
-	    	} catch (MongoException me) {
-	            ServiceException serviceException = new ServiceException("Exception storing PSC discrepancy: ", me);
-	            LOG.errorRequest(request, serviceException, createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy));
-	            throw serviceException;
-	    	}
-    	}
+        if (pscDiscrepancy.getDetails() == null || pscDiscrepancy.getDetails().isEmpty()) {
+            Errors errData = new Errors();
+            Err error = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS)
+                    .withError(DISCREPANCY_DETAILS + " must not be null").build();
+            errData.addError(error);
+            return ServiceResult.invalid(errData);
+        } else {
+            try {
+                PscDiscrepancyEntity pscDiscrepancyEntity =
+                        pscDiscrepancyMapper.restToEntity(pscDiscrepancy);
+
+                String pscDiscrepancyId = UUID.randomUUID().toString();
+                pscDiscrepancyEntity.setId(pscDiscrepancyId);
+                pscDiscrepancyEntity.setCreatedAt(LocalDateTime.now());
+                pscDiscrepancyEntity.getData().setKind(Kind.PSC_DISCREPANCY);
+                pscDiscrepancyEntity.getData().setEtag(createEtag());
+                pscDiscrepancyEntity.getData()
+                        .setLinks(linksForCreation(pscDiscrepancyId, pscDiscrepancyReportId));
+
+                PscDiscrepancyEntity createdPscDiscrepancyEntity =
+                        pscDiscrepancyRepository.insert(pscDiscrepancyEntity);
+
+                PscDiscrepancy createdPscDiscrepancy =
+                        pscDiscrepancyMapper.entityToRest(createdPscDiscrepancyEntity);
+
+                return ServiceResult.created(createdPscDiscrepancy);
+            } catch (MongoException me) {
+                ServiceException serviceException =
+                        new ServiceException("Exception storing PSC discrepancy: ", me);
+                LOG.errorRequest(request, serviceException,
+                        createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy));
+                throw serviceException;
+            }
+        }
     }
     
     private String createEtag() {
@@ -114,7 +121,7 @@ public class PscDiscrepancyService {
     public Map<String,Object> createPscDiscrepancyDebugMap(String pscDiscrepancyReportId, PscDiscrepancy pscDiscrepancy) {
         final Map<String, Object> debugMap = new HashMap<>();
         debugMap.put("discrepancy-report-id", pscDiscrepancyReportId);
-        debugMap.put("details", pscDiscrepancy.getDetails());
+        debugMap.put(DISCREPANCY_DETAILS, pscDiscrepancy.getDetails());
         return debugMap;
     }
 }

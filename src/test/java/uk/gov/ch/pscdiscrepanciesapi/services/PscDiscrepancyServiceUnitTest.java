@@ -63,14 +63,6 @@ public class PscDiscrepancyServiceUnitTest {
     void setUp() {
         pscDiscrepancy = new PscDiscrepancy();
         pscDiscrepancyEntity = new PscDiscrepancyEntity();
-        
-//        pscDiscrepancy.setDetails(DETAILS_DATA);
-//        PscDiscrepancyData pscDiscrepancyData = new PscDiscrepancyData();
-//        pscDiscrepancyData.setDetails(DETAILS_DATA);
-//        pscDiscrepancyEntity.setData(pscDiscrepancyData);
-//
-//        when(linkFactory.createLinkPscDiscrepancy(anyString(), anyString())).thenReturn(SELF_LINK);
-//        when(linkFactory.createLinkPscDiscrepancyReport(REPORT_ID)).thenReturn(PARENT_LINK);
     }
 
     @Test
@@ -100,10 +92,11 @@ public class PscDiscrepancyServiceUnitTest {
     @Test
     @DisplayName("Test createPscDiscrepancy returns an invalid ServiceResult")
     void createPscDiscrepancyReturnsInvalidServiceResult() throws ServiceException {
-        
-    	Errors errData = new Errors();
-		Err error = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS).withError(DISCREPANCY_DETAILS + " must not be null").build();
-		errData.addError(error);
+
+        Errors errData = new Errors();
+        Err error = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS)
+                .withError(DISCREPANCY_DETAILS + " must not be null").build();
+        errData.addError(error);
 
         ServiceResult<PscDiscrepancy> result =
                 pscDiscrepancyService.createPscDiscrepancy(pscDiscrepancy, REPORT_ID, request);
@@ -124,11 +117,11 @@ public class PscDiscrepancyServiceUnitTest {
 
         when(linkFactory.createLinkPscDiscrepancy(anyString(), anyString())).thenReturn(SELF_LINK);
         when(linkFactory.createLinkPscDiscrepancyReport(REPORT_ID)).thenReturn(PARENT_LINK);
-        		
+
         when(mockDiscrepancyRepo.insert(pscDiscrepancyEntity)).thenThrow(new MongoException(""));
         when(mockDiscrepancyMapper.restToEntity(pscDiscrepancy)).thenReturn(pscDiscrepancyEntity);
 
-	    assertThrows(ServiceException.class, () ->
-	    	pscDiscrepancyService.createPscDiscrepancy(pscDiscrepancy, REPORT_ID, request));
+        assertThrows(ServiceException.class, () -> pscDiscrepancyService
+                .createPscDiscrepancy(pscDiscrepancy, REPORT_ID, request));
     }
 }
