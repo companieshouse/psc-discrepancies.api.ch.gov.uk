@@ -1,39 +1,13 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import uk.gov.companieshouse.service.links.Links;
 import uk.gov.companieshouse.service.rest.ApiObjectImpl;
 
 public class PscDiscrepancy extends ApiObjectImpl {
 
-    @JsonProperty("kind")
-    private String kind;
-
-    @JsonProperty("etag")
-    private String etag;
-
     @JsonProperty("details")
     private String details;
-
-    @JsonProperty("links")
-    private Links links;
-
-    public String getKind() {
-        return kind;
-    }
-
-    public void setKind(String kind) {
-        this.kind = kind;
-    }
-
-    public String getEtag() {
-        return etag;
-    }
-
-    public void setEtag(String etag) {
-        this.etag = etag;
-    }
 
     public String getDetails() {
         return details;
@@ -43,11 +17,29 @@ public class PscDiscrepancy extends ApiObjectImpl {
         this.details = details;
     }
 
-    public Links getLinks() {
-        return links;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(details);
+        return result;
     }
 
-    public void setLinks(Links links) {
-        this.links = links;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof PscDiscrepancy)) {
+            return false;
+        }
+        PscDiscrepancy other = (PscDiscrepancy) obj;
+        return Objects.equals(super.getEtag(), other.getEtag())
+                        && Objects.equals(super.getKind(), other.getKind())
+                        && Objects.deepEquals(super.getLinks(), other.getLinks())
+                        && Objects.equals(details, other.details);
     }
 }
