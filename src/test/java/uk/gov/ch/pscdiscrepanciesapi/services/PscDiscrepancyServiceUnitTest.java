@@ -21,7 +21,7 @@ import com.mongodb.MongoException;
 
 import uk.gov.ch.pscdiscrepanciesapi.common.LinkFactory;
 import uk.gov.ch.pscdiscrepanciesapi.mappers.PscDiscrepancyMapper;
-import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyData;
+import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyEntityData;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyEntity;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancy;
 import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyRepository;
@@ -70,7 +70,7 @@ public class PscDiscrepancyServiceUnitTest {
     void createPscDiscrepancySuccessful() throws ServiceException {
         
         pscDiscrepancy.setDetails(DETAILS_DATA);
-        PscDiscrepancyData pscDiscrepancyData = new PscDiscrepancyData();
+        PscDiscrepancyEntityData pscDiscrepancyData = new PscDiscrepancyEntityData();
         pscDiscrepancyData.setDetails(DETAILS_DATA);
         pscDiscrepancyEntity.setData(pscDiscrepancyData);
 
@@ -111,7 +111,7 @@ public class PscDiscrepancyServiceUnitTest {
     void createPscDiscrepancyThrowsServiceException() {
         
         pscDiscrepancy.setDetails(DETAILS_DATA);
-        PscDiscrepancyData pscDiscrepancyData = new PscDiscrepancyData();
+        PscDiscrepancyEntityData pscDiscrepancyData = new PscDiscrepancyEntityData();
         pscDiscrepancyData.setDetails(DETAILS_DATA);
         pscDiscrepancyEntity.setData(pscDiscrepancyData);
 

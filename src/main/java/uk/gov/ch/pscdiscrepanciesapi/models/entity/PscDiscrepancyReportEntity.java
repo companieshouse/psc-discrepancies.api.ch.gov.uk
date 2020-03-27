@@ -19,7 +19,7 @@ public class PscDiscrepancyReportEntity {
     private LocalDateTime updatedAt;
 
     @Field("data")
-    private PscDiscrepancyReportData data;
+    private PscDiscrepancyReportEntityData data;
 
     public String getId() {
         return id;
@@ -45,11 +45,11 @@ public class PscDiscrepancyReportEntity {
         this.updatedAt = updatedAt;
     }
 
-    public PscDiscrepancyReportData getData() {
+    public PscDiscrepancyReportEntityData getData() {
         return data;
     }
 
-    public void setData(PscDiscrepancyReportData data) {
+    public void setData(PscDiscrepancyReportEntityData data) {
         this.data = data;
     }
 }

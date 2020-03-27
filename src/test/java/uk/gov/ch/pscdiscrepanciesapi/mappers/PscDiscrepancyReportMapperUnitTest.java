@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportData;
+import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntityData;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntity;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 
@@ -29,14 +29,14 @@ public class PscDiscrepancyReportMapperUnitTest {
 
     private PscDiscrepancyReport pscDiscrepancyReport;
     private PscDiscrepancyReportEntity pscDiscrepancyReportEntity;
-    private PscDiscrepancyReportData pscDiscrepancyReportData;
+    private PscDiscrepancyReportEntityData pscDiscrepancyReportData;
 
     @BeforeEach
     void setUp() throws Exception {
         pscDiscrepancyReportMapper = Mappers.getMapper(PscDiscrepancyReportMapper.class);
 
         pscDiscrepancyReportEntity = new PscDiscrepancyReportEntity();
-        pscDiscrepancyReportData = new PscDiscrepancyReportData();
+        pscDiscrepancyReportData = new PscDiscrepancyReportEntityData();
         pscDiscrepancyReportData.setKind(KIND);
         pscDiscrepancyReportData.setEtag(ETAG);
         pscDiscrepancyReportData.setObligedEntityName(OBLIGED_ENTITY_NAME);

@@ -12,12 +12,12 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancy;
 @Mapper(componentModel = "spring")
 public interface PscDiscrepancyMapper {
 
-    @Mapping(source = "pscDiscrepancy.data.kind", target = "kind")
-    @Mapping(source = "pscDiscrepancy.data.etag", target = "etag")
-    @Mapping(source = "pscDiscrepancy.data.details", target = "details")
-    @Mapping(source = "pscDiscrepancy.data.links", target = "links")
+    @Mapping(source = "pscDiscrepancyEntity.data.kind", target = "kind")
+    @Mapping(source = "pscDiscrepancyEntity.data.etag", target = "etag")
+    @Mapping(source = "pscDiscrepancyEntity.data.details", target = "details")
+    @Mapping(source = "pscDiscrepancyEntity.data.links", target = "links")
 
-    PscDiscrepancy entityToRest(PscDiscrepancyEntity pscDiscrepancy);
+    PscDiscrepancy entityToRest(PscDiscrepancyEntity pscDiscrepancyEntity);
 
     @InheritInverseConfiguration
     PscDiscrepancyEntity restToEntity(PscDiscrepancy pscDiscrepancy);

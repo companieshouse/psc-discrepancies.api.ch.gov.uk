@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import uk.gov.companieshouse.service.links.Links;
 
-public class PscDiscrepancyData {
+public class PscDiscrepancyEntityData {
     @Field("kind")
     private String kind;
 
