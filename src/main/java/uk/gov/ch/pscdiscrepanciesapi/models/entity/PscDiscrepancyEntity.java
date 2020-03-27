@@ -6,8 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "psc_discrepancy_reports")
-public class PscDiscrepancyReportEntity {
+@Document(collection = "psc_discrepancies")
+public class PscDiscrepancyEntity {
     @Id
     @Field("_id")
     private String id;
@@ -19,7 +19,7 @@ public class PscDiscrepancyReportEntity {
     private LocalDateTime updatedAt;
 
     @Field("data")
-    private PscDiscrepancyReportEntityData data;
+    private PscDiscrepancyEntityData data;
 
     public String getId() {
         return id;
@@ -45,11 +45,11 @@ public class PscDiscrepancyReportEntity {
         this.updatedAt = updatedAt;
     }
 
-    public PscDiscrepancyReportEntityData getData() {
+    public PscDiscrepancyEntityData getData() {
         return data;
     }
 
-    public void setData(PscDiscrepancyReportEntityData data) {
+    public void setData(PscDiscrepancyEntityData data) {
         this.data = data;
     }
 }
