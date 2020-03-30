@@ -2,6 +2,8 @@ package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import uk.gov.companieshouse.service.links.Links;
+
 import java.util.Map;
 
 public class PscDiscrepancyReport {
@@ -25,7 +27,7 @@ public class PscDiscrepancyReport {
     private String status;
 
     @JsonProperty("links")
-    private Map<String, String> links;
+    private Links links;
 
     public String getKind() {
         return kind;
@@ -75,11 +77,12 @@ public class PscDiscrepancyReport {
         this.status = status;
     }
 
-    public Map<String, String> getLinks() {
+    public Links getLinks() {
         return links;
     }
 
-    public void setLinks(Map<String, String> links) {
+    public void setLinks(Links links) {
         this.links = links;
     }
+    
 }
