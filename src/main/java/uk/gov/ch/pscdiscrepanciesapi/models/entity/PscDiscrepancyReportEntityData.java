@@ -1,10 +1,7 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.entity;
 
 import org.springframework.data.mongodb.core.mapping.Field;
-
 import uk.gov.companieshouse.service.links.Links;
-
-import java.util.Map;
 
 public class PscDiscrepancyReportEntityData {
     @Field("kind")

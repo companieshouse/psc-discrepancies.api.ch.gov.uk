@@ -1,12 +1,11 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import uk.gov.companieshouse.service.links.Links;
+import uk.gov.companieshouse.service.rest.ApiObjectImpl;
 
-import java.util.Map;
-
-public class PscDiscrepancyReport {
+public class PscDiscrepancyReport extends ApiObjectImpl {
 
     @JsonProperty("kind")
     private String kind;
@@ -28,22 +27,6 @@ public class PscDiscrepancyReport {
 
     @JsonProperty("links")
     private Links links;
-
-    public String getKind() {
-        return kind;
-    }
-
-    public void setKind(String kind) {
-        this.kind = kind;
-    }
-
-    public String getEtag() {
-        return etag;
-    }
-
-    public void setEtag(String etag) {
-        this.etag = etag;
-    }
 
     public String getObligedEntityName() {
         return obligedEntityName;
@@ -77,12 +60,44 @@ public class PscDiscrepancyReport {
         this.status = status;
     }
 
-    public Links getLinks() {
-        return links;
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((companyNumber == null) ? 0 : companyNumber.hashCode());
+        result = prime * result
+                + ((obligedEntityEmail == null) ? 0 : obligedEntityEmail.hashCode());
+        result = prime * result + ((obligedEntityName == null) ? 0 : obligedEntityName.hashCode());
+        result = prime * result + ((status == null) ? 0 : status.hashCode());
+        return result;
     }
 
-    public void setLinks(Links links) {
-        this.links = links;
-    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof PscDiscrepancyReport)) {
+            return false;
+        }
+        PscDiscrepancyReport other = (PscDiscrepancyReport) obj;
+        
+        return Objects.equals(super.getEtag(), other.getEtag())
+                && Objects.equals(super.getKind(), other.getKind())
+                && Objects.deepEquals(super.getLinks(), other.getLinks())
+                && Objects.equals(companyNumber, other.companyNumber)
+                && Objects.equals(obligedEntityEmail, other.obligedEntityEmail)
+                && Objects.equals(obligedEntityName, other.obligedEntityName)
+                && Objects.equals(status, other.status);
+        }
     
 }
