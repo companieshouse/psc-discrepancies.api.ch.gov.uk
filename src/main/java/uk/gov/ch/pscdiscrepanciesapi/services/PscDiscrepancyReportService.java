@@ -1,8 +1,12 @@
 package uk.gov.ch.pscdiscrepanciesapi.services;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,16 +52,27 @@ public class PscDiscrepancyReportService {
                 .entityToRest(pscDiscrepancyReportEntity)).orElse(null);
     }
     
+    /**
+     * Create a PSC discrepancy report.
+     * 
+     * @param pscDiscrepancyReport Report details to be stored
+     * @param request Http request
+     * 
+     * @return ServiceResult object with created PSC discrepancy report
+     * 
+     * @throws ServiceException
+     */
     public ServiceResult<PscDiscrepancyReport> createPscDiscrepancyReport(
             PscDiscrepancyReport pscDiscrepancyReport, HttpServletRequest request)
             throws ServiceException {
-        if (pscDiscrepancyReport.getObligedEntityEmail() == null
-                || pscDiscrepancyReport.getObligedEntityEmail().isEmpty()) {
-            Errors errData = new Errors();
-            Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
-                    .withError(OBLIGED_ENTITY_EMAIL + " must not be null").build();
-            errData.addError(error);
-            return ServiceResult.invalid(errData);
+        
+        Errors validationErrors = validateEmail(pscDiscrepancyReport.getObligedEntityEmail());
+
+        if (validationErrors.hasErrors()) {
+            Map<String, Object> debugMap = new HashMap<>();
+            debugMap.put("validationErrors", validationErrors);
+            LOG.error("Validation errors", debugMap);
+            return ServiceResult.invalid(validationErrors);
         } else {
             try {
                 PscDiscrepancyReportEntity reportToStore =
@@ -68,7 +83,7 @@ public class PscDiscrepancyReportService {
                 reportToStore.setCreatedAt(LocalDateTime.now());
                 reportToStore.getData().setKind(Kind.PSC_DISCREPANCY_REPORT);
                 reportToStore.getData().setEtag(createEtag());
-                reportToStore.getData().setLinks(linksForCreation("self", pscDiscrepancyReportId));
+                reportToStore.getData().setLinks(linksForCreation(pscDiscrepancyReportId));
 
                 PscDiscrepancyReportEntity storedReport =
                         pscDiscrepancyReportRepository.insert(reportToStore);
@@ -80,23 +95,72 @@ public class PscDiscrepancyReportService {
             } catch (MongoException me) {
                 ServiceException serviceException =
                         new ServiceException("Exception storing PSC discrepancy report: ", me);
+                Map<String, Object> debugMap = new HashMap<>();
+                debugMap.put("validationErrors", validationErrors);
+                LOG.errorRequest(request, serviceException,
+                        createPscDiscrepancyReportDebugMap(pscDiscrepancyReport));
                 throw serviceException;
             }
         }
+    }
+    
+    /**
+     * Validate obliged entity email.
+     * 
+     * @param email Email to validate
+     * 
+     * @return Errors object containing any errors
+     */
+    private Errors validateEmail(String email) {
+        Errors errData = new Errors();
+        Err error = null;
+        if (email == null || email.isEmpty()) {
+            error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
+                .withError(OBLIGED_ENTITY_EMAIL + " must not be null").build();
+            errData.addError(error);
+        } else {
+            String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]+$";
+            
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(email);
+
+            if(!matcher.matches()) {
+                error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
+                    .withError(OBLIGED_ENTITY_EMAIL + " is not in the correct format").build();
+                errData.addError(error);
+            }
+        }
+
+        return errData;
     }
 
     private String createEtag() {
         return GenerateEtagUtil.generateEtag();
     }
     
-    private Links linksForCreation(String self, String pscDiscrepancyReportId) {
-    	
+    private Links linksForCreation(String pscDiscrepancyReportId) {
+    
         Links links = new Links();
 
-        String selfLink = linkFactory.createLinkPscDiscrepancy(self, pscDiscrepancyReportId);
+        String selfLink = linkFactory.createLinkPscDiscrepancyReport(pscDiscrepancyReportId);
         links.setLink(CoreLinkKeys.SELF, selfLink);
 
         return links;
     }
     
+    /**
+     * Create a debug map for structured logging
+     * 
+     * @param pscDiscrepancyReport
+     * 
+     * @return Debug map
+     */
+    public Map<String,Object> createPscDiscrepancyReportDebugMap(PscDiscrepancyReport pscDiscrepancyReport) {
+        final Map<String, Object> debugMap = new HashMap<>();
+        debugMap.put("obliged_entity_name", pscDiscrepancyReport.getObligedEntityName());
+        debugMap.put("obliged_entity_email", pscDiscrepancyReport.getObligedEntityEmail());
+        debugMap.put("company_number", pscDiscrepancyReport.getCompanyNumber());
+        debugMap.put("status", pscDiscrepancyReport.getStatus());
+        return debugMap;
+    }
 }

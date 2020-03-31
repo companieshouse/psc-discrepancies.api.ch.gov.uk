@@ -44,7 +44,7 @@ public class PscDiscrepancyReportController {
                 pscDiscrepancyReportService.findPscDiscrepancyReportById(id);
 
         if(pscDiscrepancyReport == null) {
-        	LOG.info("No PSC discrepancy report found with ID " + id);
+            LOG.info("No PSC discrepancy report found with ID " + id);
             return ResponseEntity.notFound().build();
         }
 
@@ -52,7 +52,7 @@ public class PscDiscrepancyReportController {
     }
     
     @PostMapping
-    public ResponseEntity<ChResponseBody<PscDiscrepancyReport>> post(
+    public ResponseEntity<ChResponseBody<PscDiscrepancyReport>> createPscDiscrepancyReport(
             @Valid @RequestBody PscDiscrepancyReport pscDiscrepancyReport,
             HttpServletRequest request) {
 

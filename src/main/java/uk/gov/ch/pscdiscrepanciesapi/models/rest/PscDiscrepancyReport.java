@@ -2,16 +2,9 @@ package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.gov.companieshouse.service.links.Links;
 import uk.gov.companieshouse.service.rest.ApiObjectImpl;
 
 public class PscDiscrepancyReport extends ApiObjectImpl {
-
-    @JsonProperty("kind")
-    private String kind;
-
-    @JsonProperty("etag")
-    private String etag;
 
     @JsonProperty("obliged_entity_name")
     private String obligedEntityName;
@@ -24,9 +17,6 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
 
     @JsonProperty("status")
     private String status;
-
-    @JsonProperty("links")
-    private Links links;
 
     public String getObligedEntityName() {
         return obligedEntityName;
