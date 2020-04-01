@@ -33,8 +33,8 @@ public class PscDiscrepancyReportService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
 
-	private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
-	
+    private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
+
     @Autowired
     private PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
 
@@ -73,34 +73,34 @@ public class PscDiscrepancyReportService {
             debugMap.put("validationErrors", validationErrors);
             LOG.error("Validation errors", debugMap);
             return ServiceResult.invalid(validationErrors);
-        } else {
-            try {
-                PscDiscrepancyReportEntity reportToStore =
-                        pscDiscrepancyReportMapper.restToEntity(pscDiscrepancyReport);
+        }
 
-                String pscDiscrepancyReportId = UUID.randomUUID().toString();
-                reportToStore.setId(pscDiscrepancyReportId);
-                reportToStore.setCreatedAt(LocalDateTime.now());
-                reportToStore.getData().setKind(Kind.PSC_DISCREPANCY_REPORT);
-                reportToStore.getData().setEtag(createEtag());
-                reportToStore.getData().setLinks(linksForCreation(pscDiscrepancyReportId));
+        try {
+            PscDiscrepancyReportEntity reportToStore =
+                    pscDiscrepancyReportMapper.restToEntity(pscDiscrepancyReport);
 
-                PscDiscrepancyReportEntity storedReport =
-                        pscDiscrepancyReportRepository.insert(reportToStore);
+            String pscDiscrepancyReportId = UUID.randomUUID().toString();
+            reportToStore.setId(pscDiscrepancyReportId);
+            reportToStore.setCreatedAt(LocalDateTime.now());
+            reportToStore.getData().setKind(Kind.PSC_DISCREPANCY_REPORT);
+            reportToStore.getData().setEtag(createEtag());
+            reportToStore.getData().setLinks(linksForCreation(pscDiscrepancyReportId));
 
-                PscDiscrepancyReport reportToReturn =
-                        pscDiscrepancyReportMapper.entityToRest(storedReport);
+            PscDiscrepancyReportEntity storedReport =
+                    pscDiscrepancyReportRepository.insert(reportToStore);
 
-                return ServiceResult.created(reportToReturn);
-            } catch (MongoException me) {
-                ServiceException serviceException =
-                        new ServiceException("Exception storing PSC discrepancy report: ", me);
-                Map<String, Object> debugMap = new HashMap<>();
-                debugMap.put("validationErrors", validationErrors);
-                LOG.errorRequest(request, serviceException,
-                        createPscDiscrepancyReportDebugMap(pscDiscrepancyReport));
-                throw serviceException;
-            }
+            PscDiscrepancyReport reportToReturn =
+                    pscDiscrepancyReportMapper.entityToRest(storedReport);
+
+            return ServiceResult.created(reportToReturn);
+        } catch (MongoException me) {
+            ServiceException serviceException =
+                    new ServiceException("Exception storing PSC discrepancy report: ", me);
+            Map<String, Object> debugMap = new HashMap<>();
+            debugMap.put("validationErrors", validationErrors);
+            LOG.errorRequest(request, serviceException,
+                    createPscDiscrepancyReportDebugMap(pscDiscrepancyReport));
+            throw serviceException;
         }
     }
     

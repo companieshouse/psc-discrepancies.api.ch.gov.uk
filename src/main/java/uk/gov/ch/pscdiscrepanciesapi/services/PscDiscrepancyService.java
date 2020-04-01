@@ -64,33 +64,33 @@ public class PscDiscrepancyService {
                     .withError(DISCREPANCY_DETAILS + " must not be null").build();
             errData.addError(error);
             return ServiceResult.invalid(errData);
-        } else {
-            try {
-                PscDiscrepancyEntity pscDiscrepancyEntity =
-                        pscDiscrepancyMapper.restToEntity(pscDiscrepancy);
+        }
+        
+        try {
+            PscDiscrepancyEntity pscDiscrepancyEntity =
+                    pscDiscrepancyMapper.restToEntity(pscDiscrepancy);
 
-                String pscDiscrepancyId = UUID.randomUUID().toString();
-                pscDiscrepancyEntity.setId(pscDiscrepancyId);
-                pscDiscrepancyEntity.setCreatedAt(LocalDateTime.now());
-                pscDiscrepancyEntity.getData().setKind(Kind.PSC_DISCREPANCY);
-                pscDiscrepancyEntity.getData().setEtag(createEtag());
-                pscDiscrepancyEntity.getData()
-                        .setLinks(linksForCreation(pscDiscrepancyId, pscDiscrepancyReportId));
+            String pscDiscrepancyId = UUID.randomUUID().toString();
+            pscDiscrepancyEntity.setId(pscDiscrepancyId);
+            pscDiscrepancyEntity.setCreatedAt(LocalDateTime.now());
+            pscDiscrepancyEntity.getData().setKind(Kind.PSC_DISCREPANCY);
+            pscDiscrepancyEntity.getData().setEtag(createEtag());
+            pscDiscrepancyEntity.getData()
+                    .setLinks(linksForCreation(pscDiscrepancyId, pscDiscrepancyReportId));
 
-                PscDiscrepancyEntity createdPscDiscrepancyEntity =
-                        pscDiscrepancyRepository.insert(pscDiscrepancyEntity);
+            PscDiscrepancyEntity createdPscDiscrepancyEntity =
+                    pscDiscrepancyRepository.insert(pscDiscrepancyEntity);
 
-                PscDiscrepancy createdPscDiscrepancy =
-                        pscDiscrepancyMapper.entityToRest(createdPscDiscrepancyEntity);
+            PscDiscrepancy createdPscDiscrepancy =
+                    pscDiscrepancyMapper.entityToRest(createdPscDiscrepancyEntity);
 
-                return ServiceResult.created(createdPscDiscrepancy);
-            } catch (MongoException me) {
-                ServiceException serviceException =
-                        new ServiceException("Exception storing PSC discrepancy: ", me);
-                LOG.errorRequest(request, serviceException,
-                        createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy));
-                throw serviceException;
-            }
+            return ServiceResult.created(createdPscDiscrepancy);
+        } catch (MongoException me) {
+            ServiceException serviceException =
+                    new ServiceException("Exception storing PSC discrepancy: ", me);
+            LOG.errorRequest(request, serviceException,
+                    createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy));
+            throw serviceException;
         }
     }
     
@@ -98,6 +98,14 @@ public class PscDiscrepancyService {
         return GenerateEtagUtil.generateEtag();
     }
     
+    /**
+     * Create links for a PSC discrepancy
+     * 
+     * @param pscDiscrepancyId ID of PSC discrepancy
+     * @param pscDiscrepancyReportId ID of PSC discrepancy report
+     * 
+     * @return a Links object containing links to self and parent
+     */
     private Links linksForCreation(String pscDiscrepancyId, String pscDiscrepancyReportId) {
     	
         Links links = new Links();

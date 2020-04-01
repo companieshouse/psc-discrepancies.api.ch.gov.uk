@@ -38,10 +38,10 @@ public class LinkFactory {
     public String createLinkPscDiscrepancy(String pscDiscrepancyId, String pscDiscrepancyReportId) {
         StringBuilder builder = new StringBuilder();
         builder.append(createLinkPscDiscrepancyReport(pscDiscrepancyReportId));
+        builder.append(SLASH);
+        builder.append(PSC_DISCREPANCIES);
         builder.append(SLASH);  
-        builder.append(PSC_DISCREPANCIES);  
-        builder.append(SLASH);  
-        builder.append(pscDiscrepancyId);   
+        builder.append(pscDiscrepancyId);
         return builder.toString();
     }
 }

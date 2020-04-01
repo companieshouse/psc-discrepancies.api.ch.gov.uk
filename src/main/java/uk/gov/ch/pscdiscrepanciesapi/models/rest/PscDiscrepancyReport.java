@@ -82,12 +82,12 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
         PscDiscrepancyReport other = (PscDiscrepancyReport) obj;
         
         return Objects.equals(super.getEtag(), other.getEtag())
-                && Objects.equals(super.getKind(), other.getKind())
-                && Objects.deepEquals(super.getLinks(), other.getLinks())
-                && Objects.equals(companyNumber, other.companyNumber)
-                && Objects.equals(obligedEntityEmail, other.obligedEntityEmail)
-                && Objects.equals(obligedEntityName, other.obligedEntityName)
-                && Objects.equals(status, other.status);
+            && Objects.equals(super.getKind(), other.getKind())
+            && Objects.deepEquals(super.getLinks(), other.getLinks())
+            && Objects.equals(companyNumber, other.companyNumber)
+            && Objects.equals(obligedEntityEmail, other.obligedEntityEmail)
+            && Objects.equals(obligedEntityName, other.obligedEntityName)
+            && Objects.equals(status, other.status);
         }
     
 }

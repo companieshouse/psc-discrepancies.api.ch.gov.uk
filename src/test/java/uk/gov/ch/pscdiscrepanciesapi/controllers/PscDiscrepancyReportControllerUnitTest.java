@@ -87,9 +87,12 @@ public class PscDiscrepancyReportControllerUnitTest {
         pscDiscrepancyReport.setLinks(links);
         ServiceResult<PscDiscrepancyReport> serviceResult = ServiceResult.created(pscDiscrepancyReport);
 
-        when(mockReportService.createPscDiscrepancyReport(any(PscDiscrepancyReport.class), any(HttpServletRequest.class))).thenReturn(serviceResult);
+        when(mockReportService.createPscDiscrepancyReport(any(PscDiscrepancyReport.class),
+                any(HttpServletRequest.class))).thenReturn(serviceResult);
         
-        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response = pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport, request);
+        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response =
+                pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport,
+                        request);
 
         assertNotNull(response);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -110,9 +113,12 @@ public class PscDiscrepancyReportControllerUnitTest {
 
         ServiceResult<PscDiscrepancyReport> serviceResult = ServiceResult.invalid(errData);
 
-        when(mockReportService.createPscDiscrepancyReport(any(PscDiscrepancyReport.class), any(HttpServletRequest.class))).thenReturn(serviceResult);
-        
-        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response = pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport, request);
+        when(mockReportService.createPscDiscrepancyReport(any(PscDiscrepancyReport.class),
+                any(HttpServletRequest.class))).thenReturn(serviceResult);
+
+        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response =
+                pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport,
+                        request);
 
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -134,9 +140,12 @@ public class PscDiscrepancyReportControllerUnitTest {
 
         ServiceResult<PscDiscrepancyReport> serviceResult = ServiceResult.invalid(errData);
 
-        when(mockReportService.createPscDiscrepancyReport(any(PscDiscrepancyReport.class), any(HttpServletRequest.class))).thenReturn(serviceResult);
-        
-        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response = pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport, request);
+        when(mockReportService.createPscDiscrepancyReport(any(PscDiscrepancyReport.class),
+                any(HttpServletRequest.class))).thenReturn(serviceResult);
+
+        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response =
+                pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport,
+                        request);
 
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -147,9 +156,12 @@ public class PscDiscrepancyReportControllerUnitTest {
     @DisplayName("When createPscDiscrepancy throws a ServiceException then an Internal Server Error response is returned.")
     void createPscDiscrepancyThrowsServiceException() throws ServiceException {
 
-        doThrow(ServiceException.class).when(mockReportService).createPscDiscrepancyReport(any(PscDiscrepancyReport.class), any(HttpServletRequest.class));
-        
-        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response = pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport, request);
+        doThrow(ServiceException.class).when(mockReportService).createPscDiscrepancyReport(
+                any(PscDiscrepancyReport.class), any(HttpServletRequest.class));
+
+        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response =
+                pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport,
+                        request);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
