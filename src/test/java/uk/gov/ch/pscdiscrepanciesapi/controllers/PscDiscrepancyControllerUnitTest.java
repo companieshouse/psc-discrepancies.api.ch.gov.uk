@@ -42,32 +42,34 @@ public class PscDiscrepancyControllerUnitTest {
 
     @Mock
     private HttpServletRequest request;
-    
+
     @Mock
     ResponseEntity<ChResponseBody<PscDiscrepancy>> pscDiscrepancytoReturn;
-	
+
     private PscDiscrepancyController pscDiscrepancyController;
 
     @BeforeEach
     void setUp() {
-    	pscDiscrepancy = new PscDiscrepancy();
+        pscDiscrepancy = new PscDiscrepancy();
         PluggableResponseEntityFactory responseFactory = new ResponseEntityFactoriesConfig().createResponseFactory();
-    	pscDiscrepancyController = new PscDiscrepancyController(responseFactory, pscDiscrepancyService);
+        pscDiscrepancyController = new PscDiscrepancyController(responseFactory, pscDiscrepancyService);
     }
 
     @Test
     @DisplayName("When createPscDiscrepancy returns an valid ServiceResult then a Created response is returned with a SuccessBody.")
     void createPscDiscrepancySuccessful() throws ServiceException {
-    	
+
         Links links = new Links();
         links.setLink(CoreLinkKeys.SELF, "/psc-discrepancy-reports/123/discrepancies/456");
         pscDiscrepancy = new PscDiscrepancy();
         pscDiscrepancy.setLinks(links);
-    	ServiceResult<PscDiscrepancy> serviceResult = ServiceResult.created(pscDiscrepancy);
+        ServiceResult<PscDiscrepancy> serviceResult = ServiceResult.created(pscDiscrepancy);
 
-        when(pscDiscrepancyService.createPscDiscrepancy(any(PscDiscrepancy.class), anyString(), any(HttpServletRequest.class))).thenReturn(serviceResult);
-        
-        ResponseEntity<ChResponseBody<PscDiscrepancy>> response = pscDiscrepancyController.createPscDiscrepancy(REPORT_ID, pscDiscrepancy, request);
+        when(pscDiscrepancyService.createPscDiscrepancy(any(PscDiscrepancy.class), anyString(),
+                any(HttpServletRequest.class))).thenReturn(serviceResult);
+
+        ResponseEntity<ChResponseBody<PscDiscrepancy>> response = pscDiscrepancyController
+                .createPscDiscrepancy(REPORT_ID, pscDiscrepancy, request);
 
         assertNotNull(response);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -77,7 +79,7 @@ public class PscDiscrepancyControllerUnitTest {
     @Test
     @DisplayName("When createPscDiscrepancy returns an invalid ServiceResult then a Bad Request response is returned with an ErrorBody.")
     void createPscDiscrepancyReturnsValidationServiceResult() throws ServiceException {
-    	
+
         Links links = new Links();
         links.setLink(CoreLinkKeys.SELF, "/psc-discrepancy-reports/123/discrepancies/456");
         pscDiscrepancy = new PscDiscrepancy();
@@ -87,11 +89,13 @@ public class PscDiscrepancyControllerUnitTest {
                 .withError(DISCREPANCY_DETAILS + " must not be null").build();
         errData.addError(error);
 
-    	ServiceResult<PscDiscrepancy> serviceResult = ServiceResult.invalid(errData);
+        ServiceResult<PscDiscrepancy> serviceResult = ServiceResult.invalid(errData);
 
-        when(pscDiscrepancyService.createPscDiscrepancy(any(PscDiscrepancy.class), anyString(), any(HttpServletRequest.class))).thenReturn(serviceResult);
-        
-        ResponseEntity<ChResponseBody<PscDiscrepancy>> response = pscDiscrepancyController.createPscDiscrepancy(REPORT_ID, pscDiscrepancy, request);
+        when(pscDiscrepancyService.createPscDiscrepancy(any(PscDiscrepancy.class), anyString(),
+                any(HttpServletRequest.class))).thenReturn(serviceResult);
+
+        ResponseEntity<ChResponseBody<PscDiscrepancy>> response = pscDiscrepancyController
+                .createPscDiscrepancy(REPORT_ID, pscDiscrepancy, request);
 
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -102,11 +106,43 @@ public class PscDiscrepancyControllerUnitTest {
     @DisplayName("When createPscDiscrepancy throws a ServiceException then an Internal Server Error response is returned.")
     void createPscDiscrepancyThrowsServiceException() throws ServiceException {
 
-        doThrow(ServiceException.class).when(pscDiscrepancyService).createPscDiscrepancy(any(PscDiscrepancy.class), anyString(), any(HttpServletRequest.class));
-        
-        ResponseEntity<ChResponseBody<PscDiscrepancy>> response = pscDiscrepancyController.createPscDiscrepancy(REPORT_ID, pscDiscrepancy, request);
+        doThrow(ServiceException.class).when(pscDiscrepancyService).createPscDiscrepancy(any(PscDiscrepancy.class),
+                anyString(), any(HttpServletRequest.class));
+
+        ResponseEntity<ChResponseBody<PscDiscrepancy>> response = pscDiscrepancyController
+                .createPscDiscrepancy(REPORT_ID, pscDiscrepancy, request);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
+    }
+    
+    @DisplayName("When getDiscrepancy successfully returns a service response of a discrepancy")
+    void getDiscrepancySuccessful() {
+        
+    }
+    
+    @DisplayName("When getDiscrepancy returns an invalid ServiceResult then a Bad Request is returned with an error body")
+    void getDiscrepancyReturnsValidationServiceResult() {
+        
+    }
+    
+    @DisplayName("When getDiscrepancy throws a ServiceException then an Internal Server Error response is returned")
+    void getDiscrepancyThrowsServiceException() {
+        
+    }
+    
+    @DisplayName("When getDiscrepancies successfully returns a service response of a list of discrepancies")
+    void getDiscrepanciesSuccessful() {
+        
+    }
+    
+    @DisplayName("When getDiscrepancies returns an invalid ServiceResult then a Bad Request is returned with an error body")
+    void getDiscrepanciesReturnValidationServiceResult() {
+        
+    }
+    
+    @DisplayName("When getDiscrepancies throws a ServiceException then an Internal Server Error response is returned")
+    void getDiscrepanciesThrowsServiceException() {
+        
     }
 }

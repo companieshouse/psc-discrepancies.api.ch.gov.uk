@@ -35,64 +35,64 @@ public class PscDiscrepancyController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
 
-	@Autowired
-	public PscDiscrepancyController(PluggableResponseEntityFactory responseFactory,
-			PscDiscrepancyService pscDiscrepancyService) {
-		this.responseFactory = responseFactory;
-		this.pscDiscrepancyService = pscDiscrepancyService;
-	}
+    @Autowired
+    public PscDiscrepancyController(PluggableResponseEntityFactory responseFactory,
+            PscDiscrepancyService pscDiscrepancyService) {
+        this.responseFactory = responseFactory;
+        this.pscDiscrepancyService = pscDiscrepancyService;
+    }
 
-	@PostMapping
-	public ResponseEntity<ChResponseBody<PscDiscrepancy>> createPscDiscrepancy(
-			@PathVariable("discrepancy-report-id") String pscDiscrepancyReportId,
-			@Valid @RequestBody PscDiscrepancy pscDiscrepancy, HttpServletRequest request) {
+    @PostMapping
+    public ResponseEntity<ChResponseBody<PscDiscrepancy>> createPscDiscrepancy(
+            @PathVariable("discrepancy-report-id") String pscDiscrepancyReportId,
+            @Valid @RequestBody PscDiscrepancy pscDiscrepancy, HttpServletRequest request) {
 
-		ResponseEntity<ChResponseBody<PscDiscrepancy>> pscDiscrepancytoReturn;
-		try {
-			LOG.infoContext(pscDiscrepancyReportId, "Create a discrepancy for a PSC discrepancy report",
-					pscDiscrepancyService.createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy));
-			ServiceResult<PscDiscrepancy> pscDiscrepancyResult = pscDiscrepancyService
-					.createPscDiscrepancy(pscDiscrepancy, pscDiscrepancyReportId, request);
-			pscDiscrepancytoReturn = responseFactory.createResponse(pscDiscrepancyResult);
-		} catch (ServiceException e) {
-			final Map<String, Object> debugMap = pscDiscrepancyService
-					.createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy);
-			LOG.errorRequest(request, e, debugMap);
-			// log wrapped cause exception too, as there is a bug in logger that cannot
-			// extract
-			// causes
-			LOG.errorRequest(request, (Exception) e.getCause(), debugMap);
-			pscDiscrepancytoReturn = responseFactory.createEmptyInternalServerError();
-		}
+        ResponseEntity<ChResponseBody<PscDiscrepancy>> pscDiscrepancytoReturn;
+        try {
+            LOG.infoContext(pscDiscrepancyReportId, "Create a discrepancy for a PSC discrepancy report",
+                    pscDiscrepancyService.createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy));
+            ServiceResult<PscDiscrepancy> pscDiscrepancyResult = pscDiscrepancyService
+                    .createPscDiscrepancy(pscDiscrepancy, pscDiscrepancyReportId, request);
+            pscDiscrepancytoReturn = responseFactory.createResponse(pscDiscrepancyResult);
+        } catch (ServiceException e) {
+            final Map<String, Object> debugMap = pscDiscrepancyService
+                    .createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy);
+            LOG.errorRequest(request, e, debugMap);
+            // log wrapped cause exception too, as there is a bug in logger that cannot
+            // extract
+            // causes
+            LOG.errorRequest(request, (Exception) e.getCause(), debugMap);
+            pscDiscrepancytoReturn = responseFactory.createEmptyInternalServerError();
+        }
 
-		return pscDiscrepancytoReturn;
-	}
+        return pscDiscrepancytoReturn;
+    }
 
-	@GetMapping
-	public ResponseEntity<ChResponseBody<PscDiscrepancy>> getDiscrepancy(
-			@PathVariable("discrepancy-report-id") String pscDiscrepancyReportId,
-			@PathVariable("discrepancy-id") String pscDiscrepancyId, HttpServletRequest request) {
-		ResponseEntity<ChResponseBody<PscDiscrepancy>> pscDiscrepancyToReturn;
-		try {
-			ServiceResult<PscDiscrepancy> pscDiscrepancyResult = pscDiscrepancyService.getDiscrepancy(pscDiscrepancyId);
-			pscDiscrepancyToReturn = responseFactory.createResponse(pscDiscrepancyResult);
-		} catch (ServiceException e) {
-			pscDiscrepancyToReturn = responseFactory.createEmptyInternalServerError();
-		}
-		return pscDiscrepancyToReturn;
-	}
+    @GetMapping("/discrepancy-id")
+    public ResponseEntity<ChResponseBody<PscDiscrepancy>> getDiscrepancy(
+            @PathVariable("discrepancy-report-id") String pscDiscrepancyReportId,
+            @PathVariable("discrepancy-id") String pscDiscrepancyId, HttpServletRequest request) {
+        ResponseEntity<ChResponseBody<PscDiscrepancy>> pscDiscrepancyToReturn;
+        try {
+            ServiceResult<PscDiscrepancy> pscDiscrepancyResult = pscDiscrepancyService.getDiscrepancy(pscDiscrepancyId);
+            pscDiscrepancyToReturn = responseFactory.createResponse(pscDiscrepancyResult);
+        } catch (ServiceException e) {
+            pscDiscrepancyToReturn = responseFactory.createEmptyInternalServerError();
+        }
+        return pscDiscrepancyToReturn;
+    }
 
-	@GetMapping
-	public ResponseEntity<ChResponseBody<List<PscDiscrepancy>>> getDiscrepancies(
-			@PathVariable("discrepancy-report-id") String pscDiscrepancyReportId, HttpServletRequest request) {
-		ResponseEntity<ChResponseBody<List<PscDiscrepancy>>> pscDiscrepanciesToReturn;
-		try {
-			ServiceResult<List<PscDiscrepancy>> pscDiscrepancyList = pscDiscrepancyService
-					.getDiscrepancies(pscDiscrepancyReportId);
-			pscDiscrepanciesToReturn = responseFactory.createResponse(pscDiscrepancyList);
-		} catch (ServiceException se) {
-			pscDiscrepanciesToReturn = responseFactory.createEmptyInternalServerError();
-		}
-		return pscDiscrepanciesToReturn;
-	}
+    @GetMapping
+    public ResponseEntity<ChResponseBody<List<PscDiscrepancy>>> getDiscrepancies(
+            @PathVariable("discrepancy-report-id") String pscDiscrepancyReportId, HttpServletRequest request) {
+        ResponseEntity<ChResponseBody<List<PscDiscrepancy>>> pscDiscrepanciesToReturn;
+        try {
+            ServiceResult<List<PscDiscrepancy>> pscDiscrepancyList = pscDiscrepancyService
+                    .getDiscrepancies(pscDiscrepancyReportId);
+            pscDiscrepanciesToReturn = responseFactory.createResponse(pscDiscrepancyList);
+        } catch (ServiceException se) {
+            pscDiscrepanciesToReturn = responseFactory.createEmptyInternalServerError();
+        }
+        return pscDiscrepanciesToReturn;
+    }
 }
