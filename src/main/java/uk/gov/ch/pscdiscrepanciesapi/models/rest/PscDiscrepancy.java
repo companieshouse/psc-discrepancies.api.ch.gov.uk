@@ -38,8 +38,8 @@ public class PscDiscrepancy extends ApiObjectImpl {
         }
         PscDiscrepancy other = (PscDiscrepancy) obj;
         return Objects.equals(super.getEtag(), other.getEtag())
-                        && Objects.equals(super.getKind(), other.getKind())
-                        && Objects.deepEquals(super.getLinks(), other.getLinks())
-                        && Objects.equals(details, other.details);
+            && Objects.equals(super.getKind(), other.getKind())
+            && Objects.deepEquals(super.getLinks(), other.getLinks())
+            && Objects.equals(details, other.details);
     }
 }

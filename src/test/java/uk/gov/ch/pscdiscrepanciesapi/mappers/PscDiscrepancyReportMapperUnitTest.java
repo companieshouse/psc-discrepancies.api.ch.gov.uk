@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntityData;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntity;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
+import uk.gov.companieshouse.service.links.Links;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class PscDiscrepancyReportMapperUnitTest {
     private static final String OBLIGED_ENTITY_NAME = "obligedEntityName";
     private static final String OBLIGED_ENTITY_EMAIL = "obligedEntityEmail";
     private static final String COMPANY_NUMBER = "companyNumber";
-    private static final Map<String, String> LINKS = new HashMap<>();
+    private static final Links LINKS = new Links();
 
     private PscDiscrepancyReport pscDiscrepancyReport;
     private PscDiscrepancyReportEntity pscDiscrepancyReportEntity;

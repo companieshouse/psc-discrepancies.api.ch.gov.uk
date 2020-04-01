@@ -1,8 +1,7 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.entity;
 
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.util.Map;
+import uk.gov.companieshouse.service.links.Links;
 
 public class PscDiscrepancyReportEntityData {
     @Field("kind")
@@ -24,7 +23,7 @@ public class PscDiscrepancyReportEntityData {
     private String status;
 
     @Field("links")
-    private Map<String, String> links;
+    private Links links;
 
     public String getKind() {
         return kind;
@@ -74,11 +73,11 @@ public class PscDiscrepancyReportEntityData {
         this.status = status;
     }
 
-    public Map<String, String> getLinks() {
+    public Links getLinks() {
         return links;
     }
 
-    public void setLinks(Map<String, String> links) {
+    public void setLinks(Links links) {
         this.links = links;
     }
 }
