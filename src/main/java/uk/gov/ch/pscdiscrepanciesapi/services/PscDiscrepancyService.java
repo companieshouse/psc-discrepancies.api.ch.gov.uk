@@ -105,7 +105,7 @@ public class PscDiscrepancyService {
      * @return the PSC Discrepancy which has the matching ID
      * @throws ServiceException
      */
-    public ServiceResult<PscDiscrepancy> getDiscrepancy(String pscDiscrepancyId) throws ServiceException {
+    public ServiceResult<PscDiscrepancy> getDiscrepancy(String pscDiscrepancyReportId, String pscDiscrepancyId, HttpServletRequest request) throws ServiceException {
         if (pscDiscrepancyId == null || pscDiscrepancyId.isEmpty()) {
             return ServiceResult.invalid(createErrors(DISCREPANCY_ID, MUST_NOT_BE_NULL));
         }
@@ -121,6 +121,7 @@ public class PscDiscrepancyService {
             }
         } catch (MongoException me) {
             ServiceException serviceException = new ServiceException("Exception retrieving PSC discrepancy: ", me);
+            LOG.errorRequest(request, serviceException, createDebugMapWithoutDiscrepancyObject(pscDiscrepancyReportId, pscDiscrepancyId));
             throw serviceException;
         }
     }
@@ -132,14 +133,14 @@ public class PscDiscrepancyService {
      * @return the List of PSC Discrepancies
      * @throws ServiceException
      */
-    public ServiceResult<List<PscDiscrepancy>> getDiscrepancies(String pscDiscrepancyReportId) throws ServiceException {
+    public ServiceResult<List<PscDiscrepancy>> getDiscrepancies(String pscDiscrepancyReportId, HttpServletRequest request) throws ServiceException {
         if (pscDiscrepancyReportId == null || pscDiscrepancyReportId.isEmpty()) {
             return ServiceResult.invalid(createErrors(DISCREPANCY_REPORT_ID, MUST_NOT_BE_NULL));
         }
         try {
             List<PscDiscrepancyEntity> storedDiscrepancies = pscDiscrepancyRepository
                     .getDiscrepancies(REPORT_PATH + pscDiscrepancyReportId);
-            if (storedDiscrepancies != null && storedDiscrepancies.size() > 0) {
+            if (storedDiscrepancies != null && !storedDiscrepancies.isEmpty()) {
                 List<PscDiscrepancy> retrievedDiscrepancies = new ArrayList<>();
                 for (PscDiscrepancyEntity pscDiscrepancyEntity : storedDiscrepancies) {
                     retrievedDiscrepancies.add(pscDiscrepancyMapper.entityToRest(pscDiscrepancyEntity));
@@ -150,6 +151,7 @@ public class PscDiscrepancyService {
             }
         } catch (MongoException me) {
             ServiceException serviceException = new ServiceException("Exception retrieving PSC discrepancy: ", me);
+            LOG.errorRequest(request, serviceException, createDebugMapWithoutDiscrepancyObject(pscDiscrepancyReportId, null));
             throw serviceException;
         }
     }
@@ -190,7 +192,7 @@ public class PscDiscrepancyService {
     public Map<String, Object> createPscDiscrepancyDebugMap(String pscDiscrepancyReportId,
             PscDiscrepancy pscDiscrepancy) {
         final Map<String, Object> debugMap = new HashMap<>();
-        debugMap.put("discrepancy-report-id", pscDiscrepancyReportId);
+        debugMap.put(DISCREPANCY_REPORT_ID, pscDiscrepancyReportId);
         debugMap.put(DISCREPANCY_DETAILS, pscDiscrepancy.getDetails());
         return debugMap;
     }

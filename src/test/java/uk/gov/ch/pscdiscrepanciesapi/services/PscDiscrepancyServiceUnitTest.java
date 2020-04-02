@@ -154,7 +154,7 @@ public class PscDiscrepancyServiceUnitTest {
         when(mockDiscrepancyRepo.getDiscrepancies(PARENT_LINK)).thenReturn(pscDiscrepancyEntityList);
         when(mockDiscrepancyMapper.entityToRest(pscDiscrepancyEntityList.get(0))).thenReturn(pscDiscrepancy);
 
-        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies(REPORT_ID);
+        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies(REPORT_ID, request);
 
         assertNotNull(result);
         assertEquals(ServiceResultStatus.FOUND, result.getStatus());
@@ -165,7 +165,7 @@ public class PscDiscrepancyServiceUnitTest {
     @Test
     @DisplayName("Test getDiscrepancies using null report id returns invalid")
     void getDiscrepanciesNullIdReturnsInvalid() throws ServiceException {
-        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies(null);
+        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies(null, request);
 
         Err error = createErrors(REPORT_ID, " must not be null");
 
@@ -177,7 +177,7 @@ public class PscDiscrepancyServiceUnitTest {
     @Test
     @DisplayName("Test getDiscrepancies using empty String report id returns invalid")
     void getDiscrepanciesEmptyReportIdReturnsInvalid() throws ServiceException {
-        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies("");
+        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies("", request);
 
         Err error = createErrors(REPORT_ID, " must not be null");
 
@@ -192,7 +192,7 @@ public class PscDiscrepancyServiceUnitTest {
 
         when(mockDiscrepancyRepo.getDiscrepancies(PARENT_LINK)).thenReturn(null);
 
-        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies(REPORT_ID);
+        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies(REPORT_ID, request);
 
         assertNotNull(result);
         assertEquals(ServiceResultStatus.NOT_FOUND, result.getStatus());
@@ -203,7 +203,7 @@ public class PscDiscrepancyServiceUnitTest {
     void getDiscrepanciesEmptyListReturnsNotFound() throws ServiceException {
         when(mockDiscrepancyRepo.getDiscrepancies(PARENT_LINK)).thenReturn(new ArrayList<PscDiscrepancyEntity>());
 
-        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies(REPORT_ID);
+        ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies(REPORT_ID, request);
 
         assertNotNull(result);
         assertEquals(ServiceResultStatus.NOT_FOUND, result.getStatus());
@@ -213,7 +213,7 @@ public class PscDiscrepancyServiceUnitTest {
     @DisplayName("Test getDiscrepancies repository throws a MongoException which throws a ServiceException")
     void getDiscrepanciesMongoExceptionThrowsServiceException() {
         when(mockDiscrepancyRepo.getDiscrepancies(PARENT_LINK)).thenThrow(new MongoException(""));
-        assertThrows(ServiceException.class, () -> pscDiscrepancyService.getDiscrepancies(REPORT_ID));
+        assertThrows(ServiceException.class, () -> pscDiscrepancyService.getDiscrepancies(REPORT_ID, request));
 
     }
 
@@ -227,7 +227,7 @@ public class PscDiscrepancyServiceUnitTest {
         when(mockDiscrepancyRepo.findById(DISCREPANCY_ID)).thenReturn(optionalEntity);
         when(mockDiscrepancyMapper.entityToRest(pscDiscrepancyEntity)).thenReturn(pscDiscrepancy);
 
-        ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.getDiscrepancy(DISCREPANCY_ID);
+        ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.getDiscrepancy(REPORT_ID, DISCREPANCY_ID, request);
 
         assertNotNull(result);
         assertEquals(ServiceResultStatus.FOUND, result.getStatus());
@@ -237,7 +237,7 @@ public class PscDiscrepancyServiceUnitTest {
     @Test
     @DisplayName("Test getDiscrepancy using null discrepancy id returns invalid")
     void getDiscrepancyNullIdReturnsInvalid() throws ServiceException {
-        ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.getDiscrepancy(null);
+        ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.getDiscrepancy(REPORT_ID, null, request);
 
         Err error = createErrors(DISCREPANCY_ID, " must not be null");
 
@@ -249,7 +249,7 @@ public class PscDiscrepancyServiceUnitTest {
     @Test
     @DisplayName("Test getDiscrepancy using empty String discrepancy id returns invalid")
     void getDiscrepancyEmptyReportIdReturnsInvalid() throws ServiceException {
-        ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.getDiscrepancy("");
+        ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.getDiscrepancy(REPORT_ID, "", request);
 
         Err error = createErrors(DISCREPANCY_ID, " must not be null");
 
@@ -263,7 +263,7 @@ public class PscDiscrepancyServiceUnitTest {
     void getDiscrepancyNullListReturnsNotFound() throws ServiceException {
         when(mockDiscrepancyRepo.findById(DISCREPANCY_ID)).thenReturn(null);
 
-        ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.getDiscrepancy(DISCREPANCY_ID);
+        ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.getDiscrepancy(REPORT_ID, DISCREPANCY_ID, request);
 
         assertNotNull(result);
         assertEquals(ServiceResultStatus.NOT_FOUND, result.getStatus());
@@ -273,7 +273,7 @@ public class PscDiscrepancyServiceUnitTest {
     @DisplayName("Test getDiscrepancy repository throws a MongoException which throws a ServiceException")
     void getDiscrepancyMongoExceptionThrowsServiceException() {
         when(mockDiscrepancyRepo.findById(DISCREPANCY_ID)).thenThrow(new MongoException(""));
-        assertThrows(ServiceException.class, () -> pscDiscrepancyService.getDiscrepancy(DISCREPANCY_ID));
+        assertThrows(ServiceException.class, () -> pscDiscrepancyService.getDiscrepancy(REPORT_ID, DISCREPANCY_ID, request));
     }
 
     @Test
@@ -281,8 +281,8 @@ public class PscDiscrepancyServiceUnitTest {
     void createDebugMapWithoutDiscrepancyObjectReturnsMap() {
         Map<String, Object> returnedMap = pscDiscrepancyService.createDebugMapWithoutDiscrepancyObject("123", "456");
         assertTrue(returnedMap.size() == 2);
-        assertEquals(returnedMap.get(REPORT_ID), "123");
-        assertEquals(returnedMap.get(DISCREPANCY_ID), "456");
+        assertEquals("123", returnedMap.get(REPORT_ID));
+        assertEquals("456", returnedMap.get(DISCREPANCY_ID));
 
     }
 
@@ -291,7 +291,7 @@ public class PscDiscrepancyServiceUnitTest {
     void createDebugMapWithoutDiscrepancyObjectWithNullDiscrepancyDetailsId() {
         Map<String, Object> returnedMap = pscDiscrepancyService.createDebugMapWithoutDiscrepancyObject("123", null);
         assertTrue(returnedMap.size() == 1);
-        assertEquals(returnedMap.get(REPORT_ID), "123");
+        assertEquals("123", returnedMap.get(REPORT_ID));
     }
 
     private PscDiscrepancy createTestDiscrepancy(String details, String etag, String kind) {

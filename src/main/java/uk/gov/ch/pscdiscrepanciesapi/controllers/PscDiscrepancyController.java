@@ -8,9 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -74,10 +72,12 @@ public class PscDiscrepancyController {
             @PathVariable("discrepancy-report-id") String pscDiscrepancyReportId,
             @PathVariable("discrepancy-id") String pscDiscrepancyId, HttpServletRequest request) {
         ResponseEntity<ChResponseBody<PscDiscrepancy>> pscDiscrepancyToReturn;
-        Map<String, Object> debugMap = pscDiscrepancyService.createDebugMapWithoutDiscrepancyObject(pscDiscrepancyReportId, pscDiscrepancyId);
+        Map<String, Object> debugMap = 
+                pscDiscrepancyService.createDebugMapWithoutDiscrepancyObject(pscDiscrepancyReportId, pscDiscrepancyId);
         try {
             LOG.info("Retrieving discrepancy for discrepancy report", debugMap);
-            ServiceResult<PscDiscrepancy> pscDiscrepancyResult = pscDiscrepancyService.getDiscrepancy(pscDiscrepancyId);
+            ServiceResult<PscDiscrepancy> pscDiscrepancyResult = 
+                    pscDiscrepancyService.getDiscrepancy(pscDiscrepancyReportId, pscDiscrepancyId, request);
             pscDiscrepancyToReturn = responseFactory.createResponse(pscDiscrepancyResult);
         } catch (ServiceException e) {
             LOG.error("Error retrieving discrepancy for report", debugMap);
@@ -95,7 +95,7 @@ public class PscDiscrepancyController {
         try {
             LOG.info("Retrieving all discrepancies for discrepancy report", debugMap);
             ServiceResult<List<PscDiscrepancy>> pscDiscrepancyList = pscDiscrepancyService
-                    .getDiscrepancies(pscDiscrepancyReportId);
+                    .getDiscrepancies(pscDiscrepancyReportId, request);
             pscDiscrepanciesToReturn = responseFactory.createResponse(pscDiscrepancyList);
         } catch (ServiceException se) {
             LOG.error("Error retrieving all discrepancies for report", debugMap);
