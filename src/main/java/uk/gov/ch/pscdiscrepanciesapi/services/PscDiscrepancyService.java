@@ -55,7 +55,7 @@ public class PscDiscrepancyService {
     /**
      * Create a PSC Discrepancy record.
      * 
-     * @param pscDiscrepancy         PSC Discrepancy from UI
+     * @param pscDiscrepancy PSC Discrepancy from UI
      * @param pscDiscrepancyReportId
      * @param request
      * 
@@ -195,6 +195,12 @@ public class PscDiscrepancyService {
         return debugMap;
     }
     
+    /**
+     * Create a debug map for structured logging when there is no PscDiscrepancy object
+     * @param pscDiscrepancyReportId the id of the psc discrepancy report
+     * @param pscDiscrepancyId the id of the psc discrepancy details
+     * @return
+     */
     public Map<String, Object> createDebugMapWithoutDiscrepancyObject(String pscDiscrepancyReportId, String pscDiscrepancyId){
         final Map<String, Object> debugMap = new HashMap<>();
         debugMap.put(DISCREPANCY_REPORT_ID, pscDiscrepancyReportId);

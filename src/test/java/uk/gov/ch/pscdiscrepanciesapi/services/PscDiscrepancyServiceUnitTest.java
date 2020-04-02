@@ -115,12 +115,12 @@ public class PscDiscrepancyServiceUnitTest {
                 .withError(DISCREPANCY_DETAILS + " must not be null").build();
         errData.addError(error);
 
-        ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.createPscDiscrepancy(pscDiscrepancy, REPORT_ID,
-                request);
+        ServiceResult<PscDiscrepancy> result = 
+                pscDiscrepancyService.createPscDiscrepancy(pscDiscrepancy, REPORT_ID, request);
 
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
-        assertTrue(result.getErrors().containsError(error));
+        assertTrue(result.getErrors().containsError(error)); s
     }
 
     @Test
@@ -275,7 +275,7 @@ public class PscDiscrepancyServiceUnitTest {
         when(mockDiscrepancyRepo.findById(DISCREPANCY_ID)).thenThrow(new MongoException(""));
         assertThrows(ServiceException.class, () -> pscDiscrepancyService.getDiscrepancy(DISCREPANCY_ID));
     }
-    
+
     @Test
     @DisplayName("Test createDebugMapWithoutDiscrepancyObject returns a Map with discrepancy report id and discrepancy id entries")
     void createDebugMapWithoutDiscrepancyObjectReturnsMap() {
@@ -283,9 +283,9 @@ public class PscDiscrepancyServiceUnitTest {
         assertTrue(returnedMap.size() == 2);
         assertEquals(returnedMap.get(REPORT_ID), "123");
         assertEquals(returnedMap.get(DISCREPANCY_ID), "456");
-        
+
     }
-    
+
     @Test
     @DisplayName("Test createDebugMapWithoutDiscrepancyObject returns a Map with discrepancy report id entry")
     void createDebugMapWithoutDiscrepancyObjectWithNullDiscrepancyDetailsId() {
