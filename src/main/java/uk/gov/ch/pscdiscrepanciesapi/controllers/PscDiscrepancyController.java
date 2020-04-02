@@ -8,10 +8,11 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
@@ -41,7 +42,7 @@ public class PscDiscrepancyController {
         this.pscDiscrepancyService = pscDiscrepancyService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ResponseEntity<ChResponseBody<PscDiscrepancy>> createPscDiscrepancy(
             @PathVariable("discrepancy-report-id") String pscDiscrepancyReportId,
             @Valid @RequestBody PscDiscrepancy pscDiscrepancy, HttpServletRequest request) {
@@ -67,7 +68,7 @@ public class PscDiscrepancyController {
         return pscDiscrepancytoReturn;
     }
 
-    @RequestMapping(value= {"/{discrepancy-id}"}, method = RequestMethod.GET)
+    @GetMapping("/{discrepancy-id}")
     public ResponseEntity<ChResponseBody<PscDiscrepancy>> getDiscrepancy(
             @PathVariable("discrepancy-report-id") String pscDiscrepancyReportId,
             @PathVariable("discrepancy-id") String pscDiscrepancyId, HttpServletRequest request) {
@@ -87,7 +88,7 @@ public class PscDiscrepancyController {
         return pscDiscrepancyToReturn;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<ChResponseBody<List<PscDiscrepancy>>> getDiscrepancies(
             @PathVariable("discrepancy-report-id") String pscDiscrepancyReportId, HttpServletRequest request) {
         ResponseEntity<ChResponseBody<List<PscDiscrepancy>>> pscDiscrepanciesToReturn;
