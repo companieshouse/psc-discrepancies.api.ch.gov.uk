@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,6 +64,25 @@ public class PscDiscrepancyReportController {
                             request);
             pscDiscrepancyReportToReturn =
                     responseFactory.createResponse(pscDiscrepancyReportResult);
+        } catch (ServiceException e) {
+            pscDiscrepancyReportToReturn = responseFactory.createEmptyInternalServerError();
+        }
+
+        return pscDiscrepancyReportToReturn;
+    }
+
+    @PutMapping
+    public ResponseEntity<ChResponseBody<PscDiscrepancyReport>> updatePscDiscrepancy(
+                    @PathVariable("discrepancy-report-id") String pscDiscrepancyReportId,
+                    @Valid @RequestBody PscDiscrepancyReport pscDiscrepancyReport, HttpServletRequest request) {
+
+        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> pscDiscrepancyReportToReturn;
+        try {
+            ServiceResult<PscDiscrepancyReport> pscDiscrepancyReportResult =
+                            pscDiscrepancyReportService.updatePscDiscrepancyReport(pscDiscrepancyReportId, pscDiscrepancyReport,
+                                            request);
+            pscDiscrepancyReportToReturn =
+                            responseFactory.createResponse(pscDiscrepancyReportResult);
         } catch (ServiceException e) {
             pscDiscrepancyReportToReturn = responseFactory.createEmptyInternalServerError();
         }
