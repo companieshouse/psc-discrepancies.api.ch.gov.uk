@@ -194,6 +194,15 @@ public class PscDiscrepancyService {
         debugMap.put(DISCREPANCY_DETAILS, pscDiscrepancy.getDetails());
         return debugMap;
     }
+    
+    public Map<String, Object> createDebugMapWithoutDiscrepancyObject(String pscDiscrepancyReportId, String pscDiscrepancyId){
+        final Map<String, Object> debugMap = new HashMap<>();
+        debugMap.put(DISCREPANCY_REPORT_ID, pscDiscrepancyReportId);
+        if(pscDiscrepancyId != null) {
+            debugMap.put(DISCREPANCY_ID, pscDiscrepancyId);
+        }
+        return debugMap;
+    }
 
     /**
      * Create an error object

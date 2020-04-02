@@ -275,6 +275,24 @@ public class PscDiscrepancyServiceUnitTest {
         when(mockDiscrepancyRepo.findById(DISCREPANCY_ID)).thenThrow(new MongoException(""));
         assertThrows(ServiceException.class, () -> pscDiscrepancyService.getDiscrepancy(DISCREPANCY_ID));
     }
+    
+    @Test
+    @DisplayName("Test createDebugMapWithoutDiscrepancyObject returns a Map with discrepancy report id and discrepancy id entries")
+    void createDebugMapWithoutDiscrepancyObjectReturnsMap() {
+        Map<String, Object> returnedMap = pscDiscrepancyService.createDebugMapWithoutDiscrepancyObject("123", "456");
+        assertTrue(returnedMap.size() == 2);
+        assertEquals(returnedMap.get(REPORT_ID), "123");
+        assertEquals(returnedMap.get(DISCREPANCY_ID), "456");
+        
+    }
+    
+    @Test
+    @DisplayName("Test createDebugMapWithoutDiscrepancyObject returns a Map with discrepancy report id entry")
+    void createDebugMapWithoutDiscrepancyObjectWithNullDiscrepancyDetailsId() {
+        Map<String, Object> returnedMap = pscDiscrepancyService.createDebugMapWithoutDiscrepancyObject("123", null);
+        assertTrue(returnedMap.size() == 1);
+        assertEquals(returnedMap.get(REPORT_ID), "123");
+    }
 
     private PscDiscrepancy createTestDiscrepancy(String details, String etag, String kind) {
         PscDiscrepancy pscDiscrepancy = new PscDiscrepancy();
