@@ -40,7 +40,7 @@ public class LinkFactory {
         builder.append(createLinkPscDiscrepancyReport(pscDiscrepancyReportId));
         builder.append(SLASH);
         builder.append(PSC_DISCREPANCIES);
-        builder.append(SLASH);
+        builder.append(SLASH);  
         builder.append(pscDiscrepancyId);
         return builder.toString();
     }

@@ -34,6 +34,7 @@ public class PscDiscrepancyControllerUnitTest {
 
     private static final String REPORT_ID = "reportId";
     private static final String DISCREPANCY_DETAILS = "details";
+    private static final String SELF_LINK = "/psc-discrepancy-reports/123/discrepancies/456";
 
     private PscDiscrepancy pscDiscrepancy;
 
@@ -60,8 +61,7 @@ public class PscDiscrepancyControllerUnitTest {
     void createPscDiscrepancySuccessful() throws ServiceException {
 
         Links links = new Links();
-        links.setLink(CoreLinkKeys.SELF, "/psc-discrepancy-reports/123/discrepancies/456");
-        pscDiscrepancy = new PscDiscrepancy();
+        links.setLink(CoreLinkKeys.SELF, SELF_LINK);
         pscDiscrepancy.setLinks(links);
         ServiceResult<PscDiscrepancy> serviceResult = ServiceResult.created(pscDiscrepancy);
 
@@ -81,8 +81,7 @@ public class PscDiscrepancyControllerUnitTest {
     void createPscDiscrepancyReturnsValidationServiceResult() throws ServiceException {
 
         Links links = new Links();
-        links.setLink(CoreLinkKeys.SELF, "/psc-discrepancy-reports/123/discrepancies/456");
-        pscDiscrepancy = new PscDiscrepancy();
+        links.setLink(CoreLinkKeys.SELF, SELF_LINK);
         pscDiscrepancy.setLinks(links);
         Errors errData = new Errors();
         Err error = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS)
