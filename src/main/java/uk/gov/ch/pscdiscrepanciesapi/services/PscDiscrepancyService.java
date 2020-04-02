@@ -111,7 +111,7 @@ public class PscDiscrepancyService {
         }
         try {
             Optional<PscDiscrepancyEntity> storedDiscrepancy = pscDiscrepancyRepository.findById(pscDiscrepancyId);
-            if (storedDiscrepancy != null) {
+            if (storedDiscrepancy.isPresent()) {
                 PscDiscrepancy pscDiscrepancy = storedDiscrepancy
                         .map(pscDiscrepancyEntity -> pscDiscrepancyMapper.entityToRest(pscDiscrepancyEntity))
                         .orElse(null);
