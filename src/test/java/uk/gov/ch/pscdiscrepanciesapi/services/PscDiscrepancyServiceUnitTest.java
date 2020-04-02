@@ -259,9 +259,10 @@ public class PscDiscrepancyServiceUnitTest {
     }
 
     @Test
-    @DisplayName("Test getDiscrepancy repository returns null should return not found")
+    @DisplayName("Test getDiscrepancy repository returns nno discrepancy should return not found")
     void getDiscrepancyNullListReturnsNotFound() throws ServiceException {
-        when(mockDiscrepancyRepo.findById(DISCREPANCY_ID)).thenReturn(null);
+        Optional<PscDiscrepancyEntity> optionalEntity = Optional.empty();
+        when(mockDiscrepancyRepo.findById(DISCREPANCY_ID)).thenReturn(optionalEntity);
 
         ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.getDiscrepancy(REPORT_ID, DISCREPANCY_ID, request);
 
