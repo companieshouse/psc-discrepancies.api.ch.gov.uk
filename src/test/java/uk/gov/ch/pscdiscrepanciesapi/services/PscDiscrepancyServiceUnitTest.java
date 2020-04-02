@@ -120,7 +120,7 @@ public class PscDiscrepancyServiceUnitTest {
 
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
-        assertTrue(result.getErrors().containsError(error)); s
+        assertTrue(result.getErrors().containsError(error));
     }
 
     @Test
