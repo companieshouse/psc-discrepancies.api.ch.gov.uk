@@ -104,6 +104,16 @@ public class PscDiscrepancyReportService {
         }
     }
     
+    /*
+     * 
+     * validate whole object and store it
+     * if status == complete then invoke onStatusComplete() 
+     * 
+     * 
+     * 
+     * 
+     */
+    
     /**
      * Validate obliged entity email.
      * 
