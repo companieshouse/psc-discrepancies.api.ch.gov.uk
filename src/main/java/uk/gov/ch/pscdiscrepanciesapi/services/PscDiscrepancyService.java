@@ -41,7 +41,7 @@ public class PscDiscrepancyService {
     private static final String DISCREPANCY_DETAILS = "details";
     private static final String DISCREPANCY_ID = "discrepancy-id";
     private static final String DISCREPANCY_REPORT_ID = "discrepancy-report-id";
-    private static final String REPORT_PATH = "/psc-discrepancy-reports/";
+    private static final String REPORT_URI = "/psc-discrepancy-reports/";
 
     @Autowired
     private PscDiscrepancyRepository pscDiscrepancyRepository;
@@ -139,7 +139,7 @@ public class PscDiscrepancyService {
         }
         try {
             List<PscDiscrepancyEntity> storedDiscrepancies = pscDiscrepancyRepository
-                    .getDiscrepancies(REPORT_PATH + pscDiscrepancyReportId);
+                    .getDiscrepancies(REPORT_URI + pscDiscrepancyReportId);
             if (storedDiscrepancies != null && !storedDiscrepancies.isEmpty()) {
                 List<PscDiscrepancy> retrievedDiscrepancies = new ArrayList<>();
                 for (PscDiscrepancyEntity pscDiscrepancyEntity : storedDiscrepancies) {
