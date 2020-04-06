@@ -10,37 +10,41 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.json.JsonSanitizer;
 
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscSubmission;
+import uk.gov.companieshouse.environment.EnvironmentReader;
+import uk.gov.companieshouse.environment.impl.EnvironmentReaderImpl;
+import uk.gov.companieshouse.service.ServiceException;
 
 /**
  * Listens for the creation of a PscDiscrepancySurvey, converts it to JSON, and sends by HTTP POST
  * it to the supplied URL.
  *
  */
+@Service
 public class PscSubmissionSender {
-
+    
+    private static final String CHIPS_REST_INTERFACE_ENDPOINT = "CHIPS_REST_INTERFACE_ENDPOINT";
     private static final Logger LOG = LogManager.getLogger(PscSubmissionSender.class);
-    private final CloseableHttpClient client;
+    
     private final String postUrl;
-    private final ObjectMapper objectMapper;
-    private final String requestId;
-
-    public PscSubmissionSender(CloseableHttpClient client, String postUrl,
-                    ObjectMapper objectMapper, String requestId) {
-        this.client = client;
-        this.postUrl = postUrl;
-        this.objectMapper = objectMapper;
-        this.requestId = requestId;
+    
+    public PscSubmissionSender() {
+        this(new EnvironmentReaderImpl());
+    }
+    
+    public PscSubmissionSender(EnvironmentReader environmentReader) {
+        this.postUrl = environmentReader.getMandatoryString(CHIPS_REST_INTERFACE_ENDPOINT);
     }
 
-    public boolean created(PscSubmission submission) {
+    public void send(PscSubmission submission,CloseableHttpClient client,ObjectMapper objectMapper,String requestId) throws ServiceException {
         try {
-            //TODO getRequestId to set in here 
-            //submission.setRequestId(requestId);
+            submission.setRequestId(requestId);
             String discrepancyJson = objectMapper.writeValueAsString(submission);
             String sanitisedJson = JsonSanitizer.sanitize(discrepancyJson);
             StringEntity entity = new StringEntity(sanitisedJson);
@@ -50,19 +54,21 @@ public class PscSubmissionSender {
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
             try (CloseableHttpResponse response = client.execute(httpPost)) {
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
+                    //TODO: Use structured Logging 
                     LOG.info("Successfully sent JSON");
-                    return true;
                 } else {
+                    //TODO: Use structured Logging 
                     LOG.error("Failed to send JSON: {}", response);
-                    return false;
                 }
             }
         } catch (JsonProcessingException e) {
+            //TODO: Use structured Logging 
             LOG.error("Error serialising to JSON: ", e);
-            return false;
+            throw new ServiceException("Error serialising to JSON", e);
         } catch (IOException e) {
+            //TODO: Use structured Logging 
             LOG.error("Error serialising to JSON or sending payload: ", e);
-            return false;
+            throw new ServiceException("Error serialising to JSON or sending payload", e);
         }
     }
 }

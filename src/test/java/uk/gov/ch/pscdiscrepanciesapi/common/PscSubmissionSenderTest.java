@@ -31,6 +31,8 @@ import org.mockito.quality.Strictness;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscSubmission;
+import uk.gov.companieshouse.environment.EnvironmentReader;
+import uk.gov.companieshouse.service.ServiceException;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -46,6 +48,8 @@ public class PscSubmissionSenderTest {
     private StatusLine statusLine;
     @Mock
     private CloseableHttpClient client;
+    @Mock
+    private EnvironmentReader environmentReader;
     
     private PscSubmissionSender submissionSender;
     @Captor
@@ -56,19 +60,21 @@ public class PscSubmissionSenderTest {
 
     @BeforeEach
     public void setUp() {
-        submissionSender = new PscSubmissionSender(client, REST_API,
-                        objectMapper, CORRELATION_ID);
+        submissionSender = new PscSubmissionSender(environmentReader);
         submission = new PscSubmission();
+        when(environmentReader.getMandatoryString(null)).thenReturn(REST_API);
+        //add argCaptor to here to capture environment reader before each test 
+        //when environmentReader is invoked, return test URL 
     }
 
     @Test
-    public void testJsonSentSuccessfully() throws ClientProtocolException, IOException {
+    public void testJsonSentSuccessfully() throws ClientProtocolException, IOException, ServiceException {
         when(objectMapper.writeValueAsString(submission)).thenReturn("\"jsonSuccessful\"");
         when(client.execute(any(HttpPost.class))).thenReturn(response);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
-
-        assertTrue(submissionSender.created(submission));
+        submissionSender.send(submission, client, objectMapper, CORRELATION_ID);
+        //assertTrue(submissionSender.send(submission, client, objectMapper, null));
 
         verify(client).execute(argCaptor.capture());
 
