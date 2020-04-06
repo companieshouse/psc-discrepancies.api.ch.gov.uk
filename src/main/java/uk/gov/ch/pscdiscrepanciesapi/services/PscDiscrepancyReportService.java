@@ -36,14 +36,19 @@ public class PscDiscrepancyReportService {
 
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
 
-    @Autowired
-    private PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
+    private final PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
 
-    @Autowired
-    private PscDiscrepancyReportMapper pscDiscrepancyReportMapper;
-    
-    @Autowired
-    private LinkFactory linkFactory;
+    private final PscDiscrepancyReportMapper pscDiscrepancyReportMapper;
+
+    private final LinkFactory linkFactory;
+
+    public PscDiscrepancyReportService(@Autowired PscDiscrepancyReportRepository pscDiscrepancyReportRepository,
+                     @Autowired PscDiscrepancyReportMapper pscDiscrepancyReportMapper,
+                     @Autowired LinkFactory linkFactory) {
+                        this.pscDiscrepancyReportRepository = pscDiscrepancyReportRepository;
+                        this.pscDiscrepancyReportMapper = pscDiscrepancyReportMapper;
+                        this.linkFactory = linkFactory;
+    }
 
     public PscDiscrepancyReport findPscDiscrepancyReportById(String reportId) {
         Optional<PscDiscrepancyReportEntity> storedReport =

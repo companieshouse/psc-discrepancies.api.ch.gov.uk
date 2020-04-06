@@ -51,15 +51,15 @@ public class PscDiscrepancyReportServiceUnitTest {
     private HttpServletRequest request;
     
     @Mock
-    private LinkFactory linkFactory;
+    private LinkFactory mockLinkFactory;
 
-    @InjectMocks
     private PscDiscrepancyReportService pscDiscrepancyReportService;
 
     @BeforeEach
     void setUp() {
         pscDiscrepancyReport = new PscDiscrepancyReport();
         pscDiscrepancyReportEntity = new PscDiscrepancyReportEntity();
+        pscDiscrepancyReportService = new PscDiscrepancyReportService(mockReportRepo, mockReportMapper, mockLinkFactory);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         pscDiscrepancyReportData.setObligedEntityEmail(VALID_EMAIL);
         pscDiscrepancyReportEntity.setData(pscDiscrepancyReportData);
 
-        when(linkFactory.createLinkPscDiscrepancyReport(anyString())).thenReturn(SELF_LINK);
+        when(mockLinkFactory.createLinkPscDiscrepancyReport(anyString())).thenReturn(SELF_LINK);
                 
         when(mockReportRepo.insert(pscDiscrepancyReportEntity)).thenReturn(pscDiscrepancyReportEntity);
         when(mockReportMapper.restToEntity(pscDiscrepancyReport)).thenReturn(pscDiscrepancyReportEntity);
@@ -158,7 +158,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         pscDiscrepancyReportData.setObligedEntityEmail(VALID_EMAIL);
         pscDiscrepancyReportEntity.setData(pscDiscrepancyReportData);
 
-        when(linkFactory.createLinkPscDiscrepancyReport(anyString())).thenReturn(SELF_LINK);
+        when(mockLinkFactory.createLinkPscDiscrepancyReport(anyString())).thenReturn(SELF_LINK);
 
         when(mockReportRepo.insert(pscDiscrepancyReportEntity)).thenThrow(new MongoException(""));
         when(mockReportMapper.restToEntity(pscDiscrepancyReport)).thenReturn(pscDiscrepancyReportEntity);
