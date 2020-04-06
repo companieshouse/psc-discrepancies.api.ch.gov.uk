@@ -35,8 +35,6 @@ public class PscDiscrepancyReportControllerUnitTest {
     private static final String REPORT_ID = "reportId";
     private static final String SELF_LINK = "/psc-discrepancy-reports/123";
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
-    private static final String VALID_EMAIL = "m@m.com";
-    private static final String INVALID_EMAIL = "mm.com";
 
     private PscDiscrepancyReport pscDiscrepancyReport;
 
@@ -60,7 +58,7 @@ public class PscDiscrepancyReportControllerUnitTest {
     @DisplayName("Test getPscDiscrepancyReport by id is successful")
     void getPscDiscrepancyReportSuccessful() {
         when(mockReportService.findPscDiscrepancyReportById(REPORT_ID)).thenReturn(pscDiscrepancyReport);
-        ResponseEntity response = pscDiscrepancyReportController.get(REPORT_ID);
+        ResponseEntity<PscDiscrepancyReport> response = pscDiscrepancyReportController.get(REPORT_ID);
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -71,7 +69,7 @@ public class PscDiscrepancyReportControllerUnitTest {
     @DisplayName("Test getPscDiscrepancyReport by id is unsuccessful")
     void getPscDiscrepancyReportUnsuccessful() {
         when(mockReportService.findPscDiscrepancyReportById(REPORT_ID)).thenReturn(null);
-        ResponseEntity response = pscDiscrepancyReportController.get(REPORT_ID);
+        ResponseEntity<PscDiscrepancyReport> response = pscDiscrepancyReportController.get(REPORT_ID);
 
         assertNotNull(response);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -100,12 +98,9 @@ public class PscDiscrepancyReportControllerUnitTest {
     }
 
     @Test
-    @DisplayName("When createPscDiscrepancyReport returns an invalid ServiceResult when email is null then a Bad Request response is returned with an ErrorBody.")
-    void createPscDiscrepancyReportReturnsInvalidServiceResultEmailNull() throws ServiceException {
-        
-        Links links = new Links();
-        links.setLink(CoreLinkKeys.SELF, SELF_LINK);
-        pscDiscrepancyReport.setLinks(links);
+    @DisplayName("When createPscDiscrepancyReport returns an invalid ServiceResult then a Bad Request response is returned with an ErrorBody.")
+    void createPscDiscrepancyReportReturnsBadRequestOnInvalidServiceResult() throws ServiceException {
+
         Errors errData = new Errors();
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
                 .withError(OBLIGED_ENTITY_EMAIL + " must not be null").build();
@@ -126,34 +121,7 @@ public class PscDiscrepancyReportControllerUnitTest {
     }
 
     @Test
-    @DisplayName("When createPscDiscrepancyReport returns an invalid ServiceResult when email format is incorrect then a Bad Request response is returned with an ErrorBody.")
-    void createPscDiscrepancyReportReturnsInvalidServiceResultEmailIncorrectFormat() throws ServiceException {
-        
-        Links links = new Links();
-        links.setLink(CoreLinkKeys.SELF, SELF_LINK);
-        pscDiscrepancyReport.setObligedEntityEmail(INVALID_EMAIL);
-        pscDiscrepancyReport.setLinks(links);
-        Errors errData = new Errors();
-        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
-                .withError(OBLIGED_ENTITY_EMAIL + " must not be null").build();
-        errData.addError(error);
-
-        ServiceResult<PscDiscrepancyReport> serviceResult = ServiceResult.invalid(errData);
-
-        when(mockReportService.createPscDiscrepancyReport(any(PscDiscrepancyReport.class),
-                any(HttpServletRequest.class))).thenReturn(serviceResult);
-
-        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response =
-                pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport,
-                        request);
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody().getErrorBody().hasErrors());
-    }
-
-    @Test
-    @DisplayName("When createPscDiscrepancy throws a ServiceException then an Internal Server Error response is returned.")
+    @DisplayName("When createPscDiscrepancyReport throws a ServiceException then an Internal Server Error response is returned.")
     void createPscDiscrepancyThrowsServiceException() throws ServiceException {
 
         doThrow(ServiceException.class).when(mockReportService).createPscDiscrepancyReport(
