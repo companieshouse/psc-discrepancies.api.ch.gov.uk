@@ -1,7 +1,7 @@
 package uk.gov.ch.pscdiscrepanciesapi.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -50,21 +50,20 @@ public class PscSubmissionSenderTest {
     private CloseableHttpClient client;
     @Mock
     private EnvironmentReader environmentReader;
-    
+
     private PscSubmissionSender submissionSender;
     @Captor
     private ArgumentCaptor<HttpPost> argCaptor;
-    private static final String CORRELATION_ID = "1234";
+    private static final String REQUEST_ID = "1234";
     private static final String REST_API = "http://test.ch:00000/chips";
+    private static final String CHIPS_REST_INTERFACE_ENDPOINT = "CHIPS_REST_INTERFACE_ENDPOINT";
     private PscSubmission submission;
 
     @BeforeEach
     public void setUp() {
+        when(environmentReader.getMandatoryString(CHIPS_REST_INTERFACE_ENDPOINT)).thenReturn(REST_API);
         submissionSender = new PscSubmissionSender(environmentReader);
         submission = new PscSubmission();
-        when(environmentReader.getMandatoryString(null)).thenReturn(REST_API);
-        //add argCaptor to here to capture environment reader before each test 
-        //when environmentReader is invoked, return test URL 
     }
 
     @Test
@@ -73,8 +72,8 @@ public class PscSubmissionSenderTest {
         when(client.execute(any(HttpPost.class))).thenReturn(response);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
-        submissionSender.send(submission, client, objectMapper, CORRELATION_ID);
-        //assertTrue(submissionSender.send(submission, client, objectMapper, null));
+        submissionSender.send(submission, client, objectMapper, REQUEST_ID);
+        // assertTrue(submissionSender.send(submission, client, objectMapper, null));
 
         verify(client).execute(argCaptor.capture());
 
@@ -86,13 +85,12 @@ public class PscSubmissionSenderTest {
     }
 
     @Test
-    public void testJsonSentUnsuccessfully() throws ClientProtocolException, IOException {
+    public void testJsonSentUnsuccessfully() throws ClientProtocolException, IOException, ServiceException {
         when(objectMapper.writeValueAsString(submission)).thenReturn("\"jsonUnsuccessful\"");
         when(client.execute(any(HttpPost.class))).thenReturn(response);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_BAD_GATEWAY);
-
-        assertFalse(submissionSender.created(submission));
+        submissionSender.send(submission, client, objectMapper, REQUEST_ID);
 
         verify(client).execute(argCaptor.capture());
 
@@ -103,24 +101,25 @@ public class PscSubmissionSenderTest {
     }
 
     @Test
-    public void testThrowsJsonProcessingException() throws ClientProtocolException, IOException {
-        when(objectMapper.writeValueAsString(submission))
-                        .thenThrow(new JsonProcessingException("") {
-                            private static final long serialVersionUID = 1L;
-                        });
+    public void testThrowsJsonProcessingException() throws ClientProtocolException, IOException, ServiceException {
+        when(objectMapper.writeValueAsString(submission)).thenThrow(new JsonProcessingException("") {
+            private static final long serialVersionUID = 1L;
+        });
+        ServiceException se = assertThrows(ServiceException.class,
+                () -> submissionSender.send(submission, client, objectMapper, REQUEST_ID));
 
-        assertFalse(submissionSender.created(submission));
+        String exceptionMessage = se.getMessage();
+        assertTrue(exceptionMessage.contains("Error serialising to JSON"));
     }
 
     @Test
     void whenBadJsonSuppliedThenItIsSanitisedBeforeSending()
-                    throws ClientProtocolException, IOException {
+            throws ClientProtocolException, IOException, ServiceException {
         when(objectMapper.writeValueAsString(submission)).thenReturn("unquotedString");
         when(client.execute(any(HttpPost.class))).thenReturn(response);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
-
-        assertTrue(submissionSender.created(submission));
+        submissionSender.send(submission, client, objectMapper, REQUEST_ID);
 
         verify(client).execute((HttpUriRequest) argCaptor.capture());
 
@@ -131,11 +130,14 @@ public class PscSubmissionSenderTest {
     }
 
     @Test
-    public void testThrowsIOException() throws ClientProtocolException, IOException {
+    public void testThrowsIOException() throws ClientProtocolException, IOException, ServiceException {
         when(objectMapper.writeValueAsString(submission)).thenReturn("");
         when(client.execute(any(HttpPost.class))).thenThrow(new IOException());
 
-        assertFalse(submissionSender.created(submission));
+        ServiceException se = assertThrows(ServiceException.class,
+                () -> submissionSender.send(submission, client, objectMapper, REQUEST_ID));
+
+        String exceptionMessage = se.getMessage();
+        assertTrue(exceptionMessage.contains("Error serialising to JSON or sending payload"));
     }
 }
-
