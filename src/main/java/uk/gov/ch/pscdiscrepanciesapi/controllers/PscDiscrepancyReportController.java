@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +26,7 @@ import uk.gov.companieshouse.service.rest.response.PluggableResponseEntityFactor
 public class PscDiscrepancyReportController {
 
     private final PluggableResponseEntityFactory responseFactory;
-    
-    @Autowired
+
     private PscDiscrepancyReportService pscDiscrepancyReportService;
 
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
@@ -63,6 +63,25 @@ public class PscDiscrepancyReportController {
                             request);
             pscDiscrepancyReportToReturn =
                     responseFactory.createResponse(pscDiscrepancyReportResult);
+        } catch (ServiceException e) {
+            pscDiscrepancyReportToReturn = responseFactory.createEmptyInternalServerError();
+        }
+
+        return pscDiscrepancyReportToReturn;
+    }
+
+    @PutMapping(value = "/{psc-discrepancy-report-id}")
+    public ResponseEntity<ChResponseBody<PscDiscrepancyReport>> updatePscDiscrepancyReport(
+                    @PathVariable("psc-discrepancy-report-id") String pscDiscrepancyReportId,
+                    @Valid @RequestBody PscDiscrepancyReport pscDiscrepancyReport, HttpServletRequest request) {
+
+        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> pscDiscrepancyReportToReturn;
+        try {
+            ServiceResult<PscDiscrepancyReport> pscDiscrepancyReportResult =
+                            pscDiscrepancyReportService.updatePscDiscrepancyReport(pscDiscrepancyReportId, pscDiscrepancyReport,
+                                            request);
+            pscDiscrepancyReportToReturn =
+                            responseFactory.createResponse(pscDiscrepancyReportResult);
         } catch (ServiceException e) {
             pscDiscrepancyReportToReturn = responseFactory.createEmptyInternalServerError();
         }

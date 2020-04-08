@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Document(collection = "psc_discrepancy_reports")
 public class PscDiscrepancyReportEntity {
@@ -51,5 +52,30 @@ public class PscDiscrepancyReportEntity {
 
     public void setData(PscDiscrepancyReportEntityData data) {
         this.data = data;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(createdAt, data, id, updatedAt);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof PscDiscrepancyReportEntity)) {
+            return false;
+        }
+        PscDiscrepancyReportEntity other = (PscDiscrepancyReportEntity) obj;
+        return Objects.equals(createdAt, other.createdAt) && Objects.equals(data, other.data)
+                        && Objects.equals(id, other.id)
+                        && Objects.equals(updatedAt, other.updatedAt);
+    }
+
+    @Override
+    public String toString() {
+        return "PscDiscrepancyReportEntity [id=" + id + ", createdAt=" + createdAt + ", updatedAt="
+                        + updatedAt + ", data=" + data + "]";
     }
 }
