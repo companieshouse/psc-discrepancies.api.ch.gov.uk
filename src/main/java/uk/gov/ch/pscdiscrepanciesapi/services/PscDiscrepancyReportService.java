@@ -123,6 +123,19 @@ public class PscDiscrepancyReportService {
         }
     }
 
+    /**
+     * Updates the report with ID reportId, but only after running validation checks. If the report
+     * cannot be found, this returns {@link ServiceResult#notFound()}. If there is one or more
+     * validation failures, this returns {@link ServiceResult#invalid(Errors)} containing details of
+     * all the problems found.
+     * 
+     * @param reportId ID of the report to update.
+     * @param reportWithUpdatesToApply Contains the changes
+     * @param request The original request that lead to this method being called.
+     * @return The updated and stored report, with a new etag.
+     * @throws ServiceException If an unexpected problem is encountered, e.g. the underlying
+     *         database throws an exception.
+     */
     public ServiceResult<PscDiscrepancyReport> updatePscDiscrepancyReport(String reportId,
                     PscDiscrepancyReport reportWithUpdatesToApply, HttpServletRequest request)
                     throws ServiceException {
