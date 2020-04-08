@@ -26,8 +26,7 @@ import uk.gov.companieshouse.service.rest.response.PluggableResponseEntityFactor
 public class PscDiscrepancyReportController {
 
     private final PluggableResponseEntityFactory responseFactory;
-    
-    @Autowired
+
     private PscDiscrepancyReportService pscDiscrepancyReportService;
 
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
@@ -71,9 +70,9 @@ public class PscDiscrepancyReportController {
         return pscDiscrepancyReportToReturn;
     }
 
-    @PutMapping
-    public ResponseEntity<ChResponseBody<PscDiscrepancyReport>> updatePscDiscrepancy(
-                    @PathVariable("discrepancy-report-id") String pscDiscrepancyReportId,
+    @PutMapping(value = "/{psc-discrepancy-report-id}")
+    public ResponseEntity<ChResponseBody<PscDiscrepancyReport>> updatePscDiscrepancyReport(
+                    @PathVariable("psc-discrepancy-report-id") String pscDiscrepancyReportId,
                     @Valid @RequestBody PscDiscrepancyReport pscDiscrepancyReport, HttpServletRequest request) {
 
         ResponseEntity<ChResponseBody<PscDiscrepancyReport>> pscDiscrepancyReportToReturn;

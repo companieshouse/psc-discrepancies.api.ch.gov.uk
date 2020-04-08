@@ -1,9 +1,13 @@
 package uk.gov.ch.pscdiscrepanciesapi.services;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +22,7 @@ import uk.gov.ch.pscdiscrepanciesapi.mappers.PscDiscrepancyReportMapper;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntity;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntityData;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
+import uk.gov.ch.pscdiscrepanciesapi.models.rest.ReportStatus;
 import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyReportRepository;
 import uk.gov.companieshouse.GenerateEtagUtil;
 import uk.gov.companieshouse.logging.Logger;
@@ -35,6 +40,19 @@ public class PscDiscrepancyReportService {
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
 
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
+    private static final String STATUS = "Status";
+    private static final String COMPANY_NUMBER = "company_number";
+
+    private static final Set<String> VALID_STATUSES;
+
+    static {
+        Set<ReportStatus> all = EnumSet.allOf(ReportStatus.class);
+        Set<String> temp = new HashSet<>();
+        for (ReportStatus status : all) {
+            temp.add(status.name());
+        }
+        VALID_STATUSES = Collections.unmodifiableSet(temp);
+    }
 
     private final PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
 
@@ -107,30 +125,35 @@ public class PscDiscrepancyReportService {
     }
 
     public ServiceResult<PscDiscrepancyReport> updatePscDiscrepancyReport(String reportId,
-                    PscDiscrepancyReport updatedReport, HttpServletRequest request)
+                    PscDiscrepancyReport reportWithUpdatesToApply, HttpServletRequest request)
                     throws ServiceException {
         final ServiceResult<PscDiscrepancyReport> reportToReturn;
-        Optional<PscDiscrepancyReportEntity> queryResult =
-                        pscDiscrepancyReportRepository.findById(reportId);
-        if (!queryResult.isPresent()) {
-            reportToReturn = ServiceResult.notFound();
-        } else {
-            PscDiscrepancyReportEntity preexistingReportEntity = queryResult.get();
-            PscDiscrepancyReport preexistingReport =
-                            pscDiscrepancyReportMapper.entityToRest(preexistingReportEntity);
-
-            Errors validationErrors = validateUpdate(preexistingReport, updatedReport);
-            if (validationErrors.hasErrors()) {
-                LOG.error("Validation errors", buildErrorLogMap(validationErrors));
-                reportToReturn = ServiceResult.invalid(validationErrors);
+        try {
+            Optional<PscDiscrepancyReportEntity> queryResult =
+                            pscDiscrepancyReportRepository.findById(reportId);
+            if (!queryResult.isPresent()) {
+                reportToReturn = ServiceResult.notFound();
             } else {
-                try {
+                PscDiscrepancyReportEntity preexistingReportEntity = queryResult.get();
+                PscDiscrepancyReport preexistingReport =
+                                pscDiscrepancyReportMapper.entityToRest(preexistingReportEntity);
+
+                Errors validationErrors =
+                                validateUpdate(preexistingReport, reportWithUpdatesToApply);
+                if (validationErrors.hasErrors()) {
+                    LOG.error("Validation errors", buildErrorLogMap(validationErrors));
+                    reportToReturn = ServiceResult.invalid(validationErrors);
+                } else {
                     PscDiscrepancyReportEntityData preexistingReportEntityData =
                                     preexistingReportEntity.getData();
                     // Now copy over all values that are allowed to be updated
-                    preexistingReportEntityData.setStatus(updatedReport.getStatus());
+                    // We do this to prevent malicious/inadvertent changing of values that must
+                    // not be set by anything other than this service, e.g. kind, links, etag...
+                    preexistingReportEntityData.setStatus(reportWithUpdatesToApply.getStatus());
+                    preexistingReportEntityData.setObligedEntityEmail(
+                                    reportWithUpdatesToApply.getObligedEntityEmail());
                     preexistingReportEntityData
-                                    .setObligedEntityEmail(updatedReport.getObligedEntityEmail());
+                                    .setCompanyNumber(reportWithUpdatesToApply.getCompanyNumber());
                     // Update the etag value, as this has changed
                     preexistingReportEntityData.setEtag(createEtag());
 
@@ -140,14 +163,14 @@ public class PscDiscrepancyReportService {
                     PscDiscrepancyReport storedReport =
                                     pscDiscrepancyReportMapper.entityToRest(storedReportEntity);
                     reportToReturn = ServiceResult.updated(storedReport);
-                } catch (MongoException me) {
-                    ServiceException serviceException = new ServiceException(
-                                    "Exception storing PSC discrepancy report: ", me);
-                    LOG.errorRequest(request, serviceException,
-                                    createPscDiscrepancyReportDebugMap(updatedReport));
-                    throw serviceException;
                 }
             }
+        } catch (MongoException me) {
+            ServiceException serviceException =
+                            new ServiceException("Exception storing PSC discrepancy report: ", me);
+            LOG.errorRequest(request, serviceException,
+                            createPscDiscrepancyReportDebugMap(reportWithUpdatesToApply));
+            throw serviceException;
         }
         return reportToReturn;
     }
@@ -165,7 +188,8 @@ public class PscDiscrepancyReportService {
             errData.addError(nonMatchingEtag);
         }
         validateEmail(errData, updatedReport.getObligedEntityEmail());
-        return validateUpdate(preexistingReport, updatedReport);
+        validateStatus(errData, updatedReport.getStatus());
+        return errData;
     }
 
     private Errors validateCreate(PscDiscrepancyReport report) {
@@ -180,6 +204,39 @@ public class PscDiscrepancyReportService {
         return debugMap;
 
     }
+
+    private Errors validateStatus(Errors errors, String status) {
+        Err error = null;
+        if (status == null || status.isEmpty()) {
+            error = Err.invalidBodyBuilderWithLocation(STATUS)
+                            .withError(STATUS + " must not be empty or null").build();
+            errors.addError(error);
+        } else {
+            if (!VALID_STATUSES.contains(status)) {
+                error = Err.invalidBodyBuilderWithLocation(STATUS)
+                                .withError(STATUS + " is not one of the correct values").build();
+                errors.addError(error);
+            }
+        }
+        return errors;
+    }
+
+    private Errors validateCompanyNumber(Errors errors, String companyNumber) {
+        Err error = null;
+        if (companyNumber == null || companyNumber.isEmpty()) {
+            error = Err.invalidBodyBuilderWithLocation(COMPANY_NUMBER)
+                            .withError(COMPANY_NUMBER + " must not be empty or null").build();
+            errors.addError(error);
+        } else {
+            if (companyNumber.length() != 8) {
+                error = Err.invalidBodyBuilderWithLocation(COMPANY_NUMBER)
+                                .withError(COMPANY_NUMBER + " must be 8 characters long").build();
+                errors.addError(error);
+            }
+        }
+        return errors;
+    }
+
     /**
      * Validate obliged entity email.
      * 
@@ -191,7 +248,7 @@ public class PscDiscrepancyReportService {
         Err error = null;
         if (email == null || email.isEmpty()) {
             error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
-                .withError(OBLIGED_ENTITY_EMAIL + " must not be null").build();
+                .withError(OBLIGED_ENTITY_EMAIL + " must not be empty or null").build();
             errors.addError(error);
         } else {
             String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]+$";

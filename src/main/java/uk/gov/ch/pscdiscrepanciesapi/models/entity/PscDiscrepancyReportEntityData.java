@@ -1,5 +1,6 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.entity;
 
+import java.util.Objects;
 import org.springframework.data.mongodb.core.mapping.Field;
 import uk.gov.companieshouse.service.links.Links;
 
@@ -79,5 +80,36 @@ public class PscDiscrepancyReportEntityData {
 
     public void setLinks(Links links) {
         this.links = links;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(companyNumber, etag, kind, links, obligedEntityEmail, obligedEntityName,
+                        status);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof PscDiscrepancyReportEntityData)) {
+            return false;
+        }
+        PscDiscrepancyReportEntityData other = (PscDiscrepancyReportEntityData) obj;
+        return Objects.equals(companyNumber, other.companyNumber)
+                        && Objects.equals(etag, other.etag) && Objects.equals(kind, other.kind)
+                        && Objects.equals(links, other.links)
+                        && Objects.equals(obligedEntityEmail, other.obligedEntityEmail)
+                        && Objects.equals(obligedEntityName, other.obligedEntityName)
+                        && Objects.equals(status, other.status);
+    }
+
+    @Override
+    public String toString() {
+        return "PscDiscrepancyReportEntityData [kind=" + kind + ", etag=" + etag
+                        + ", obligedEntityName=" + obligedEntityName + ", obligedEntityEmail="
+                        + obligedEntityEmail + ", companyNumber=" + companyNumber + ", status="
+                        + status + ", links=" + links + "]";
     }
 }

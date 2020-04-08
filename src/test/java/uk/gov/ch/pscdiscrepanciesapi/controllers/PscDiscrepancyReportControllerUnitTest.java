@@ -77,7 +77,7 @@ public class PscDiscrepancyReportControllerUnitTest {
     }
 
     @Test
-    @DisplayName("When createPscDiscrepancyReport returns an valid ServiceResult then a Created response is returned with a SuccessBody.")
+    @DisplayName("When createPscDiscrepancyReport returns a valid ServiceResult then a Created response is returned with a SuccessBody.")
     void createPscDiscrepancyReportSuccessful() throws ServiceException {
         
         Links links = new Links();
@@ -130,6 +130,70 @@ public class PscDiscrepancyReportControllerUnitTest {
         ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response =
                 pscDiscrepancyReportController.createPscDiscrepancyReport(pscDiscrepancyReport,
                         request);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    @DisplayName("When updatePscDiscrepancyReport returns a valid ServiceResult then a updated response is returned with a SuccessBody.")
+    void updatePscDiscrepancyReportSuccessful() throws ServiceException {
+
+        Links links = new Links();
+        links.setLink(CoreLinkKeys.SELF, SELF_LINK);
+        pscDiscrepancyReport.setLinks(links);
+        ServiceResult<PscDiscrepancyReport> serviceResult =
+                        ServiceResult.updated(pscDiscrepancyReport);
+
+        when(mockReportService.updatePscDiscrepancyReport(any(String.class),
+                        any(PscDiscrepancyReport.class), any(HttpServletRequest.class)))
+                                        .thenReturn(serviceResult);
+
+        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response =
+                        pscDiscrepancyReportController.updatePscDiscrepancyReport(REPORT_ID,
+                                        pscDiscrepancyReport, request);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(pscDiscrepancyReport, response.getBody().getSuccessBody());
+    }
+
+    @Test
+    @DisplayName("When updatePscDiscrepancyReport returns an invalid ServiceResult then a Bad Request response is returned with an ErrorBody.")
+    void updatePscDiscrepancyReportReturnsBadRequestOnInvalidServiceResult()
+                    throws ServiceException {
+
+        Errors errData = new Errors();
+        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
+                        .withError(OBLIGED_ENTITY_EMAIL + " must not be null").build();
+        errData.addError(error);
+
+        ServiceResult<PscDiscrepancyReport> serviceResult = ServiceResult.invalid(errData);
+
+        when(mockReportService.updatePscDiscrepancyReport(any(String.class),
+                        any(PscDiscrepancyReport.class), any(HttpServletRequest.class)))
+                                        .thenReturn(serviceResult);
+
+        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response =
+                        pscDiscrepancyReportController.updatePscDiscrepancyReport(REPORT_ID,
+                                        pscDiscrepancyReport, request);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().getErrorBody().hasErrors());
+    }
+
+    @Test
+    @DisplayName("When updatePscDiscrepancyReport throws a ServiceException then an Internal Server Error response is returned.")
+    void updatePscDiscrepancyThrowsServiceException() throws ServiceException {
+
+        doThrow(ServiceException.class).when(mockReportService).updatePscDiscrepancyReport(
+                        any(String.class), any(PscDiscrepancyReport.class),
+                        any(HttpServletRequest.class));
+
+        ResponseEntity<ChResponseBody<PscDiscrepancyReport>> response =
+                        pscDiscrepancyReportController.updatePscDiscrepancyReport(REPORT_ID,
+                                        pscDiscrepancyReport, request);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
