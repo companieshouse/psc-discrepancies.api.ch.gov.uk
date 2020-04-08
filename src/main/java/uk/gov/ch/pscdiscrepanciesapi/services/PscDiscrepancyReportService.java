@@ -41,7 +41,6 @@ public class PscDiscrepancyReportService {
 
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
     private static final String STATUS = "Status";
-    private static final String COMPANY_NUMBER = "company_number";
 
     private static final Set<String> VALID_STATUSES;
 
@@ -215,22 +214,6 @@ public class PscDiscrepancyReportService {
             if (!VALID_STATUSES.contains(status)) {
                 error = Err.invalidBodyBuilderWithLocation(STATUS)
                                 .withError(STATUS + " is not one of the correct values").build();
-                errors.addError(error);
-            }
-        }
-        return errors;
-    }
-
-    private Errors validateCompanyNumber(Errors errors, String companyNumber) {
-        Err error = null;
-        if (companyNumber == null || companyNumber.isEmpty()) {
-            error = Err.invalidBodyBuilderWithLocation(COMPANY_NUMBER)
-                            .withError(COMPANY_NUMBER + " must not be empty or null").build();
-            errors.addError(error);
-        } else {
-            if (companyNumber.length() != 8) {
-                error = Err.invalidBodyBuilderWithLocation(COMPANY_NUMBER)
-                                .withError(COMPANY_NUMBER + " must be 8 characters long").build();
                 errors.addError(error);
             }
         }
