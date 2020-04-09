@@ -502,7 +502,7 @@
           },
           "status" : {
             "type" : "string",
-            "enum" : [ "INCOMPLETE", "COMPLETE", "INVALID", "SUBMITTED", "DELETED" ],
+            "enum" : [ "INCOMPLETE", "COMPLETE", "INVALID", "SUBMITTED", "DELETED", "FAILED_TO_SUBMIT" ],
             "example" : "SUBMITTED"
           },
           "links" : {

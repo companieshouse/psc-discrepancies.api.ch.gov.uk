@@ -5,23 +5,34 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoException;
+
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
 import uk.gov.ch.pscdiscrepanciesapi.common.Kind;
 import uk.gov.ch.pscdiscrepanciesapi.common.LinkFactory;
+import uk.gov.ch.pscdiscrepanciesapi.common.PscSubmissionSender;
 import uk.gov.ch.pscdiscrepanciesapi.mappers.PscDiscrepancyReportMapper;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntity;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntityData;
+import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancy;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
+import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscSubmission;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.ReportStatus;
 import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyReportRepository;
 import uk.gov.companieshouse.GenerateEtagUtil;
@@ -56,15 +67,20 @@ public class PscDiscrepancyReportService {
     private final PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
 
     private final PscDiscrepancyReportMapper pscDiscrepancyReportMapper;
+    
+    private final PscDiscrepancyService pscDiscrepancyService;
 
     private final LinkFactory linkFactory;
+    private final PscSubmissionSender pscSubmissionSender;
 
     public PscDiscrepancyReportService(@Autowired PscDiscrepancyReportRepository pscDiscrepancyReportRepository,
-                     @Autowired PscDiscrepancyReportMapper pscDiscrepancyReportMapper,
-                     @Autowired LinkFactory linkFactory) {
-                        this.pscDiscrepancyReportRepository = pscDiscrepancyReportRepository;
-                        this.pscDiscrepancyReportMapper = pscDiscrepancyReportMapper;
-                        this.linkFactory = linkFactory;
+            @Autowired PscDiscrepancyReportMapper pscDiscrepancyReportMapper,@Autowired PscSubmissionSender pscSubmissionSender,
+            @Autowired PscDiscrepancyService pscDiscrepancyService, @Autowired LinkFactory linkFactory) {
+        this.pscDiscrepancyReportRepository = pscDiscrepancyReportRepository;
+        this.pscDiscrepancyReportMapper = pscDiscrepancyReportMapper;
+        this.pscSubmissionSender = pscSubmissionSender;
+        this.pscDiscrepancyService = pscDiscrepancyService; 
+        this.linkFactory = linkFactory;
     }
 
     public PscDiscrepancyReport findPscDiscrepancyReportById(String reportId) {
@@ -92,7 +108,9 @@ public class PscDiscrepancyReportService {
         Errors validationErrors = validateCreate(pscDiscrepancyReport);
 
         if (validationErrors.hasErrors()) {
-            LOG.error("Validation errors", buildErrorLogMap(validationErrors));
+            Map<String, Object> debugMap = new HashMap<>();
+            debugMap.put("validationErrors", validationErrors);
+            LOG.error("Validation errors", debugMap);
             return ServiceResult.invalid(validationErrors);
         }
 
@@ -170,11 +188,26 @@ public class PscDiscrepancyReportService {
                     preexistingReportEntityData.setEtag(createEtag());
 
                     PscDiscrepancyReportEntity storedReportEntity =
-                                    pscDiscrepancyReportRepository.save(preexistingReportEntity);
+                            pscDiscrepancyReportRepository.save(preexistingReportEntity);
 
                     PscDiscrepancyReport storedReport =
                                     pscDiscrepancyReportMapper.entityToRest(storedReportEntity);
+                    
+                    if (storedReport.getStatus().equals("COMPLETE")) {
+                        boolean reportSent = sendReport(storedReport, request, reportId);
+                        if (reportSent == true) {
+                            storedReport.setStatus("SUBMITTED");
+                        } else {
+                            storedReport.setStatus("FAILED_TO_SEND");
+                        }
+                        PscDiscrepancyReportEntity sentReportEntityToSave = pscDiscrepancyReportMapper
+                                .restToEntity(storedReport);
+                        PscDiscrepancyReportEntity sentReportEntity = pscDiscrepancyReportRepository.save(sentReportEntityToSave);
+                        storedReport = pscDiscrepancyReportMapper.entityToRest(sentReportEntity);
+                    }
+                    
                     reportToReturn = ServiceResult.updated(storedReport);
+                    
                 }
             }
         } catch (MongoException me) {
@@ -290,5 +323,20 @@ public class PscDiscrepancyReportService {
         debugMap.put("company_number", pscDiscrepancyReport.getCompanyNumber());
         debugMap.put("status", pscDiscrepancyReport.getStatus());
         return debugMap;
+    }
+
+    private boolean sendReport(PscDiscrepancyReport storedReport, HttpServletRequest request, String reportId) {
+        try {
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            PscSubmission reportToSubmit = new PscSubmission();
+            ServiceResult<List<PscDiscrepancy>> reportDetails = pscDiscrepancyService.getDiscrepancies(reportId,
+                    request);
+            reportToSubmit.setReport(storedReport);
+            reportToSubmit.setDiscrepancies(reportDetails.getData());
+            return pscSubmissionSender.send(reportToSubmit, httpClient, new ObjectMapper(), request.getSession().getId());
+        } catch (ServiceException se) {
+            LOG.error("ERROR Sending JSON to CHIPS Rest Interfaces ", se);
+            return false;
+        }
     }
 }
