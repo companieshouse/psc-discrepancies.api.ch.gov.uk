@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.mongodb.MongoException;
 import uk.gov.ch.pscdiscrepanciesapi.common.LinkFactory;
+import uk.gov.ch.pscdiscrepanciesapi.common.PscSubmissionSender;
 import uk.gov.ch.pscdiscrepanciesapi.mappers.PscDiscrepancyReportMapper;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntity;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyReportEntityData;
@@ -55,6 +56,12 @@ public class PscDiscrepancyReportServiceUnitTest {
     private HttpServletRequest mockRequest;
     
     @Mock
+    private PscSubmissionSender mockSender;
+    
+    @Mock
+    private PscDiscrepancyService mockDiscrepancyService;
+    
+    @Mock
     private LinkFactory mockLinkFactory;
 
     private PscDiscrepancyReportService pscDiscrepancyReportService;
@@ -63,7 +70,8 @@ public class PscDiscrepancyReportServiceUnitTest {
     void setUp() {
         pscDiscrepancyReport = new PscDiscrepancyReport();
         pscDiscrepancyReportEntity = new PscDiscrepancyReportEntity();
-        pscDiscrepancyReportService = new PscDiscrepancyReportService(mockReportRepo, mockReportMapper, mockLinkFactory);
+        pscDiscrepancyReportService = new PscDiscrepancyReportService(mockReportRepo, mockReportMapper, mockSender,
+                mockDiscrepancyService, mockLinkFactory);
     }
 
     @Test
@@ -170,25 +178,30 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertThrows(ServiceException.class, () -> pscDiscrepancyReportService
                 .createPscDiscrepancyReport(pscDiscrepancyReport, mockRequest));
     }
-
+//TODO Step 1: Get status to not be complete to miss new code, 
+    // step 2: Add new test to test complete status path 
+    //
     @Test
     @DisplayName("When updateDiscrepancyReport finds an existing report to update, then it updates it and returns success")
     void updatePscDiscrepancyReport() throws ServiceException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
-        PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
+        PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
+                ReportStatus.INCOMPLETE.toString());
         preexistingReportEntity.setData(preexistingReportEntityData);
         PscDiscrepancyReport preexistingReport = createReport(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
         doReturn(Optional.of(preexistingReportEntity)).when(mockReportRepo).findById(REPORT_ID);
-
+        
         doReturn(preexistingReport).when(mockReportMapper).entityToRest(preexistingReportEntity);
-
+        
         PscDiscrepancyReportEntity savedEntity = Mockito.mock(PscDiscrepancyReportEntity.class);
-        PscDiscrepancyReport savedReport = Mockito.mock(PscDiscrepancyReport.class);
-        doReturn(savedEntity).when(mockReportRepo).save(Mockito.any());
+        PscDiscrepancyReport savedReport = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
+        doReturn(savedEntity).when(mockReportRepo).save(preexistingReportEntity);
         doReturn(savedReport).when(mockReportMapper).entityToRest(savedEntity);
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
-        ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID, reportWithUpdatesToApply, mockRequest);
+        ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
+                reportWithUpdatesToApply, mockRequest);
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
+        assertEquals(ReportStatus.INVALID.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
     }
 
