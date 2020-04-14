@@ -1,5 +1,6 @@
 package uk.gov.ch.pscdiscrepanciesapi.services;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -192,22 +193,11 @@ public class PscDiscrepancyReportService {
 
                     PscDiscrepancyReport storedReport =
                                     pscDiscrepancyReportMapper.entityToRest(storedReportEntity);
-                    
-                    if (storedReport.getStatus().equals("COMPLETE")) {
-                        boolean reportSent = sendReport(storedReport, request, reportId);
-                        if (reportSent == true) {
-                            storedReport.setStatus("SUBMITTED");
-                        } else {
-                            storedReport.setStatus("FAILED_TO_SEND");
-                        }
-                        PscDiscrepancyReportEntity sentReportEntityToSave = pscDiscrepancyReportMapper
-                                .restToEntity(storedReport);
-                        PscDiscrepancyReportEntity sentReportEntity = pscDiscrepancyReportRepository.save(sentReportEntityToSave);
-                        storedReport = pscDiscrepancyReportMapper.entityToRest(sentReportEntity);
-                    }
-                    
                     reportToReturn = ServiceResult.updated(storedReport);
-                    
+
+                    if (storedReport.getStatus().equals(ReportStatus.COMPLETE.toString())) {
+                        onReportCompleted(storedReport, storedReportEntity, request, reportId);
+                    }
                 }
             }
         } catch (MongoException me) {
@@ -224,7 +214,7 @@ public class PscDiscrepancyReportService {
                     PscDiscrepancyReport updatedReport) {
         Errors errData = new Errors();
         if (!preexistingReport.getEtag().equals(updatedReport.getEtag())) {
-            Err nonMatchingEtag = Err.invalidBodyBuilderWithLocation("Links")
+            Err nonMatchingEtag = Err.invalidBodyBuilderWithLocation("etag")
                             .withError("Etag does not match. etag in system: " + preexistingReport.getEtag()
                                             + " incoming etag: "
                                             + updatedReport.getEtag()
@@ -325,18 +315,32 @@ public class PscDiscrepancyReportService {
         return debugMap;
     }
 
-    private boolean sendReport(PscDiscrepancyReport storedReport, HttpServletRequest request, String reportId) {
-        try {
-            CloseableHttpClient httpClient = HttpClients.createDefault();
+    private void onReportCompleted(PscDiscrepancyReport storedReport,
+                    PscDiscrepancyReportEntity storedReportEntity, HttpServletRequest request,
+                    String reportId) {
+        boolean reportSent = false;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             PscSubmission reportToSubmit = new PscSubmission();
-            ServiceResult<List<PscDiscrepancy>> reportDetails = pscDiscrepancyService.getDiscrepancies(reportId,
-                    request);
+            ServiceResult<List<PscDiscrepancy>> reportDetails =
+                            pscDiscrepancyService.getDiscrepancies(reportId, request);
             reportToSubmit.setReport(storedReport);
             reportToSubmit.setDiscrepancies(reportDetails.getData());
-            return pscSubmissionSender.send(reportToSubmit, httpClient, new ObjectMapper(), request.getSession().getId());
+            reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, new ObjectMapper(),
+                            request.getSession().getId());
+            PscDiscrepancyReportEntityData sentReportEntityData = storedReportEntity.getData();
+            if (reportSent) {
+                sentReportEntityData.setStatus(ReportStatus.SUBMITTED.toString());
+            } else {
+                sentReportEntityData.setStatus(ReportStatus.FAILED_TO_SUBMIT.toString());
+            }
+            pscDiscrepancyReportRepository.save(storedReportEntity);
+        } catch (MongoException mongoEx) {
+            LOG.error("Error saving report with new status after attempting to submit report, with reportSent: "
+                            + reportSent, mongoEx);
         } catch (ServiceException se) {
             LOG.error("ERROR Sending JSON to CHIPS Rest Interfaces ", se);
-            return false;
+        } catch (IOException e) {
+            LOG.error("ERROR closing client when sending JSON to CHIPS Rest Interfaces ", e);
         }
     }
 }

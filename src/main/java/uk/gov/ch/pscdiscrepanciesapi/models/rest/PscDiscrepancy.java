@@ -42,4 +42,9 @@ public class PscDiscrepancy extends ApiObjectImpl {
             && Objects.deepEquals(super.getLinks(), other.getLinks())
             && Objects.equals(details, other.details);
     }
+
+    @Override
+    public String toString() {
+        return "PscDiscrepancy [details=" + details + "]";
+    }
 }

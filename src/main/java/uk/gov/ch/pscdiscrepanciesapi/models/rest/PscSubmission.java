@@ -1,6 +1,7 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
 import java.util.List;
+import java.util.Objects;
 
 public class PscSubmission {
     
@@ -51,11 +52,7 @@ public class PscSubmission {
         if (getClass() != obj.getClass())
             return false;
         PscSubmission other = (PscSubmission) obj;
-        if (discrepancies == null) {
-            if (other.discrepancies != null)
-                return false;
-        } else if (!discrepancies.equals(other.discrepancies))
-            return false;
+
         if (report == null) {
             if (other.report != null)
                 return false;
@@ -66,7 +63,12 @@ public class PscSubmission {
                 return false;
         } else if (!requestId.equals(other.requestId))
             return false;
-        return true;
+        return Objects.deepEquals(discrepancies, other.discrepancies);
     }
-    
+
+    @Override
+    public String toString() {
+        return "PscSubmission [requestId=" + requestId + ", report=" + report + ", discrepancies="
+                        + discrepancies + "]";
+    }
 }
