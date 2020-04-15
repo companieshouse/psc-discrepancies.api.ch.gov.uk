@@ -327,9 +327,6 @@ public class PscDiscrepancyReportService {
             reportToSubmit.setDiscrepancies(reportDetails.getData());
             reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, new ObjectMapper(),
                             request.getSession().getId());
-        } catch (MongoException mongoEx) {
-            LOG.error("Error saving report with new status after attempting to submit report, with reportSent: "
-                            + reportSent, mongoEx);
         } catch (ServiceException ex) {
             LOG.error("ERROR Sending JSON to CHIPS Rest Interfaces ", ex);
         } catch (IOException e) {

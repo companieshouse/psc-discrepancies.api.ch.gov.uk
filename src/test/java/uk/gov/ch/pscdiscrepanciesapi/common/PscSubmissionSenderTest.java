@@ -102,9 +102,7 @@ public class PscSubmissionSenderTest {
 
     @Test
     public void testThrowsJsonProcessingException() throws ClientProtocolException, IOException, ServiceException {
-        when(objectMapper.writeValueAsString(submission)).thenThrow(new JsonProcessingException("") {
-            private static final long serialVersionUID = 1L;
-        });
+        when(objectMapper.writeValueAsString(submission)).thenThrow(JsonProcessingException.class);
         ServiceException se = assertThrows(ServiceException.class,
                 () -> submissionSender.send(submission, client, objectMapper, REQUEST_ID));
 

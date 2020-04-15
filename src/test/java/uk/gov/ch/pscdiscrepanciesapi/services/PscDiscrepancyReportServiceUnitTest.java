@@ -46,7 +46,8 @@ import uk.gov.companieshouse.service.rest.err.Errors;
 
 @ExtendWith(MockitoExtension.class)
 public class PscDiscrepancyReportServiceUnitTest {
-
+    private static final String DISCREPANCY_DETAILS = "discrepancy";
+    private static final String REQUEST_ID = "requestId_1";
     private static final String REPORT_ID = "reportId";
     private static final String SELF_LINK = "/parent/" + REPORT_ID;
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
@@ -83,6 +84,12 @@ public class PscDiscrepancyReportServiceUnitTest {
         pscDiscrepancyReportEntity = new PscDiscrepancyReportEntity();
         pscDiscrepancyReportService = new PscDiscrepancyReportService(mockReportRepo, mockReportMapper, mockSender,
                 mockDiscrepancyService, mockLinkFactory);
+    }
+
+    private void setupMockRequestWithMockSession() {
+        HttpSession mockSession = mock(HttpSession.class);
+        when(mockRequest.getSession()).thenReturn(mockSession);
+        when(mockSession.getId()).thenReturn(REQUEST_ID);
     }
 
     @Test
@@ -343,8 +350,7 @@ public class PscDiscrepancyReportServiceUnitTest {
     @Test
     @DisplayName("When updatePscDiscrepancyReport catches a MongoException from existing report search, then it transforms it to a ServiceException.")
     void updatePscDiscrepancyReportThrowsServiceException() {
-
-        when(mockReportRepo.findById(REPORT_ID)).thenThrow(new MongoException(""));
+        when(mockReportRepo.findById(REPORT_ID)).thenThrow(MongoException.class);
         assertThrows(ServiceException.class, () -> pscDiscrepancyReportService
                 .updatePscDiscrepancyReport(REPORT_ID, pscDiscrepancyReport, mockRequest));
     }
@@ -365,23 +371,16 @@ public class PscDiscrepancyReportServiceUnitTest {
         doReturn(mockSavedEntity).when(mockReportRepo).save(preexistingReportEntity);
         doReturn(savedReport).when(mockReportMapper).entityToRest(mockSavedEntity);
 
-        PscDiscrepancy discrepancy = new PscDiscrepancy();
-        discrepancy.setDetails("discrepancy");
-        List<PscDiscrepancy> savedDiscrepancies = new ArrayList<>();
-        savedDiscrepancies.add(discrepancy);
+        List<PscDiscrepancy> savedDiscrepancies = createDiscrepancies(DISCREPANCY_DETAILS);
         doReturn(ServiceResult.found(savedDiscrepancies)).when(mockDiscrepancyService).getDiscrepancies(REPORT_ID, mockRequest);
-
-        HttpSession mockSession = mock(HttpSession.class);
-        when(mockRequest.getSession()).thenReturn(mockSession);
-        String requestId = "1";
-        when(mockSession.getId()).thenReturn(requestId);
 
         PscSubmission expectedSubmission = new PscSubmission();
         expectedSubmission.setReport(savedReport);
         expectedSubmission.setDiscrepancies(savedDiscrepancies);
 
+        setupMockRequestWithMockSession();
         doReturn(true).when(mockSender).send(eq(expectedSubmission), any(CloseableHttpClient.class),
-                any(ObjectMapper.class), eq(requestId));
+                any(ObjectMapper.class), eq(REQUEST_ID));
 
         PscDiscrepancyReportEntityData mockSavedEntityData = mock(PscDiscrepancyReportEntityData.class);
         when(mockSavedEntity.getData()).thenReturn(mockSavedEntityData);
@@ -414,23 +413,16 @@ public class PscDiscrepancyReportServiceUnitTest {
         doReturn(mockSavedEntity).when(mockReportRepo).save(preexistingReportEntity);
         doReturn(savedReport).when(mockReportMapper).entityToRest(mockSavedEntity);
 
-        PscDiscrepancy discrepancy = new PscDiscrepancy();
-        discrepancy.setDetails("discrepancy");
-        List<PscDiscrepancy> savedDiscrepancies = new ArrayList<>();
-        savedDiscrepancies.add(discrepancy);
+        List<PscDiscrepancy> savedDiscrepancies = createDiscrepancies(DISCREPANCY_DETAILS);
         doReturn(ServiceResult.found(savedDiscrepancies)).when(mockDiscrepancyService).getDiscrepancies(REPORT_ID, mockRequest);
-
-        HttpSession mockSession = mock(HttpSession.class);
-        when(mockRequest.getSession()).thenReturn(mockSession);
-        String requestId = "1";
-        when(mockSession.getId()).thenReturn(requestId);
 
         PscSubmission expectedSubmission = new PscSubmission();
         expectedSubmission.setReport(savedReport);
         expectedSubmission.setDiscrepancies(savedDiscrepancies);
 
+        setupMockRequestWithMockSession();
         doReturn(false).when(mockSender).send(eq(expectedSubmission), any(CloseableHttpClient.class),
-                any(ObjectMapper.class), eq(requestId));
+                any(ObjectMapper.class), eq(REQUEST_ID));
 
         PscDiscrepancyReportEntityData mockSavedEntityData = mock(PscDiscrepancyReportEntityData.class);
         when(mockSavedEntity.getData()).thenReturn(mockSavedEntityData);
@@ -463,30 +455,24 @@ public class PscDiscrepancyReportServiceUnitTest {
         doReturn(mockSavedEntity).when(mockReportRepo).save(preexistingReportEntity);
         doReturn(savedReport).when(mockReportMapper).entityToRest(mockSavedEntity);
 
-        PscDiscrepancy discrepancy = new PscDiscrepancy();
-        discrepancy.setDetails("discrepancy");
-        List<PscDiscrepancy> savedDiscrepancies = new ArrayList<>();
-        savedDiscrepancies.add(discrepancy);
+        List<PscDiscrepancy> savedDiscrepancies = createDiscrepancies(DISCREPANCY_DETAILS);
         doReturn(ServiceResult.found(savedDiscrepancies)).when(mockDiscrepancyService).getDiscrepancies(REPORT_ID, mockRequest);
-
-        HttpSession mockSession = mock(HttpSession.class);
-        when(mockRequest.getSession()).thenReturn(mockSession);
-        String requestId = "1";
-        when(mockSession.getId()).thenReturn(requestId);
 
         PscSubmission expectedSubmission = new PscSubmission();
         expectedSubmission.setReport(savedReport);
         expectedSubmission.setDiscrepancies(savedDiscrepancies);
-
-        doReturn(true).when(mockSender).send(eq(expectedSubmission), any(CloseableHttpClient.class),
-                any(ObjectMapper.class), eq(requestId));
+        setupMockRequestWithMockSession();
+        when(mockSender.send(eq(expectedSubmission), any(CloseableHttpClient.class),
+                any(ObjectMapper.class), eq(REQUEST_ID))).thenReturn(true);
 
         PscDiscrepancyReportEntityData mockSavedEntityData = mock(PscDiscrepancyReportEntityData.class);
+
         when(mockSavedEntity.getData()).thenReturn(mockSavedEntityData);
         doNothing().when(mockSavedEntityData).setStatus(ReportStatus.SUBMITTED.toString());
         doThrow(MongoException.class).when(mockReportRepo).save(mockSavedEntity);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
 
@@ -511,28 +497,22 @@ public class PscDiscrepancyReportServiceUnitTest {
         doReturn(mockSavedEntity).when(mockReportRepo).save(preexistingReportEntity);
         doReturn(savedReport).when(mockReportMapper).entityToRest(mockSavedEntity);
 
-        PscDiscrepancy discrepancy = new PscDiscrepancy();
-        discrepancy.setDetails("discrepancy");
-        List<PscDiscrepancy> savedDiscrepancies = new ArrayList<>();
-        savedDiscrepancies.add(discrepancy);
+        List<PscDiscrepancy> savedDiscrepancies = createDiscrepancies(DISCREPANCY_DETAILS);
         doReturn(ServiceResult.found(savedDiscrepancies)).when(mockDiscrepancyService).getDiscrepancies(REPORT_ID, mockRequest);
-
-        HttpSession mockSession = mock(HttpSession.class);
-        when(mockRequest.getSession()).thenReturn(mockSession);
-        String requestId = "1";
-        when(mockSession.getId()).thenReturn(requestId);
 
         PscSubmission expectedSubmission = new PscSubmission();
         expectedSubmission.setReport(savedReport);
         expectedSubmission.setDiscrepancies(savedDiscrepancies);
 
-        doReturn(true).when(mockSender).send(eq(expectedSubmission), any(CloseableHttpClient.class),
-                any(ObjectMapper.class), eq(requestId));
+        setupMockRequestWithMockSession();
+        when(mockSender.send(eq(expectedSubmission), any(CloseableHttpClient.class),
+                any(ObjectMapper.class), eq(REQUEST_ID))).thenThrow(ServiceException.class);
 
         PscDiscrepancyReportEntityData mockSavedEntityData = mock(PscDiscrepancyReportEntityData.class);
         when(mockSavedEntity.getData()).thenReturn(mockSavedEntityData);
-        doNothing().when(mockSavedEntityData).setStatus(ReportStatus.SUBMITTED.toString());
-        doThrow(MongoException.class).when(mockReportRepo).save(mockSavedEntity);
+        doNothing().when(mockSavedEntityData).setStatus(ReportStatus.FAILED_TO_SUBMIT.toString());
+        PscDiscrepancyReportEntity mockSavedSentEntity = mock(PscDiscrepancyReportEntity.class);
+        doReturn(mockSavedSentEntity).when(mockReportRepo).save(mockSavedEntity);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
@@ -543,6 +523,15 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertSame(savedReport, result.getData());
     }
 
+    private List<PscDiscrepancy> createDiscrepancies(String... discrepancies) {
+        List<PscDiscrepancy> pscDiscrepancies = new ArrayList<>();
+        for (String discrepancy : discrepancies) {
+            PscDiscrepancy pscDiscrepancy = new PscDiscrepancy();
+            pscDiscrepancy.setDetails(discrepancy);
+            pscDiscrepancies.add(pscDiscrepancy);
+        }
+        return pscDiscrepancies;
+    }
     private PscDiscrepancyReport createReport(String obligedEntityEmail, String status) {
         PscDiscrepancyReport report = new PscDiscrepancyReport();
         report.setObligedEntityEmail(obligedEntityEmail);
