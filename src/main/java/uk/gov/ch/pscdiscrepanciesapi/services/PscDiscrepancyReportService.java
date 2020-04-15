@@ -306,7 +306,7 @@ public class PscDiscrepancyReportService {
      * 
      * @return Debug map
      */
-    public Map<String,Object> createPscDiscrepancyReportDebugMap(PscDiscrepancyReport pscDiscrepancyReport) {
+    private Map<String,Object> createPscDiscrepancyReportDebugMap(PscDiscrepancyReport pscDiscrepancyReport) {
         final Map<String, Object> debugMap = new HashMap<>();
         debugMap.put("obliged_entity_name", pscDiscrepancyReport.getObligedEntityName());
         debugMap.put("obliged_entity_email", pscDiscrepancyReport.getObligedEntityEmail());
@@ -327,6 +327,16 @@ public class PscDiscrepancyReportService {
             reportToSubmit.setDiscrepancies(reportDetails.getData());
             reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, new ObjectMapper(),
                             request.getSession().getId());
+        } catch (MongoException mongoEx) {
+            LOG.error("Error saving report with new status after attempting to submit report, with reportSent: "
+                            + reportSent, mongoEx);
+        } catch (ServiceException ex) {
+            LOG.error("ERROR Sending JSON to CHIPS Rest Interfaces ", ex);
+        } catch (IOException e) {
+            LOG.error("ERROR closing client when sending JSON to CHIPS Rest Interfaces ", e);
+        }
+
+        try {
             PscDiscrepancyReportEntityData sentReportEntityData = storedReportEntity.getData();
             if (reportSent) {
                 sentReportEntityData.setStatus(ReportStatus.SUBMITTED.toString());
@@ -337,10 +347,6 @@ public class PscDiscrepancyReportService {
         } catch (MongoException mongoEx) {
             LOG.error("Error saving report with new status after attempting to submit report, with reportSent: "
                             + reportSent, mongoEx);
-        } catch (ServiceException se) {
-            LOG.error("ERROR Sending JSON to CHIPS Rest Interfaces ", se);
-        } catch (IOException e) {
-            LOG.error("ERROR closing client when sending JSON to CHIPS Rest Interfaces ", e);
         }
     }
 }

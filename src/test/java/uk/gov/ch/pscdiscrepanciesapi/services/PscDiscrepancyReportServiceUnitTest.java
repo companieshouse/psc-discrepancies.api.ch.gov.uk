@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
@@ -363,7 +364,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         PscDiscrepancyReport savedReport = createReport(VALID_EMAIL, ReportStatus.COMPLETE.toString());
         doReturn(mockSavedEntity).when(mockReportRepo).save(preexistingReportEntity);
         doReturn(savedReport).when(mockReportMapper).entityToRest(mockSavedEntity);
-// START OF NEW CODE
+
         PscDiscrepancy discrepancy = new PscDiscrepancy();
         discrepancy.setDetails("discrepancy");
         List<PscDiscrepancy> savedDiscrepancies = new ArrayList<>();
@@ -388,7 +389,151 @@ public class PscDiscrepancyReportServiceUnitTest {
         PscDiscrepancyReportEntity mockSavedSentEntity = mock(PscDiscrepancyReportEntity.class);
         doReturn(mockSavedSentEntity).when(mockReportRepo).save(mockSavedEntity);
 
-//END OF NEW CODE
+        PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
+        ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
+                reportWithUpdatesToApply, mockRequest);
+
+        assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
+        assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
+        assertSame(savedReport, result.getData());
+    }
+
+    @Test
+    @DisplayName("When a completed report is submitted to updatePscDiscrepancyReport, and the submit to chips fails, then the report is saved with a status of FAILED_TO_SUBMIT")
+    void updatePscDiscrepancyReportSendReportFailedToSubmit() throws ServiceException {
+        PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
+        PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
+                ReportStatus.INCOMPLETE.toString());
+        preexistingReportEntity.setData(preexistingReportEntityData);
+        PscDiscrepancyReport preexistingReport = createReport(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
+        doReturn(Optional.of(preexistingReportEntity)).when(mockReportRepo).findById(REPORT_ID);
+        doReturn(preexistingReport).when(mockReportMapper).entityToRest(preexistingReportEntity);
+
+        PscDiscrepancyReportEntity mockSavedEntity = mock(PscDiscrepancyReportEntity.class);
+        PscDiscrepancyReport savedReport = createReport(VALID_EMAIL, ReportStatus.COMPLETE.toString());
+        doReturn(mockSavedEntity).when(mockReportRepo).save(preexistingReportEntity);
+        doReturn(savedReport).when(mockReportMapper).entityToRest(mockSavedEntity);
+
+        PscDiscrepancy discrepancy = new PscDiscrepancy();
+        discrepancy.setDetails("discrepancy");
+        List<PscDiscrepancy> savedDiscrepancies = new ArrayList<>();
+        savedDiscrepancies.add(discrepancy);
+        doReturn(ServiceResult.found(savedDiscrepancies)).when(mockDiscrepancyService).getDiscrepancies(REPORT_ID, mockRequest);
+
+        HttpSession mockSession = mock(HttpSession.class);
+        when(mockRequest.getSession()).thenReturn(mockSession);
+        String requestId = "1";
+        when(mockSession.getId()).thenReturn(requestId);
+
+        PscSubmission expectedSubmission = new PscSubmission();
+        expectedSubmission.setReport(savedReport);
+        expectedSubmission.setDiscrepancies(savedDiscrepancies);
+
+        doReturn(false).when(mockSender).send(eq(expectedSubmission), any(CloseableHttpClient.class),
+                any(ObjectMapper.class), eq(requestId));
+
+        PscDiscrepancyReportEntityData mockSavedEntityData = mock(PscDiscrepancyReportEntityData.class);
+        when(mockSavedEntity.getData()).thenReturn(mockSavedEntityData);
+        doNothing().when(mockSavedEntityData).setStatus(ReportStatus.FAILED_TO_SUBMIT.toString());
+        PscDiscrepancyReportEntity mockSavedSentEntity = mock(PscDiscrepancyReportEntity.class);
+        doReturn(mockSavedSentEntity).when(mockReportRepo).save(mockSavedEntity);
+
+        PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
+        ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
+                reportWithUpdatesToApply, mockRequest);
+
+        assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
+        assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
+        assertSame(savedReport, result.getData());
+    }
+
+    @Test
+    @DisplayName("When updatePscDiscrepancyReport has an updated report with the status of complete, then it sends the report. If true, save report with status of SUBMITTED")
+    void updatePscDiscrepancyReportSendReportCatchesMongoEx() throws ServiceException {
+        PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
+        PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
+                ReportStatus.INCOMPLETE.toString());
+        preexistingReportEntity.setData(preexistingReportEntityData);
+        PscDiscrepancyReport preexistingReport = createReport(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
+        doReturn(Optional.of(preexistingReportEntity)).when(mockReportRepo).findById(REPORT_ID);
+        doReturn(preexistingReport).when(mockReportMapper).entityToRest(preexistingReportEntity);
+
+        PscDiscrepancyReportEntity mockSavedEntity = mock(PscDiscrepancyReportEntity.class);
+        PscDiscrepancyReport savedReport = createReport(VALID_EMAIL, ReportStatus.COMPLETE.toString());
+        doReturn(mockSavedEntity).when(mockReportRepo).save(preexistingReportEntity);
+        doReturn(savedReport).when(mockReportMapper).entityToRest(mockSavedEntity);
+
+        PscDiscrepancy discrepancy = new PscDiscrepancy();
+        discrepancy.setDetails("discrepancy");
+        List<PscDiscrepancy> savedDiscrepancies = new ArrayList<>();
+        savedDiscrepancies.add(discrepancy);
+        doReturn(ServiceResult.found(savedDiscrepancies)).when(mockDiscrepancyService).getDiscrepancies(REPORT_ID, mockRequest);
+
+        HttpSession mockSession = mock(HttpSession.class);
+        when(mockRequest.getSession()).thenReturn(mockSession);
+        String requestId = "1";
+        when(mockSession.getId()).thenReturn(requestId);
+
+        PscSubmission expectedSubmission = new PscSubmission();
+        expectedSubmission.setReport(savedReport);
+        expectedSubmission.setDiscrepancies(savedDiscrepancies);
+
+        doReturn(true).when(mockSender).send(eq(expectedSubmission), any(CloseableHttpClient.class),
+                any(ObjectMapper.class), eq(requestId));
+
+        PscDiscrepancyReportEntityData mockSavedEntityData = mock(PscDiscrepancyReportEntityData.class);
+        when(mockSavedEntity.getData()).thenReturn(mockSavedEntityData);
+        doNothing().when(mockSavedEntityData).setStatus(ReportStatus.SUBMITTED.toString());
+        doThrow(MongoException.class).when(mockReportRepo).save(mockSavedEntity);
+
+        PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
+        ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
+                reportWithUpdatesToApply, mockRequest);
+
+        assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
+        assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
+        assertSame(savedReport, result.getData());
+    }
+
+    @Test
+    @DisplayName("When updatePscDiscrepancyReport has an updated report with the status of complete, then it sends the report. If true, save report with status of SUBMITTED")
+    void updatePscDiscrepancyReportSendReportCatchesServiceEx() throws ServiceException {
+        PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
+        PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
+                ReportStatus.INCOMPLETE.toString());
+        preexistingReportEntity.setData(preexistingReportEntityData);
+        PscDiscrepancyReport preexistingReport = createReport(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
+        doReturn(Optional.of(preexistingReportEntity)).when(mockReportRepo).findById(REPORT_ID);
+        doReturn(preexistingReport).when(mockReportMapper).entityToRest(eq(preexistingReportEntity));
+
+        PscDiscrepancyReportEntity mockSavedEntity = mock(PscDiscrepancyReportEntity.class);
+        PscDiscrepancyReport savedReport = createReport(VALID_EMAIL, ReportStatus.COMPLETE.toString());
+        doReturn(mockSavedEntity).when(mockReportRepo).save(preexistingReportEntity);
+        doReturn(savedReport).when(mockReportMapper).entityToRest(mockSavedEntity);
+
+        PscDiscrepancy discrepancy = new PscDiscrepancy();
+        discrepancy.setDetails("discrepancy");
+        List<PscDiscrepancy> savedDiscrepancies = new ArrayList<>();
+        savedDiscrepancies.add(discrepancy);
+        doReturn(ServiceResult.found(savedDiscrepancies)).when(mockDiscrepancyService).getDiscrepancies(REPORT_ID, mockRequest);
+
+        HttpSession mockSession = mock(HttpSession.class);
+        when(mockRequest.getSession()).thenReturn(mockSession);
+        String requestId = "1";
+        when(mockSession.getId()).thenReturn(requestId);
+
+        PscSubmission expectedSubmission = new PscSubmission();
+        expectedSubmission.setReport(savedReport);
+        expectedSubmission.setDiscrepancies(savedDiscrepancies);
+
+        doReturn(true).when(mockSender).send(eq(expectedSubmission), any(CloseableHttpClient.class),
+                any(ObjectMapper.class), eq(requestId));
+
+        PscDiscrepancyReportEntityData mockSavedEntityData = mock(PscDiscrepancyReportEntityData.class);
+        when(mockSavedEntity.getData()).thenReturn(mockSavedEntityData);
+        doNothing().when(mockSavedEntityData).setStatus(ReportStatus.SUBMITTED.toString());
+        doThrow(MongoException.class).when(mockReportRepo).save(mockSavedEntity);
+
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
