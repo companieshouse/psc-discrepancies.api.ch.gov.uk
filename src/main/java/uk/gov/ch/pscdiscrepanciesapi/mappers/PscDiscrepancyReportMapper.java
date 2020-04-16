@@ -11,15 +11,15 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 @Mapper(componentModel = "spring")
 public interface PscDiscrepancyReportMapper {
 
-    @Mapping(source = "pscDiscrepancyReport.data.kind", target = "kind")
-    @Mapping(source = "pscDiscrepancyReport.data.etag", target = "etag")
-    @Mapping(source = "pscDiscrepancyReport.data.obligedEntityName", target = "obligedEntityName")
-    @Mapping(source = "pscDiscrepancyReport.data.obligedEntityEmail", target = "obligedEntityEmail")
-    @Mapping(source = "pscDiscrepancyReport.data.companyNumber", target = "companyNumber")
-    @Mapping(source = "pscDiscrepancyReport.data.status", target = "status")
-    @Mapping(source = "pscDiscrepancyReport.data.links", target = "links")
+    @Mapping(source = "pscDiscrepancyReportEntity.data.kind", target = "kind")
+    @Mapping(source = "pscDiscrepancyReportEntity.data.etag", target = "etag")
+    @Mapping(source = "pscDiscrepancyReportEntity.data.obligedEntityName", target = "obligedEntityName")
+    @Mapping(source = "pscDiscrepancyReportEntity.data.obligedEntityEmail", target = "obligedEntityEmail")
+    @Mapping(source = "pscDiscrepancyReportEntity.data.companyNumber", target = "companyNumber")
+    @Mapping(source = "pscDiscrepancyReportEntity.data.status", target = "status")
+    @Mapping(source = "pscDiscrepancyReportEntity.data.links", target = "links.links")
 
-    PscDiscrepancyReport entityToRest(PscDiscrepancyReportEntity pscDiscrepancyReport);
+    PscDiscrepancyReport entityToRest(PscDiscrepancyReportEntity pscDiscrepancyReportEntity);
 
     @InheritInverseConfiguration
     PscDiscrepancyReportEntity restToEntity(PscDiscrepancyReport pscDiscrepancyReport);

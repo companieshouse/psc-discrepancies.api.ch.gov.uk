@@ -169,7 +169,7 @@ public class PscDiscrepancyService {
      * 
      * @return a Links object containing links to self and parent
      */
-    private Links linksForCreation(String pscDiscrepancyId, String pscDiscrepancyReportId) {
+    private Map<String, String> linksForCreation(String pscDiscrepancyId, String pscDiscrepancyReportId) {
 
         Links links = new Links();
 
@@ -179,7 +179,7 @@ public class PscDiscrepancyService {
         String pscDiscrepancyReportLink = linkFactory.createLinkPscDiscrepancyReport(pscDiscrepancyReportId);
         links.setLink(PscDiscrepancyLinkKeys.PSC_DISCREPANCY_REPORT, pscDiscrepancyReportLink);
 
-        return links;
+        return links.getLinks();
     }
 
     /**
