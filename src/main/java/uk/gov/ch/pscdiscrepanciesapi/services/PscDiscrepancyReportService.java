@@ -109,9 +109,7 @@ public class PscDiscrepancyReportService {
         Errors validationErrors = validateCreate(pscDiscrepancyReport);
 
         if (validationErrors.hasErrors()) {
-            Map<String, Object> debugMap = new HashMap<>();
-            debugMap.put("validationErrors", validationErrors);
-            LOG.error("Validation errors", debugMap);
+            LOG.error("Validation errors", buildErrorLogMap(validationErrors));
             return ServiceResult.invalid(validationErrors);
         }
 

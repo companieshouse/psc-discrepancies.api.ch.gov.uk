@@ -196,9 +196,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertThrows(ServiceException.class, () -> pscDiscrepancyReportService
                 .createPscDiscrepancyReport(pscDiscrepancyReport, mockRequest));
     }
-//TODO Step 1: Get status to not be complete to miss new code, 
-    // step 2: Add new test to test complete status path 
-    //
+
     @Test
     @DisplayName("When updateDiscrepancyReport finds an existing report to update, then it updates it and returns success")
     void updatePscDiscrepancyReport() throws ServiceException {
@@ -337,6 +335,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
     }
+
     @Test
     @DisplayName("When updateDiscrepancyReport cannot find existing report, then it returns not found")
     void updatePscDiscrepancyReportCannotFindExistingReturnsNotFound() throws ServiceException {
@@ -356,7 +355,7 @@ public class PscDiscrepancyReportServiceUnitTest {
     }
 
     @Test
-    @DisplayName("When updatePscDiscrepancyReport has an updated report with the status of complete, then it sends the report. If true, save report with status of SUBMITTED")
+    @DisplayName("When a completed report is submitted to updatePscDiscrepancyReport, and the submit to chips succeeds, then the report is saved with a status of SUBMITTED")
     void updatePscDiscrepancyReportSendReportSubmitted() throws ServiceException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
         PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
@@ -440,7 +439,7 @@ public class PscDiscrepancyReportServiceUnitTest {
     }
 
     @Test
-    @DisplayName("When updatePscDiscrepancyReport has an updated report with the status of complete, then it sends the report. If true, save report with status of SUBMITTED")
+    @DisplayName("When update leads to a report being sent to chips and the saving of the result of that sent throws a MongoEx, then that ex is swallowed.")
     void updatePscDiscrepancyReportSendReportCatchesMongoEx() throws ServiceException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
         PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
@@ -482,7 +481,7 @@ public class PscDiscrepancyReportServiceUnitTest {
     }
 
     @Test
-    @DisplayName("When updatePscDiscrepancyReport has an updated report with the status of complete, then it sends the report. If true, save report with status of SUBMITTED")
+    @DisplayName("When update leads to a report being sent to chips and the send throws a ServiceException, then the exception is swallowed and report status is saved as FAILED_TO_SEND.")
     void updatePscDiscrepancyReportSendReportCatchesServiceEx() throws ServiceException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
         PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
