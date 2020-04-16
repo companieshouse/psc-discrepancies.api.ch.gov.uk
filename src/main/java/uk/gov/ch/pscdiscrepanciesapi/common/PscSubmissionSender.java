@@ -34,15 +34,19 @@ public class PscSubmissionSender {
 
     private final String postUrl;
     
+    private ObjectMapper objectMapper;
+
     public PscSubmissionSender() {
         this(new EnvironmentReaderImpl());
     }
-    
+
     public PscSubmissionSender(EnvironmentReader environmentReader) {
         this.postUrl = environmentReader.getMandatoryString(CHIPS_REST_INTERFACE_ENDPOINT);
+        this.objectMapper = new ObjectMapper();
     }
 
-    public boolean send(PscSubmission submission,CloseableHttpClient client,ObjectMapper objectMapper,String requestId) throws ServiceException {
+    public boolean send(PscSubmission submission, CloseableHttpClient client, String requestId)
+            throws ServiceException {
         try {
             submission.setRequestId(requestId);
             String discrepancyJson = objectMapper.writeValueAsString(submission);

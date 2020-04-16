@@ -21,7 +21,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoException;
 
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
@@ -75,37 +74,37 @@ public class PscDiscrepancyReportService {
     private final PscSubmissionSender pscSubmissionSender;
 
     public PscDiscrepancyReportService(@Autowired PscDiscrepancyReportRepository pscDiscrepancyReportRepository,
-            @Autowired PscDiscrepancyReportMapper pscDiscrepancyReportMapper,@Autowired PscSubmissionSender pscSubmissionSender,
-            @Autowired PscDiscrepancyService pscDiscrepancyService, @Autowired LinkFactory linkFactory) {
+            @Autowired PscDiscrepancyReportMapper pscDiscrepancyReportMapper,
+            @Autowired PscSubmissionSender pscSubmissionSender, @Autowired PscDiscrepancyService pscDiscrepancyService,
+            @Autowired LinkFactory linkFactory) {
         this.pscDiscrepancyReportRepository = pscDiscrepancyReportRepository;
         this.pscDiscrepancyReportMapper = pscDiscrepancyReportMapper;
         this.pscSubmissionSender = pscSubmissionSender;
-        this.pscDiscrepancyService = pscDiscrepancyService; 
+        this.pscDiscrepancyService = pscDiscrepancyService;
         this.linkFactory = linkFactory;
     }
 
     public PscDiscrepancyReport findPscDiscrepancyReportById(String reportId) {
-        Optional<PscDiscrepancyReportEntity> storedReport =
-                pscDiscrepancyReportRepository.findById(reportId);
+        Optional<PscDiscrepancyReportEntity> storedReport = pscDiscrepancyReportRepository.findById(reportId);
 
-        return storedReport.map(pscDiscrepancyReportEntity -> pscDiscrepancyReportMapper
-                .entityToRest(pscDiscrepancyReportEntity)).orElse(null);
+        return storedReport
+                .map(pscDiscrepancyReportEntity -> pscDiscrepancyReportMapper.entityToRest(pscDiscrepancyReportEntity))
+                .orElse(null);
     }
-   
+
     /**
      * Create a PSC discrepancy report.
      * 
      * @param pscDiscrepancyReport Report details to be stored
-     * @param request Http request
+     * @param request              Http request
      * 
      * @return ServiceResult object with created PSC discrepancy report
      * 
      * @throws ServiceException
      */
-    public ServiceResult<PscDiscrepancyReport> createPscDiscrepancyReport(
-            PscDiscrepancyReport pscDiscrepancyReport, HttpServletRequest request)
-            throws ServiceException {
-        
+    public ServiceResult<PscDiscrepancyReport> createPscDiscrepancyReport(PscDiscrepancyReport pscDiscrepancyReport,
+            HttpServletRequest request) throws ServiceException {
+
         Errors validationErrors = validateCreate(pscDiscrepancyReport);
 
         if (validationErrors.hasErrors()) {
@@ -114,8 +113,7 @@ public class PscDiscrepancyReportService {
         }
 
         try {
-            PscDiscrepancyReportEntity reportToStore =
-                    pscDiscrepancyReportMapper.restToEntity(pscDiscrepancyReport);
+            PscDiscrepancyReportEntity reportToStore = pscDiscrepancyReportMapper.restToEntity(pscDiscrepancyReport);
 
             String pscDiscrepancyReportId = UUID.randomUUID().toString();
             reportToStore.setId(pscDiscrepancyReportId);
@@ -124,73 +122,64 @@ public class PscDiscrepancyReportService {
             reportToStore.getData().setEtag(createEtag());
             reportToStore.getData().setLinks(linksForCreation(pscDiscrepancyReportId));
 
-            PscDiscrepancyReportEntity storedReport =
-                    pscDiscrepancyReportRepository.insert(reportToStore);
+            PscDiscrepancyReportEntity storedReport = pscDiscrepancyReportRepository.insert(reportToStore);
 
-            PscDiscrepancyReport reportToReturn =
-                    pscDiscrepancyReportMapper.entityToRest(storedReport);
+            PscDiscrepancyReport reportToReturn = pscDiscrepancyReportMapper.entityToRest(storedReport);
 
             return ServiceResult.created(reportToReturn);
         } catch (MongoException me) {
-            ServiceException serviceException =
-                    new ServiceException("Exception storing PSC discrepancy report: ", me);
-            LOG.errorRequest(request, serviceException,
-                    createPscDiscrepancyReportDebugMap(pscDiscrepancyReport));
+            ServiceException serviceException = new ServiceException("Exception storing PSC discrepancy report: ", me);
+            LOG.errorRequest(request, serviceException, createPscDiscrepancyReportDebugMap(pscDiscrepancyReport));
             throw serviceException;
         }
     }
 
     /**
-     * Updates the report with ID reportId, but only after running validation checks. If the report
-     * cannot be found, this returns {@link ServiceResult#notFound()}. If there is one or more
-     * validation failures, this returns {@link ServiceResult#invalid(Errors)} containing details of
-     * all the problems found.
+     * Updates the report with ID reportId, but only after running validation
+     * checks. If the report cannot be found, this returns
+     * {@link ServiceResult#notFound()}. If there is one or more validation
+     * failures, this returns {@link ServiceResult#invalid(Errors)} containing
+     * details of all the problems found.
      * 
-     * @param reportId ID of the report to update.
+     * @param reportId                 ID of the report to update.
      * @param reportWithUpdatesToApply Contains the changes
-     * @param request The original request that lead to this method being called.
+     * @param request                  The original request that lead to this method
+     *                                 being called.
      * @return The updated and stored report, with a new etag.
-     * @throws ServiceException If an unexpected problem is encountered, e.g. the underlying
-     *         database throws an exception.
+     * @throws ServiceException If an unexpected problem is encountered, e.g. the
+     *                          underlying database throws an exception.
      */
     public ServiceResult<PscDiscrepancyReport> updatePscDiscrepancyReport(String reportId,
-                    PscDiscrepancyReport reportWithUpdatesToApply, HttpServletRequest request)
-                    throws ServiceException {
+            PscDiscrepancyReport reportWithUpdatesToApply, HttpServletRequest request) throws ServiceException {
         final ServiceResult<PscDiscrepancyReport> reportToReturn;
         try {
-            Optional<PscDiscrepancyReportEntity> queryResult =
-                            pscDiscrepancyReportRepository.findById(reportId);
+            Optional<PscDiscrepancyReportEntity> queryResult = pscDiscrepancyReportRepository.findById(reportId);
             if (!queryResult.isPresent()) {
                 reportToReturn = ServiceResult.notFound();
             } else {
                 PscDiscrepancyReportEntity preexistingReportEntity = queryResult.get();
-                PscDiscrepancyReport preexistingReport =
-                                pscDiscrepancyReportMapper.entityToRest(preexistingReportEntity);
+                PscDiscrepancyReport preexistingReport = pscDiscrepancyReportMapper
+                        .entityToRest(preexistingReportEntity);
 
-                Errors validationErrors =
-                                validateUpdate(preexistingReport, reportWithUpdatesToApply);
+                Errors validationErrors = validateUpdate(preexistingReport, reportWithUpdatesToApply);
                 if (validationErrors.hasErrors()) {
                     LOG.error("Validation errors", buildErrorLogMap(validationErrors));
                     reportToReturn = ServiceResult.invalid(validationErrors);
                 } else {
-                    PscDiscrepancyReportEntityData preexistingReportEntityData =
-                                    preexistingReportEntity.getData();
+                    PscDiscrepancyReportEntityData preexistingReportEntityData = preexistingReportEntity.getData();
                     // Now copy over all values that are allowed to be updated
                     // We do this to prevent malicious/inadvertent changing of values that must
                     // not be set by anything other than this service, e.g. kind, links, etag...
                     preexistingReportEntityData.setStatus(reportWithUpdatesToApply.getStatus());
-                    preexistingReportEntityData.setObligedEntityEmail(
-                                    reportWithUpdatesToApply.getObligedEntityEmail());
-                    preexistingReportEntityData
-                                    .setCompanyNumber(reportWithUpdatesToApply.getCompanyNumber());
+                    preexistingReportEntityData.setObligedEntityEmail(reportWithUpdatesToApply.getObligedEntityEmail());
+                    preexistingReportEntityData.setCompanyNumber(reportWithUpdatesToApply.getCompanyNumber());
                     // Update the etag value, as this has changed
                     preexistingReportEntityData.setEtag(createEtag());
 
-                    PscDiscrepancyReportEntity storedReportEntity =
-                            pscDiscrepancyReportRepository.save(preexistingReportEntity);
+                    PscDiscrepancyReportEntity storedReportEntity = pscDiscrepancyReportRepository
+                            .save(preexistingReportEntity);
 
-                    PscDiscrepancyReport storedReport =
-                                    pscDiscrepancyReportMapper.entityToRest(storedReportEntity);
+                    PscDiscrepancyReport storedReport = pscDiscrepancyReportMapper.entityToRest(storedReportEntity);
                     reportToReturn = ServiceResult.updated(storedReport);
 
                     if (storedReport.getStatus().equals(ReportStatus.COMPLETE.toString())) {
@@ -199,25 +188,21 @@ public class PscDiscrepancyReportService {
                 }
             }
         } catch (MongoException me) {
-            ServiceException serviceException =
-                            new ServiceException("Exception storing PSC discrepancy report: ", me);
-            LOG.errorRequest(request, serviceException,
-                            createPscDiscrepancyReportDebugMap(reportWithUpdatesToApply));
+            ServiceException serviceException = new ServiceException("Exception storing PSC discrepancy report: ", me);
+            LOG.errorRequest(request, serviceException, createPscDiscrepancyReportDebugMap(reportWithUpdatesToApply));
             throw serviceException;
         }
         return reportToReturn;
     }
 
-    private Errors validateUpdate(PscDiscrepancyReport preexistingReport,
-                    PscDiscrepancyReport updatedReport) {
+    private Errors validateUpdate(PscDiscrepancyReport preexistingReport, PscDiscrepancyReport updatedReport) {
         Errors errData = new Errors();
         if (!preexistingReport.getEtag().equals(updatedReport.getEtag())) {
             Err nonMatchingEtag = Err.invalidBodyBuilderWithLocation("etag")
-                            .withError("Etag does not match. etag in system: " + preexistingReport.getEtag()
-                                            + " incoming etag: "
-                                            + updatedReport.getEtag()
-                                            + " You should GET, patch the result of the GET and UPDATE using that.")
-                            .build();
+                    .withError("Etag does not match. etag in system: " + preexistingReport.getEtag()
+                            + " incoming etag: " + updatedReport.getEtag()
+                            + " You should GET, patch the result of the GET and UPDATE using that.")
+                    .build();
             errData.addError(nonMatchingEtag);
         }
         validateEmail(errData, updatedReport.getObligedEntityEmail());
@@ -241,13 +226,12 @@ public class PscDiscrepancyReportService {
     private Errors validateStatus(Errors errors, String status) {
         Err error = null;
         if (status == null || status.isEmpty()) {
-            error = Err.invalidBodyBuilderWithLocation(STATUS)
-                            .withError(STATUS + " must not be empty or null").build();
+            error = Err.invalidBodyBuilderWithLocation(STATUS).withError(STATUS + " must not be empty or null").build();
             errors.addError(error);
         } else {
             if (!VALID_STATUSES.contains(status)) {
                 error = Err.invalidBodyBuilderWithLocation(STATUS)
-                                .withError(STATUS + " is not one of the correct values").build();
+                        .withError(STATUS + " is not one of the correct values").build();
                 errors.addError(error);
             }
         }
@@ -265,17 +249,17 @@ public class PscDiscrepancyReportService {
         Err error = null;
         if (email == null || email.isEmpty()) {
             error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
-                .withError(OBLIGED_ENTITY_EMAIL + " must not be empty or null").build();
+                    .withError(OBLIGED_ENTITY_EMAIL + " must not be empty or null").build();
             errors.addError(error);
         } else {
             String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]+$";
-            
+
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(email);
 
-            if(!matcher.matches()) {
+            if (!matcher.matches()) {
                 error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
-                    .withError(OBLIGED_ENTITY_EMAIL + " is not in the correct format").build();
+                        .withError(OBLIGED_ENTITY_EMAIL + " is not in the correct format").build();
                 errors.addError(error);
             }
         }
@@ -286,9 +270,9 @@ public class PscDiscrepancyReportService {
     private String createEtag() {
         return GenerateEtagUtil.generateEtag();
     }
-    
+
     private Links linksForCreation(String pscDiscrepancyReportId) {
-    
+
         Links links = new Links();
 
         String selfLink = linkFactory.createLinkPscDiscrepancyReport(pscDiscrepancyReportId);
@@ -296,7 +280,7 @@ public class PscDiscrepancyReportService {
 
         return links;
     }
-    
+
     /**
      * Create a debug map for structured logging
      * 
@@ -304,7 +288,7 @@ public class PscDiscrepancyReportService {
      * 
      * @return Debug map
      */
-    private Map<String,Object> createPscDiscrepancyReportDebugMap(PscDiscrepancyReport pscDiscrepancyReport) {
+    private Map<String, Object> createPscDiscrepancyReportDebugMap(PscDiscrepancyReport pscDiscrepancyReport) {
         final Map<String, Object> debugMap = new HashMap<>();
         debugMap.put("obliged_entity_name", pscDiscrepancyReport.getObligedEntityName());
         debugMap.put("obliged_entity_email", pscDiscrepancyReport.getObligedEntityEmail());
@@ -313,18 +297,16 @@ public class PscDiscrepancyReportService {
         return debugMap;
     }
 
-    private void onReportCompleted(PscDiscrepancyReport storedReport,
-                    PscDiscrepancyReportEntity storedReportEntity, HttpServletRequest request,
-                    String reportId) {
+    private void onReportCompleted(PscDiscrepancyReport storedReport, PscDiscrepancyReportEntity storedReportEntity,
+            HttpServletRequest request, String reportId) {
         boolean reportSent = false;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             PscSubmission reportToSubmit = new PscSubmission();
-            ServiceResult<List<PscDiscrepancy>> reportDetails =
-                            pscDiscrepancyService.getDiscrepancies(reportId, request);
+            ServiceResult<List<PscDiscrepancy>> reportDetails = pscDiscrepancyService.getDiscrepancies(reportId,
+                    request);
             reportToSubmit.setReport(storedReport);
             reportToSubmit.setDiscrepancies(reportDetails.getData());
-            reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, new ObjectMapper(),
-                            request.getSession().getId());
+            reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, request.getSession().getId());
         } catch (ServiceException ex) {
             LOG.error("ERROR Sending JSON to CHIPS Rest Interfaces ", ex);
         } catch (IOException e) {
@@ -341,7 +323,7 @@ public class PscDiscrepancyReportService {
             pscDiscrepancyReportRepository.save(storedReportEntity);
         } catch (MongoException mongoEx) {
             LOG.error("Error saving report with new status after attempting to submit report, with reportSent: "
-                            + reportSent, mongoEx);
+                    + reportSent, mongoEx);
         }
     }
 }

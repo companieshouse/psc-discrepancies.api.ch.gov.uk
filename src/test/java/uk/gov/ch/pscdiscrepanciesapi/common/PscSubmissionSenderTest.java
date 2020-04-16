@@ -78,7 +78,7 @@ public class PscSubmissionSenderTest {
         when(client.execute(any(HttpPost.class))).thenReturn(response);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
-        assertTrue(submissionSender.send(submission, client, objectMapper, REQUEST_ID));
+        assertTrue(submissionSender.send(submission, client, REQUEST_ID));
 
         verify(client).execute(capturedPost.capture());
 
@@ -94,7 +94,7 @@ public class PscSubmissionSenderTest {
         when(client.execute(any(HttpPost.class))).thenReturn(response);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_BAD_GATEWAY);
-        submissionSender.send(submission, client, objectMapper, REQUEST_ID);
+        submissionSender.send(submission, client, REQUEST_ID);
 
         verify(client).execute(capturedPost.capture());
 
@@ -108,7 +108,7 @@ public class PscSubmissionSenderTest {
     public void testThrowsJsonProcessingException() throws ClientProtocolException, IOException, ServiceException {
         when(objectMapper.writeValueAsString(submission)).thenThrow(JsonProcessingException.class);
         ServiceException se = assertThrows(ServiceException.class,
-                () -> submissionSender.send(submission, client, objectMapper, REQUEST_ID));
+                () -> submissionSender.send(submission, client, REQUEST_ID));
 
         String exceptionMessage = se.getMessage();
         assertTrue(exceptionMessage.contains("Error serialising to JSON"));
@@ -121,7 +121,7 @@ public class PscSubmissionSenderTest {
         when(client.execute(any(HttpPost.class))).thenReturn(response);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
-        submissionSender.send(submission, client, objectMapper, REQUEST_ID);
+        submissionSender.send(submission, client, REQUEST_ID);
 
         verify(client).execute((HttpUriRequest) capturedPost.capture());
 
@@ -137,7 +137,7 @@ public class PscSubmissionSenderTest {
         when(client.execute(any(HttpPost.class))).thenThrow(new IOException());
 
         ServiceException se = assertThrows(ServiceException.class,
-                () -> submissionSender.send(submission, client, objectMapper, REQUEST_ID));
+                () -> submissionSender.send(submission, client, REQUEST_ID));
 
         String exceptionMessage = se.getMessage();
         assertTrue(exceptionMessage.contains("Error serialising to JSON or sending payload"));
