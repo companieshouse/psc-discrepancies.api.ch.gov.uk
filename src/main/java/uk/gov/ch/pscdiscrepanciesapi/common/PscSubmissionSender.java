@@ -22,7 +22,7 @@ import uk.gov.companieshouse.environment.impl.EnvironmentReaderImpl;
 import uk.gov.companieshouse.service.ServiceException;
 
 /**
- * Listens for the creation of a PscDiscrepancySurvey, converts it to JSON, and sends by HTTP POST
+ * Listens for a completed PscDiscrepancyReport, converts it to JSON, and sends by HTTP POST
  * it to the supplied URL.
  *
  */
