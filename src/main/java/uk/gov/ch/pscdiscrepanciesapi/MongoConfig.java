@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
  * Custom configurations for Mongo
  *
  * 1. MappingMongoConverter that doesn't save _class to mongo.
- * 2. MongoClientOptions that externalises the connection pooling options
  */
 @Configuration
 public class MongoConfig {
