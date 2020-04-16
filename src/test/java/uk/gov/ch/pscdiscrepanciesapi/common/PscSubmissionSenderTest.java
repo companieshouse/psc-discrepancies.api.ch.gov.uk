@@ -37,26 +37,32 @@ import uk.gov.companieshouse.service.ServiceException;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class PscSubmissionSenderTest {
+    private static final String REQUEST_ID = "1234";
+    private static final String REST_API = "http://test.ch:00000/chips";
+    private static final String CHIPS_REST_INTERFACE_ENDPOINT = "CHIPS_REST_INTERFACE_ENDPOINT";
 
     @Mock
     private CloseableHttpResponse response;
+
     @Mock
     private HttpEntity entity;
+
     @Mock
     private ObjectMapper objectMapper;
+
     @Mock
     private StatusLine statusLine;
+
     @Mock
     private CloseableHttpClient client;
+
     @Mock
     private EnvironmentReader environmentReader;
 
     private PscSubmissionSender submissionSender;
+
     @Captor
-    private ArgumentCaptor<HttpPost> argCaptor;
-    private static final String REQUEST_ID = "1234";
-    private static final String REST_API = "http://test.ch:00000/chips";
-    private static final String CHIPS_REST_INTERFACE_ENDPOINT = "CHIPS_REST_INTERFACE_ENDPOINT";
+    private ArgumentCaptor<HttpPost> capturedPost;
     private PscSubmission submission;
 
     @BeforeEach
@@ -72,16 +78,14 @@ public class PscSubmissionSenderTest {
         when(client.execute(any(HttpPost.class))).thenReturn(response);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
-        submissionSender.send(submission, client, objectMapper, REQUEST_ID);
-        // assertTrue(submissionSender.send(submission, client, objectMapper, null));
+        assertTrue(submissionSender.send(submission, client, objectMapper, REQUEST_ID));
 
-        verify(client).execute(argCaptor.capture());
+        verify(client).execute(capturedPost.capture());
 
-        HttpPost httpPost = argCaptor.getValue();
+        HttpPost httpPost = capturedPost.getValue();
         StringEntity stringEntity = (StringEntity) httpPost.getEntity();
         String result = IOUtils.toString(stringEntity.getContent(), StandardCharsets.UTF_8);
         assertEquals("\"jsonSuccessful\"", result);
-
     }
 
     @Test
@@ -92,9 +96,9 @@ public class PscSubmissionSenderTest {
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_BAD_GATEWAY);
         submissionSender.send(submission, client, objectMapper, REQUEST_ID);
 
-        verify(client).execute(argCaptor.capture());
+        verify(client).execute(capturedPost.capture());
 
-        HttpPost httpPost = argCaptor.getValue();
+        HttpPost httpPost = capturedPost.getValue();
         StringEntity stringEntity = (StringEntity) httpPost.getEntity();
         String result = IOUtils.toString(stringEntity.getContent(), StandardCharsets.UTF_8);
         assertEquals("\"jsonUnsuccessful\"", result);
@@ -119,9 +123,9 @@ public class PscSubmissionSenderTest {
         when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
         submissionSender.send(submission, client, objectMapper, REQUEST_ID);
 
-        verify(client).execute((HttpUriRequest) argCaptor.capture());
+        verify(client).execute((HttpUriRequest) capturedPost.capture());
 
-        HttpPost httpPost = (HttpPost) argCaptor.getValue();
+        HttpPost httpPost = (HttpPost) capturedPost.getValue();
         StringEntity stringEntity = (StringEntity) httpPost.getEntity();
         String result = IOUtils.toString(stringEntity.getContent(), StandardCharsets.UTF_8);
         assertEquals("\"unquotedString\"", result);
