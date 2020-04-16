@@ -31,25 +31,23 @@ public class PscSubmissionSender {
 
     private static final String CHIPS_REST_INTERFACE_ENDPOINT = "CHIPS_REST_INTERFACE_ENDPOINT";
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final String postUrl;
     
-    private ObjectMapper objectMapper;
-
     public PscSubmissionSender() {
         this(new EnvironmentReaderImpl());
     }
 
     public PscSubmissionSender(EnvironmentReader environmentReader) {
         this.postUrl = environmentReader.getMandatoryString(CHIPS_REST_INTERFACE_ENDPOINT);
-        this.objectMapper = new ObjectMapper();
     }
 
     public boolean send(PscSubmission submission, CloseableHttpClient client, String requestId)
             throws ServiceException {
         try {
             submission.setRequestId(requestId);
-            String discrepancyJson = objectMapper.writeValueAsString(submission);
+            String discrepancyJson = OBJECT_MAPPER.writeValueAsString(submission);
             String sanitisedJson = JsonSanitizer.sanitize(discrepancyJson);
             StringEntity entity = new StringEntity(sanitisedJson);
             LOG.info("About to submit report: " + submission);
