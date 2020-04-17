@@ -12,6 +12,8 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 import uk.gov.companieshouse.service.links.Links;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.HashMap;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 public class PscDiscrepancyReportMapperUnitTest {
@@ -24,6 +26,7 @@ public class PscDiscrepancyReportMapperUnitTest {
     private static final String OBLIGED_ENTITY_EMAIL = "obligedEntityEmail";
     private static final String COMPANY_NUMBER = "companyNumber";
     private static final Links LINKS = new Links();
+    private static final Map<String, String> MAP_LINKS = new HashMap<>();
 
     private PscDiscrepancyReport pscDiscrepancyReport;
     private PscDiscrepancyReportEntity pscDiscrepancyReportEntity;
@@ -40,7 +43,7 @@ public class PscDiscrepancyReportMapperUnitTest {
         pscDiscrepancyReportData.setObligedEntityName(OBLIGED_ENTITY_NAME);
         pscDiscrepancyReportData.setObligedEntityEmail(OBLIGED_ENTITY_EMAIL);
         pscDiscrepancyReportData.setCompanyNumber(COMPANY_NUMBER);
-        pscDiscrepancyReportData.setLinks(LINKS);
+        pscDiscrepancyReportData.setLinks(MAP_LINKS);
         pscDiscrepancyReportEntity.setData(pscDiscrepancyReportData);
 
         pscDiscrepancyReport = new PscDiscrepancyReport();
