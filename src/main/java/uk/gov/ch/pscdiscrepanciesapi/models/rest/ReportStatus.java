@@ -5,5 +5,6 @@ public enum ReportStatus {
     COMPLETE,
     INVALID,
     SUBMITTED,
-    DELETED;
+    DELETED,
+    FAILED_TO_SUBMIT;
 }
