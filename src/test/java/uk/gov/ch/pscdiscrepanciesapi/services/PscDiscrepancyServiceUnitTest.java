@@ -320,13 +320,13 @@ public class PscDiscrepancyServiceUnitTest {
         return pscDiscrepancyEntity;
     }
 
-    private Links createLinks() {
+    private Map<String, String> createLinks() {
         Links links = new Links();
         Map<String, String> linksMap = new HashMap<String, String>();
         linksMap.put("self", SELF_LINK);
         linksMap.put(PscDiscrepancyLinkKeys.PSC_DISCREPANCY_REPORT.toString(), PARENT_LINK);
         links.setLinks(linksMap);
-        return links;
+        return links.getLinks();
     }
 
     private Err createErrors(String field, String message) {

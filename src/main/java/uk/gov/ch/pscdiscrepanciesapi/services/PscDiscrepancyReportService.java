@@ -271,14 +271,13 @@ public class PscDiscrepancyReportService {
         return GenerateEtagUtil.generateEtag();
     }
 
-    private Links linksForCreation(String pscDiscrepancyReportId) {
-
+    private Map<String, String> linksForCreation(String pscDiscrepancyReportId) {
         Links links = new Links();
 
         String selfLink = linkFactory.createLinkPscDiscrepancyReport(pscDiscrepancyReportId);
         links.setLink(CoreLinkKeys.SELF, selfLink);
 
-        return links;
+        return links.getLinks();
     }
 
     /**
