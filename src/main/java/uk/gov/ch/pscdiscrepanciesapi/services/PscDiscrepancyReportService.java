@@ -56,6 +56,7 @@ public class PscDiscrepancyReportService {
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
     private static final String STATUS = "Status";
     private static final String CONTACT_NAME = "Obliged Entity Contact Name";
+    private static final String EMPTY_OR_NULL_ERROR_MESSAGE = " must not be empty or null";
     private CharSetValidation charSetValidator = new CharSetValidationImpl();
 
     private static final Set<String> VALID_STATUSES;
@@ -216,7 +217,9 @@ public class PscDiscrepancyReportService {
         }
         validateEmail(errData, updatedReport.getObligedEntityEmail());
         validateStatus(errData, updatedReport.getStatus());
-        validateContactName(errData, updatedReport.getObligedEntityContactName());
+        if(updatedReport.getObligedEntityContactName() != null) {
+            validateContactName(errData, updatedReport.getObligedEntityContactName());
+        }
         return errData;
     }
 
@@ -236,7 +239,7 @@ public class PscDiscrepancyReportService {
     private Errors validateStatus(Errors errors, String status) {
         Err error = null;
         if (status == null || status.isEmpty()) {
-            error = Err.invalidBodyBuilderWithLocation(STATUS).withError(STATUS + " must not be empty or null").build();
+            error = Err.invalidBodyBuilderWithLocation(STATUS).withError(STATUS + EMPTY_OR_NULL_ERROR_MESSAGE).build();
             errors.addError(error);
         } else {
             if (!VALID_STATUSES.contains(status)) {
@@ -259,7 +262,7 @@ public class PscDiscrepancyReportService {
         Err error;
         if(contactName.isEmpty()) {
             error = Err.invalidBodyBuilderWithLocation(CONTACT_NAME)
-                    .withError(CONTACT_NAME + " must not be empty or null").build();
+                    .withError(CONTACT_NAME + " must not be empty").build();
             errors.addError(error);
         } else {
             if(!charSetValidator.validateCharSet(CharSet.CHARACTER_SET_2, contactName)) {
@@ -283,7 +286,7 @@ public class PscDiscrepancyReportService {
         Err error = null;
         if (email == null || email.isEmpty()) {
             error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
-                    .withError(OBLIGED_ENTITY_EMAIL + " must not be empty or null").build();
+                    .withError(OBLIGED_ENTITY_EMAIL + EMPTY_OR_NULL_ERROR_MESSAGE).build();
             errors.addError(error);
         } else {
             String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]+$";
