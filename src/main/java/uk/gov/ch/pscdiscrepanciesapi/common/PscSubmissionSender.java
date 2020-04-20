@@ -29,7 +29,8 @@ import uk.gov.companieshouse.service.ServiceException;
 @Service
 public class PscSubmissionSender {
 
-    private static final String CHIPS_REST_INTERFACE_ENDPOINT = "CHIPS_REST_INTERFACE_ENDPOINT";
+    private static final String PSC_DISCREPANCY_REPORT_SUBMISSION_URI =
+                    "PSC_DISCREPANCY_REPORT_SUBMISSION_URI";
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -40,7 +41,7 @@ public class PscSubmissionSender {
     }
 
     public PscSubmissionSender(EnvironmentReader environmentReader) {
-        this.postUrl = environmentReader.getMandatoryString(CHIPS_REST_INTERFACE_ENDPOINT);
+        this.postUrl = environmentReader.getMandatoryString(PSC_DISCREPANCY_REPORT_SUBMISSION_URI);
     }
 
     public boolean send(PscSubmission submission, CloseableHttpClient client, String requestId)
