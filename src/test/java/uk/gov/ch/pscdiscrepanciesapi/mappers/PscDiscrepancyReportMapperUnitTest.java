@@ -22,6 +22,7 @@ public class PscDiscrepancyReportMapperUnitTest {
 
     private static final String KIND = "kind";
     private static final String ETAG = "etag";
+    private static final String OBLIGED_ENTTIY_CONTACT_NAME = "contactName";
     private static final String OBLIGED_ENTITY_NAME = "obligedEntityName";
     private static final String OBLIGED_ENTITY_EMAIL = "obligedEntityEmail";
     private static final String COMPANY_NUMBER = "companyNumber";
@@ -62,6 +63,8 @@ public class PscDiscrepancyReportMapperUnitTest {
 
         assertEquals(pscDiscrepancyReport.getKind(), result.getKind());
         assertEquals(pscDiscrepancyReport.getEtag(), result.getEtag());
+        assertEquals(pscDiscrepancyReport.getObligedEntityContactName(),
+                result.getObligedEntityContactName());
         assertEquals(pscDiscrepancyReport.getObligedEntityName(), result.getObligedEntityName());
         assertEquals(pscDiscrepancyReport.getObligedEntityEmail(), result.getObligedEntityEmail());
         assertEquals(pscDiscrepancyReport.getCompanyNumber(), result.getCompanyNumber());
@@ -75,6 +78,8 @@ public class PscDiscrepancyReportMapperUnitTest {
 
         assertEquals(pscDiscrepancyReportEntity.getData().getKind(), result.getData().getKind());
         assertEquals(pscDiscrepancyReportEntity.getData().getEtag(), result.getData().getEtag());
+        assertEquals(pscDiscrepancyReportEntity.getData().getObligedEntityContactName(),
+                result.getData().getObligedEntityContactName());
         assertEquals(pscDiscrepancyReportEntity.getData().getObligedEntityName(), result.getData().getObligedEntityName());
         assertEquals(pscDiscrepancyReportEntity.getData().getObligedEntityEmail(), result.getData().getObligedEntityEmail());
         assertEquals(pscDiscrepancyReportEntity.getData().getCompanyNumber(), result.getData().getCompanyNumber());

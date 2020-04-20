@@ -36,6 +36,9 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscSubmission;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.ReportStatus;
 import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyReportRepository;
 import uk.gov.companieshouse.GenerateEtagUtil;
+import uk.gov.companieshouse.charset.CharSet;
+import uk.gov.companieshouse.charset.validation.CharSetValidation;
+import uk.gov.companieshouse.charset.validation.impl.CharSetValidationImpl;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.service.ServiceException;
@@ -52,6 +55,8 @@ public class PscDiscrepancyReportService {
 
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
     private static final String STATUS = "Status";
+    private static final String CONTACT_NAME = "Obliged Entity Contact Name";
+    private CharSetValidation charSetValidator = new CharSetValidationImpl();
 
     private static final Set<String> VALID_STATUSES;
 
@@ -171,8 +176,12 @@ public class PscDiscrepancyReportService {
                     // We do this to prevent malicious/inadvertent changing of values that must
                     // not be set by anything other than this service, e.g. kind, links, etag...
                     preexistingReportEntityData.setStatus(reportWithUpdatesToApply.getStatus());
-                    preexistingReportEntityData.setObligedEntityEmail(reportWithUpdatesToApply.getObligedEntityEmail());
-                    preexistingReportEntityData.setCompanyNumber(reportWithUpdatesToApply.getCompanyNumber());
+                    preexistingReportEntityData.setObligedEntityEmail(
+                                    reportWithUpdatesToApply.getObligedEntityEmail());
+                    preexistingReportEntityData
+                                    .setCompanyNumber(reportWithUpdatesToApply.getCompanyNumber());
+                    preexistingReportEntityData.setObligedEntityContactName(
+                            reportWithUpdatesToApply.getObligedEntityContactName());
                     // Update the etag value, as this has changed
                     preexistingReportEntityData.setEtag(createEtag());
 
@@ -207,6 +216,7 @@ public class PscDiscrepancyReportService {
         }
         validateEmail(errData, updatedReport.getObligedEntityEmail());
         validateStatus(errData, updatedReport.getStatus());
+        validateContactName(errData, updatedReport.getObligedEntityContactName());
         return errData;
     }
 
@@ -235,6 +245,30 @@ public class PscDiscrepancyReportService {
                 errors.addError(error);
             }
         }
+        return errors;
+    }
+
+    /**
+     * Validate obliged entity contact name
+     *
+     * @param contactName Contact name to validate
+     *
+     * @return Errors object containing any errors
+     */
+    private Errors validateContactName(Errors errors, String contactName) {
+        Err error;
+        if(contactName.isEmpty()) {
+            error = Err.invalidBodyBuilderWithLocation(CONTACT_NAME)
+                    .withError(CONTACT_NAME + " must not be empty or null").build();
+            errors.addError(error);
+        } else {
+            if(!charSetValidator.validateCharSet(CharSet.CHARACTER_SET_2, contactName)) {
+                error = Err.invalidBodyBuilderWithLocation(CONTACT_NAME)
+                        .withError(CONTACT_NAME + " contains an invalid character").build();
+                errors.addError(error);
+            }
+        }
+
         return errors;
     }
 

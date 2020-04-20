@@ -11,6 +11,9 @@ public class PscDiscrepancyReportEntityData {
     @Field("etag")
     private String etag;
 
+    @Field("obliged_entity_contact_name")
+    private String obligedEntityContactName;
+
     @Field("obliged_entity_name")
     private String obligedEntityName;
 
@@ -48,6 +51,14 @@ public class PscDiscrepancyReportEntityData {
 
     public void setObligedEntityName(String obligedEntityName) {
         this.obligedEntityName = obligedEntityName;
+    }
+
+    public String getObligedEntityContactName() {
+        return obligedEntityContactName;
+    }
+
+    public void setObligedEntityContactName(String obligedEntityContactName) {
+        this.obligedEntityContactName = obligedEntityContactName;
     }
 
     public String getObligedEntityEmail() {

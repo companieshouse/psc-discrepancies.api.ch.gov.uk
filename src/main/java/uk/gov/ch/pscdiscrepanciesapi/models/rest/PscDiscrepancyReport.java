@@ -9,6 +9,9 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
     @JsonProperty("obliged_entity_name")
     private String obligedEntityName;
 
+    @JsonProperty("obliged_entity_contact_name")
+    private String obligedEntityContactName;
+
     @JsonProperty("obliged_entity_email")
     private String obligedEntityEmail;
 
@@ -24,6 +27,14 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
 
     public void setObligedEntityName(String obligedEntityName) {
         this.obligedEntityName = obligedEntityName;
+    }
+
+    public String getObligedEntityContactName() {
+        return obligedEntityContactName;
+    }
+
+    public void setObligedEntityContactName(String obligedEntityContactName) {
+        this.obligedEntityContactName = obligedEntityContactName;
     }
 
     public String getObligedEntityEmail() {
