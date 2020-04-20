@@ -257,7 +257,7 @@ public class PscDiscrepancyReportService {
      */
     private Errors validateContactName(Errors errors, String contactName) {
         Err error;
-        if(contactName == null || contactName.isEmpty()) {
+        if(contactName.isEmpty()) {
             error = Err.invalidBodyBuilderWithLocation(CONTACT_NAME)
                     .withError(CONTACT_NAME + " must not be empty or null").build();
             errors.addError(error);

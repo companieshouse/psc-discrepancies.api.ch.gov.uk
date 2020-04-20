@@ -271,31 +271,6 @@ public class PscDiscrepancyReportServiceUnitTest {
     }
 
     @Test
-    @DisplayName("When updatePscDiscrepancy is supplied with a null contact name, then it returns an invalid ServiceResult")
-    void updatePscDiscrepancyReport_NullContactName() throws ServiceException{
-        PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
-        PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
-        preexistingReportEntity.setData(preexistingReportEntityData);
-        PscDiscrepancyReport preexistingReport = createReport(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
-        when(mockReportRepo.findById(REPORT_ID)).thenReturn(Optional.of(preexistingReportEntity));
-        when(mockReportMapper.entityToRest(preexistingReportEntity))
-                .thenReturn(preexistingReport);
-
-        Errors errData = new Errors();
-        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
-                .withError(OBLIGED_ENTITY_CONTACT_NAME + " must not be empty or null").build();
-        errData.addError(error);
-
-        PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
-        reportWithUpdatesToApply.setObligedEntityContactName(null);
-        ServiceResult<PscDiscrepancyReport> result =
-                pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID, reportWithUpdatesToApply, mockRequest);
-        assertNotNull(result);
-        assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
-        assertTrue(result.getErrors().containsError(error));
-    }
-
-    @Test
     @DisplayName("When updatePscDiscrepancy is supplied with a badly formatted obliged entity email, then it returns an invalid ServiceResult.")
     void updatePscDiscrepancyReportReturnsInvalidServiceResultWhenIncorrectEmailFormat() throws ServiceException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
