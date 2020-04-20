@@ -258,7 +258,7 @@ public class PscDiscrepancyReportServiceUnitTest {
 
         Errors errData = new Errors();
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
-                .withError(OBLIGED_ENTITY_CONTACT_NAME + " must not be empty or null").build();
+                .withError(OBLIGED_ENTITY_CONTACT_NAME + " must not be empty").build();
         errData.addError(error);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
