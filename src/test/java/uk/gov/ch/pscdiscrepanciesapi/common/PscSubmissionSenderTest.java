@@ -47,7 +47,7 @@ import uk.gov.companieshouse.service.ServiceException;
 public class PscSubmissionSenderTest {
     private static final String REQUEST_ID = "1234";
     private static final String REST_API = "http://test.ch:00000/chips";
-    private static final String CHIPS_REST_INTERFACE_ENDPOINT = "CHIPS_REST_INTERFACE_ENDPOINT";
+    private static final String PSC_DISCREPANCY_REPORT_SUBMISSION_URI = "PSC_DISCREPANCY_REPORT_SUBMISSION_URI";
     private static final String DISCREPANCY_DETAILS = "discrepancy";
     private static final String VALID_EMAIL = "m@m.com";
     private static final String ETAG_1 = "1";
@@ -75,7 +75,7 @@ public class PscSubmissionSenderTest {
 
     @BeforeEach
     public void setUp() {
-        when(environmentReader.getMandatoryString(CHIPS_REST_INTERFACE_ENDPOINT)).thenReturn(REST_API);
+        when(environmentReader.getMandatoryString(PSC_DISCREPANCY_REPORT_SUBMISSION_URI)).thenReturn(REST_API);
         submissionSender = new PscSubmissionSender(environmentReader);
         submission = new PscSubmission();
         PscDiscrepancyReport report = createReport(VALID_EMAIL, ReportStatus.COMPLETE.toString());
