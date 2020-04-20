@@ -216,7 +216,9 @@ public class PscDiscrepancyReportService {
         }
         validateEmail(errData, updatedReport.getObligedEntityEmail());
         validateStatus(errData, updatedReport.getStatus());
-        validateContactName(errData, updatedReport.getObligedEntityContactName());
+        if(updatedReport.getObligedEntityContactName() != null) {
+            validateContactName(errData, updatedReport.getObligedEntityContactName());
+        }
         return errData;
     }
 
