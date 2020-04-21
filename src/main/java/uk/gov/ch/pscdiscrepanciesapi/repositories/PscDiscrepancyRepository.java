@@ -11,6 +11,6 @@ import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyEntity;
 @Repository
 public interface PscDiscrepancyRepository extends MongoRepository<PscDiscrepancyEntity, String> {
 	
-	@Query(value="{'data.links.linksMap.psc-discrepancy-reports' : ?0}")
+	@Query(value="{'data.links.psc-discrepancy-report' : ?0}")
 	public List<PscDiscrepancyEntity> getDiscrepancies(String reportLink);
 }

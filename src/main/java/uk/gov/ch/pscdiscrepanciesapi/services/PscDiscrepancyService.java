@@ -147,6 +147,7 @@ public class PscDiscrepancyService {
                 }
                 return ServiceResult.found(retrievedDiscrepancies);
             } else {
+                LOG.error("discrepancies not found");
                 return ServiceResult.notFound();
             }
         } catch (MongoException me) {
