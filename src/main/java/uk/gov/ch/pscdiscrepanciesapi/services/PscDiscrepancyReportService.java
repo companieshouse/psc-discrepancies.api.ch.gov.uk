@@ -2,27 +2,17 @@ package uk.gov.ch.pscdiscrepanciesapi.services;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.mongodb.MongoException;
-
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
 import uk.gov.ch.pscdiscrepanciesapi.common.Kind;
 import uk.gov.ch.pscdiscrepanciesapi.common.LinkFactory;
@@ -35,40 +25,21 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscSubmission;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.ReportStatus;
 import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyReportRepository;
+import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyReportValidator;
+import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyValidator;
 import uk.gov.companieshouse.GenerateEtagUtil;
-import uk.gov.companieshouse.charset.CharSet;
-import uk.gov.companieshouse.charset.validation.CharSetValidation;
-import uk.gov.companieshouse.charset.validation.impl.CharSetValidationImpl;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.service.ServiceException;
 import uk.gov.companieshouse.service.ServiceResult;
 import uk.gov.companieshouse.service.links.CoreLinkKeys;
 import uk.gov.companieshouse.service.links.Links;
-import uk.gov.companieshouse.service.rest.err.Err;
 import uk.gov.companieshouse.service.rest.err.Errors;
 
 @Service
 public class PscDiscrepancyReportService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
-
-    private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
-    private static final String STATUS = "Status";
-    private static final String CONTACT_NAME = "Obliged Entity Contact Name";
-    private static final String EMPTY_OR_NULL_ERROR_MESSAGE = " must not be empty or null";
-    private CharSetValidation charSetValidator = new CharSetValidationImpl();
-
-    private static final Set<String> VALID_STATUSES;
-
-    static {
-        Set<ReportStatus> all = EnumSet.allOf(ReportStatus.class);
-        Set<String> temp = new HashSet<>();
-        for (ReportStatus status : all) {
-            temp.add(status.name());
-        }
-        VALID_STATUSES = Collections.unmodifiableSet(temp);
-    }
 
     private final PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
 
@@ -78,6 +49,12 @@ public class PscDiscrepancyReportService {
 
     private final LinkFactory linkFactory;
     private final PscSubmissionSender pscSubmissionSender;
+
+    @Autowired
+    private PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
+
+    @Autowired
+    private PscDiscrepancyValidator pscDiscrepancyValidator;
 
     public PscDiscrepancyReportService(@Autowired PscDiscrepancyReportRepository pscDiscrepancyReportRepository,
             @Autowired PscDiscrepancyReportMapper pscDiscrepancyReportMapper,
@@ -111,7 +88,7 @@ public class PscDiscrepancyReportService {
     public ServiceResult<PscDiscrepancyReport> createPscDiscrepancyReport(PscDiscrepancyReport pscDiscrepancyReport,
             HttpServletRequest request) throws ServiceException {
 
-        Errors validationErrors = validateCreate(pscDiscrepancyReport);
+        Errors validationErrors = pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, new Errors());
 
         if (validationErrors.hasErrors()) {
             LOG.error("Validation errors", buildErrorLogMap(validationErrors));
@@ -167,7 +144,8 @@ public class PscDiscrepancyReportService {
                 PscDiscrepancyReport preexistingReport = pscDiscrepancyReportMapper
                         .entityToRest(preexistingReportEntity);
 
-                Errors validationErrors = validateUpdate(preexistingReport, reportWithUpdatesToApply);
+                Errors validationErrors = pscDiscrepancyReportValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply);
+                
                 if (validationErrors.hasErrors()) {
                     LOG.error("Validation errors", buildErrorLogMap(validationErrors));
                     reportToReturn = ServiceResult.invalid(validationErrors);
@@ -205,103 +183,11 @@ public class PscDiscrepancyReportService {
         return reportToReturn;
     }
 
-    private Errors validateUpdate(PscDiscrepancyReport preexistingReport, PscDiscrepancyReport updatedReport) {
-        Errors errData = new Errors();
-        if (!preexistingReport.getEtag().equals(updatedReport.getEtag())) {
-            Err nonMatchingEtag = Err.invalidBodyBuilderWithLocation("etag")
-                    .withError("Etag does not match. etag in system: " + preexistingReport.getEtag()
-                            + " incoming etag: " + updatedReport.getEtag()
-                            + " You should GET, patch the result of the GET and UPDATE using that.")
-                    .build();
-            errData.addError(nonMatchingEtag);
-        }
-        validateEmail(errData, updatedReport.getObligedEntityEmail());
-        validateStatus(errData, updatedReport.getStatus());
-        if(updatedReport.getObligedEntityContactName() != null) {
-            validateContactName(errData, updatedReport.getObligedEntityContactName());
-        }
-        return errData;
-    }
-
-    private Errors validateCreate(PscDiscrepancyReport report) {
-        Errors errors = new Errors();
-        validateEmail(errors, report.getObligedEntityEmail());
-        return errors;
-    }
-
     private Map<String, Object> buildErrorLogMap(Errors validationErrors) {
         Map<String, Object> debugMap = new HashMap<>();
         debugMap.put("validationErrors", validationErrors);
         return debugMap;
 
-    }
-
-    private Errors validateStatus(Errors errors, String status) {
-        Err error = null;
-        if (status == null || status.isEmpty()) {
-            error = Err.invalidBodyBuilderWithLocation(STATUS).withError(STATUS + EMPTY_OR_NULL_ERROR_MESSAGE).build();
-            errors.addError(error);
-        } else {
-            if (!VALID_STATUSES.contains(status)) {
-                error = Err.invalidBodyBuilderWithLocation(STATUS)
-                        .withError(STATUS + " is not one of the correct values").build();
-                errors.addError(error);
-            }
-        }
-        return errors;
-    }
-
-    /**
-     * Validate obliged entity contact name
-     *
-     * @param contactName Contact name to validate
-     *
-     * @return Errors object containing any errors
-     */
-    private Errors validateContactName(Errors errors, String contactName) {
-        Err error;
-        if(contactName.isEmpty()) {
-            error = Err.invalidBodyBuilderWithLocation(CONTACT_NAME)
-                    .withError(CONTACT_NAME + " must not be empty").build();
-            errors.addError(error);
-        } else {
-            if(!charSetValidator.validateCharSet(CharSet.CHARACTER_SET_2, contactName)) {
-                error = Err.invalidBodyBuilderWithLocation(CONTACT_NAME)
-                        .withError(CONTACT_NAME + " contains an invalid character").build();
-                errors.addError(error);
-            }
-        }
-
-        return errors;
-    }
-
-    /**
-     * Validate obliged entity email.
-     * 
-     * @param email Email to validate
-     * 
-     * @return Errors object containing any errors
-     */
-    private Errors validateEmail(Errors errors, String email) {
-        Err error = null;
-        if (email == null || email.isEmpty()) {
-            error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
-                    .withError(OBLIGED_ENTITY_EMAIL + EMPTY_OR_NULL_ERROR_MESSAGE).build();
-            errors.addError(error);
-        } else {
-            String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]+$";
-
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(email);
-
-            if (!matcher.matches()) {
-                error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
-                        .withError(OBLIGED_ENTITY_EMAIL + " is not in the correct format").build();
-                errors.addError(error);
-            }
-        }
-
-        return errors;
     }
 
     private String createEtag() {
@@ -326,7 +212,7 @@ public class PscDiscrepancyReportService {
      */
     private Map<String, Object> createPscDiscrepancyReportDebugMap(PscDiscrepancyReport pscDiscrepancyReport) {
         final Map<String, Object> debugMap = new HashMap<>();
-        debugMap.put("obliged_entity_name", pscDiscrepancyReport.getObligedEntityName());
+        debugMap.put("obliged_entity_contact_name", pscDiscrepancyReport.getObligedEntityContactName());
         debugMap.put("obliged_entity_email", pscDiscrepancyReport.getObligedEntityEmail());
         debugMap.put("company_number", pscDiscrepancyReport.getCompanyNumber());
         debugMap.put("status", pscDiscrepancyReport.getStatus());
@@ -336,13 +222,21 @@ public class PscDiscrepancyReportService {
     private void onReportCompleted(PscDiscrepancyReport storedReport, PscDiscrepancyReportEntity storedReportEntity,
             HttpServletRequest request, String reportId) {
         boolean reportSent = false;
+        
+        Errors validationErrors = new Errors();
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            // Validate everything that needs to be sent to CHIPS
+            validationErrors = pscDiscrepancyReportValidator.validate(storedReport, new Errors());
             PscSubmission reportToSubmit = new PscSubmission();
             ServiceResult<List<PscDiscrepancy>> reportDetails = pscDiscrepancyService.getDiscrepancies(reportId,
                     request);
-            reportToSubmit.setReport(storedReport);
-            reportToSubmit.setDiscrepancies(reportDetails.getData());
-            reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, request.getSession().getId());
+            pscDiscrepancyValidator.validateOnSubmission(reportDetails.getData(), validationErrors);
+
+            if (!validationErrors.hasErrors()) {
+                reportToSubmit.setReport(storedReport);
+                reportToSubmit.setDiscrepancies(reportDetails.getData());
+                reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, request.getSession().getId());
+            }
         } catch (ServiceException ex) {
             LOG.error("ERROR Sending JSON to CHIPS Rest Interfaces ", ex);
         } catch (IOException e) {
@@ -351,7 +245,10 @@ public class PscDiscrepancyReportService {
 
         try {
             PscDiscrepancyReportEntityData sentReportEntityData = storedReportEntity.getData();
-            if (reportSent) {
+            if(validationErrors.hasErrors()) {
+                LOG.error("Validation errors", buildErrorLogMap(validationErrors));
+                sentReportEntityData.setStatus(ReportStatus.INVALID.toString());
+            } else if (reportSent) {
                 sentReportEntityData.setStatus(ReportStatus.SUBMITTED.toString());
             } else {
                 sentReportEntityData.setStatus(ReportStatus.FAILED_TO_SUBMIT.toString());
