@@ -28,7 +28,7 @@ public class PscDiscrepancyValidator extends Validators {
             Err err = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS).withError(" no discrepancies for report").build();
             errs.addError(err);
         } else {
-            pscDiscrepancies.forEach(d -> {validateForCreation(d, errs);});
+            pscDiscrepancies.forEach(d -> validateForCreation(d, errs));
         }
         return errs;
     }
