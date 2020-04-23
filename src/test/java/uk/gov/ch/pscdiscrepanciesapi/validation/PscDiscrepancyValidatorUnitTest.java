@@ -83,7 +83,8 @@ public class PscDiscrepancyValidatorUnitTest {
         pscDiscrepancies = new ArrayList<>();
         pscDiscrepancies.add(pscDiscrepancy);
 
-        Errors errorsFromValidation = pscDiscrepancyValidator.validateOnSubmission(pscDiscrepancies, errors);
+        Errors errorsFromValidation =
+                pscDiscrepancyValidator.validateOnSubmission(pscDiscrepancies, errors);
 
         assertFalse(errorsFromValidation.hasErrors());
     }
@@ -93,9 +94,11 @@ public class PscDiscrepancyValidatorUnitTest {
     void validateOnSubmission_Unsuccessful_EmptyDiscrepancyList() {
         Errors errors = new Errors();
         pscDiscrepancies = new ArrayList<>();
-        Err err = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS_LOCATION).withError(" no discrepancies for report").build();
+        Err err =
+                Err.serviceErrBuilder().withError("No discrepancies exist for the report").build();
 
-        Errors errorsFromValidation = pscDiscrepancyValidator.validateOnSubmission(pscDiscrepancies, errors);
+        Errors errorsFromValidation =
+                pscDiscrepancyValidator.validateOnSubmission(pscDiscrepancies, errors);
 
         assertTrue(errorsFromValidation.hasErrors());
         assertTrue(errorsFromValidation.containsError(err));
