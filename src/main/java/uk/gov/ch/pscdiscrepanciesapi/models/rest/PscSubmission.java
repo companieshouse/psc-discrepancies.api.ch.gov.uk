@@ -1,6 +1,8 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class PscSubmission {
@@ -71,4 +73,19 @@ public class PscSubmission {
         return "PscSubmission [requestId=" + requestId + ", report=" + report + ", discrepancies="
                         + discrepancies + "]";
     }
+    
+    /**
+     * Create a debug map for structured logging
+     * 
+     * @param pscDiscrepancySubmission
+     * 
+     * @return Debug map
+     */
+    public Map<String, Object> debugMap() {
+        final Map<String, Object> debugMap = new HashMap<>();
+        debugMap.put("submission", toString());
+        return debugMap;
+    }
+
+
 }

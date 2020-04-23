@@ -25,7 +25,7 @@ public class PscDiscrepancyValidator extends Validators {
     
     public Errors validateOnSubmission(List<PscDiscrepancy> pscDiscrepancies, Errors errs) {
         if (pscDiscrepancies.isEmpty()) {
-            Err err = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS).withError(" no discrepancies for report").build();
+            Err err = Err.serviceErrBuilder().withError("No discrepancies exist for the report").build();
             errs.addError(err);
         } else {
             pscDiscrepancies.forEach(d -> validateForCreation(d, errs));

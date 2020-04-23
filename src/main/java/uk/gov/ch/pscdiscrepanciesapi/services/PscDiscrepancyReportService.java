@@ -12,6 +12,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoException;
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
 import uk.gov.ch.pscdiscrepanciesapi.common.Kind;
@@ -34,6 +36,7 @@ import uk.gov.companieshouse.service.ServiceException;
 import uk.gov.companieshouse.service.ServiceResult;
 import uk.gov.companieshouse.service.links.CoreLinkKeys;
 import uk.gov.companieshouse.service.links.Links;
+import uk.gov.companieshouse.service.rest.err.Err;
 import uk.gov.companieshouse.service.rest.err.Errors;
 
 @Service
@@ -68,6 +71,9 @@ public class PscDiscrepancyReportService {
     }
 
     public PscDiscrepancyReport findPscDiscrepancyReportById(String reportId) {
+
+        LOG.info("Find a PSC discrepancy report with id: " + reportId);
+
         Optional<PscDiscrepancyReportEntity> storedReport = pscDiscrepancyReportRepository.findById(reportId);
 
         return storedReport
@@ -88,10 +94,12 @@ public class PscDiscrepancyReportService {
     public ServiceResult<PscDiscrepancyReport> createPscDiscrepancyReport(PscDiscrepancyReport pscDiscrepancyReport,
             HttpServletRequest request) throws ServiceException {
 
+        LOG.infoContext(pscDiscrepancyReport.getCompanyNumber(), "Create a PSC discrepancy report", createPscDiscrepancyReportDebugMap(pscDiscrepancyReport));
+        
         Errors validationErrors = pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, new Errors());
 
         if (validationErrors.hasErrors()) {
-            LOG.error("Validation errors", buildErrorLogMap(validationErrors));
+            LOG.error("PSC Discrepancy Report create validation errors", buildErrorLogMap(validationErrors));
             return ServiceResult.invalid(validationErrors);
         }
 
@@ -134,6 +142,9 @@ public class PscDiscrepancyReportService {
      */
     public ServiceResult<PscDiscrepancyReport> updatePscDiscrepancyReport(String reportId,
             PscDiscrepancyReport reportWithUpdatesToApply, HttpServletRequest request) throws ServiceException {
+
+        LOG.infoContext(reportWithUpdatesToApply.getCompanyNumber(), "Update a PSC discrepancy report", createPscDiscrepancyReportDebugMap(reportWithUpdatesToApply));
+
         final ServiceResult<PscDiscrepancyReport> reportToReturn;
         try {
             Optional<PscDiscrepancyReportEntity> queryResult = pscDiscrepancyReportRepository.findById(reportId);
@@ -147,7 +158,7 @@ public class PscDiscrepancyReportService {
                 Errors validationErrors = pscDiscrepancyReportValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply);
                 
                 if (validationErrors.hasErrors()) {
-                    LOG.error("Validation errors", buildErrorLogMap(validationErrors));
+                    LOG.error("PSC Discrepancy Report update validation errors", buildErrorLogMap(validationErrors));
                     reportToReturn = ServiceResult.invalid(validationErrors);
                 } else {
                     PscDiscrepancyReportEntityData preexistingReportEntityData = preexistingReportEntity.getData();
@@ -185,9 +196,14 @@ public class PscDiscrepancyReportService {
 
     private Map<String, Object> buildErrorLogMap(Errors validationErrors) {
         Map<String, Object> debugMap = new HashMap<>();
-        debugMap.put("validationErrors", validationErrors);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String errors = mapper.writeValueAsString(validationErrors);
+            debugMap.put("validationErrors", errors);
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert validationErrors to string", e);
+        }
         return debugMap;
-
     }
 
     private String createEtag() {
@@ -223,18 +239,22 @@ public class PscDiscrepancyReportService {
             HttpServletRequest request, String reportId) {
         boolean reportSent = false;
         
+        PscSubmission reportToSubmit = new PscSubmission();
         Errors validationErrors = new Errors();
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             // Validate everything that needs to be sent to CHIPS
             validationErrors = pscDiscrepancyReportValidator.validate(storedReport, new Errors());
-            PscSubmission reportToSubmit = new PscSubmission();
-            ServiceResult<List<PscDiscrepancy>> reportDetails = pscDiscrepancyService.getDiscrepancies(reportId,
+            ServiceResult<List<PscDiscrepancy>> reportDiscrepancies = pscDiscrepancyService.getDiscrepancies(reportId,
                     request);
-            pscDiscrepancyValidator.validateOnSubmission(reportDetails.getData(), validationErrors);
+            if(reportDiscrepancies.getData() == null) {
+                Err err = Err.serviceErrBuilder().withError("No discrepancies exist for the report").build();
+                validationErrors.addError(err);
+            }
 
             if (!validationErrors.hasErrors()) {
+                pscDiscrepancyValidator.validateOnSubmission(reportDiscrepancies.getData(), validationErrors);
                 reportToSubmit.setReport(storedReport);
-                reportToSubmit.setDiscrepancies(reportDetails.getData());
+                reportToSubmit.setDiscrepancies(reportDiscrepancies.getData());
                 reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, request.getSession().getId());
             }
         } catch (ServiceException ex) {
@@ -246,9 +266,10 @@ public class PscDiscrepancyReportService {
         try {
             PscDiscrepancyReportEntityData sentReportEntityData = storedReportEntity.getData();
             if(validationErrors.hasErrors()) {
-                LOG.error("Validation errors", buildErrorLogMap(validationErrors));
+                LOG.error("PSC Discrepancy Report submission validation errors", buildErrorLogMap(validationErrors));
                 sentReportEntityData.setStatus(ReportStatus.INVALID.toString());
             } else if (reportSent) {
+                LOG.info("Report submitted to CHIPS", reportToSubmit.debugMap());
                 sentReportEntityData.setStatus(ReportStatus.SUBMITTED.toString());
             } else {
                 sentReportEntityData.setStatus(ReportStatus.FAILED_TO_SUBMIT.toString());
