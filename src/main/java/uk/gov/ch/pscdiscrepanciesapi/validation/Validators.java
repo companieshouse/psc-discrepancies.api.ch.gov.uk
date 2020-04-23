@@ -1,4 +1,4 @@
-package uk.gov.ch.pscdiscrepanciesapi.common;
+package uk.gov.ch.pscdiscrepanciesapi.validation;
 
 import java.util.Objects;
 import org.springframework.stereotype.Component;

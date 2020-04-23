@@ -23,6 +23,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     private static final String VALID_EMAIL = "valid_email@email.com";
     private static final String VALID_COMPANY_NUMBER = "12345678";
     private static final String VALID_STATUS = "IMCOMPLETE";
+    private static final String VALID_CONTACT_NAME = "ValidContactName";
     private static final String ETAG = "etag";
 
     private static final String INVALID_CONTACT_NAME = "^InvalidConctactName^";
@@ -34,15 +35,15 @@ public class PscDiscrepancyReportValidatorUnitTest {
     private static final String NOT_EMPTY_ERROR_MESSAGE =
             " must not be empty and must not only consist of whitespace";
 
-    private PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
     private PscDiscrepancyReport pscDiscrepancyReport;
+    private PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
 
     @BeforeEach
     void setUp() {
         pscDiscrepancyReportValidator = new PscDiscrepancyReportValidator();
 
         pscDiscrepancyReport = new PscDiscrepancyReport();
-        pscDiscrepancyReport.setObligedEntityContactName(OBLIGED_ENTITY_CONTACT_NAME);
+        pscDiscrepancyReport.setObligedEntityContactName(VALID_CONTACT_NAME);
         pscDiscrepancyReport.setObligedEntityEmail(VALID_EMAIL);
         pscDiscrepancyReport.setCompanyNumber(VALID_COMPANY_NUMBER);
         pscDiscrepancyReport.setStatus(VALID_STATUS);
@@ -191,9 +192,10 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate the whole PscDiscrepancyReport successfully")
+    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS successfully")
     void validateReport_Successful() {
         Errors errors = new Errors();
+        pscDiscrepancyReport.setStatus("COMPLETE");
 
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
@@ -202,7 +204,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate the whole PscDiscrepancyReport unsuccessfully - invalid email")
+    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid email")
     void validateReport_Unsuccessful_InvalidEmail() {
         Errors errors = new Errors();
         pscDiscrepancyReport.setStatus(INVALID_EMAIL);
@@ -219,7 +221,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate the whole PscDiscrepancyReport unsuccessfully - invalid status")
+    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid status")
     void validateReport_Unsuccessful_InvalidStatus() {
         Errors errors = new Errors();
         pscDiscrepancyReport.setStatus(INVALID_STATUS);
@@ -236,7 +238,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate the whole PscDiscrepancyReport unsuccessfully - invalid contact name")
+    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid contact name")
     void validateReport_Unsuccessful_InvalidContactName() {
         Errors errors = new Errors();
         pscDiscrepancyReport.setObligedEntityContactName(INVALID_CONTACT_NAME);
@@ -253,7 +255,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate the whole PscDiscrepancyReport unsuccessfully - invalid company number")
+    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid company number")
     void validateReport_Unsuccessful_InvalidCompanyNumber() {
         Errors errors = new Errors();
         pscDiscrepancyReport.setCompanyNumber(INVALID_COMPANY_NUMBER);

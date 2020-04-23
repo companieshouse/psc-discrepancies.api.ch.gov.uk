@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
-import uk.gov.ch.pscdiscrepanciesapi.common.Validators;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.ReportStatus;
 import uk.gov.companieshouse.charset.CharSet;
@@ -59,7 +58,7 @@ public class PscDiscrepancyReportValidator extends Validators {
      * @param errs An Err instance is added to this for each validation problem.
      */
     public Errors validateForCreation(PscDiscrepancyReport pscDiscrepancyReport, Errors errs) {
-        validateNotBlank(pscDiscrepancyReport.getObligedEntityContactName(), OBLIGED_ENTITY_CONTACT_NAME, errs);
+        validateContactName(errs, pscDiscrepancyReport.getObligedEntityContactName());
         return errs;
     }
     
