@@ -2,7 +2,6 @@ package uk.gov.ch.pscdiscrepanciesapi.validation;
 
 import java.util.List;
 import org.springframework.stereotype.Component;
-import uk.gov.ch.pscdiscrepanciesapi.common.Validators;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancy;
 import uk.gov.companieshouse.service.rest.err.Err;
 import uk.gov.companieshouse.service.rest.err.Errors;

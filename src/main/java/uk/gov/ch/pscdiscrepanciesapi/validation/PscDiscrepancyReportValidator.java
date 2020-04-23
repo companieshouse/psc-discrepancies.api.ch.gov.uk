@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
-import uk.gov.ch.pscdiscrepanciesapi.common.Validators;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.ReportStatus;
 import uk.gov.companieshouse.charset.CharSet;
