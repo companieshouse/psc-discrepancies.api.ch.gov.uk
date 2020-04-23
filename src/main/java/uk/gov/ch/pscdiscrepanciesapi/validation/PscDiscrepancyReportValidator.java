@@ -21,6 +21,7 @@ public class PscDiscrepancyReportValidator extends Validators {
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "obliged_entity_contact_name";
     private static final String COMPANY_INCORPORATION_NUMBER = "company_number";
     private static final String STATUS = "status";
+    private static final String ETAG = "etag";
 
     private CharSetValidation charSetValidator = new CharSetValidationImpl();
 
@@ -65,7 +66,7 @@ public class PscDiscrepancyReportValidator extends Validators {
     public Errors validateForUpdate(PscDiscrepancyReport preexistingReport, PscDiscrepancyReport updatedReport) {
         Errors errData = new Errors();
         if (!preexistingReport.getEtag().equals(updatedReport.getEtag())) {
-            Err nonMatchingEtag = Err.invalidBodyBuilderWithLocation("etag")
+            Err nonMatchingEtag = Err.invalidBodyBuilderWithLocation(ETAG)
                     .withError("Etag does not match. etag in system: " + preexistingReport.getEtag()
                             + " incoming etag: " + updatedReport.getEtag()
                             + " You should GET, patch the result of the GET and UPDATE using that.")

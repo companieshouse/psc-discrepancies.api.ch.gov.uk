@@ -62,12 +62,15 @@ public class PscDiscrepancyReportService {
     public PscDiscrepancyReportService(@Autowired PscDiscrepancyReportRepository pscDiscrepancyReportRepository,
             @Autowired PscDiscrepancyReportMapper pscDiscrepancyReportMapper,
             @Autowired PscSubmissionSender pscSubmissionSender, @Autowired PscDiscrepancyService pscDiscrepancyService,
-            @Autowired LinkFactory linkFactory) {
+            @Autowired LinkFactory linkFactory, @Autowired PscDiscrepancyReportValidator pscDiscrepancyReportValidator,
+            @Autowired PscDiscrepancyValidator pscDiscrepancyValidator) {
         this.pscDiscrepancyReportRepository = pscDiscrepancyReportRepository;
         this.pscDiscrepancyReportMapper = pscDiscrepancyReportMapper;
         this.pscSubmissionSender = pscSubmissionSender;
         this.pscDiscrepancyService = pscDiscrepancyService;
         this.linkFactory = linkFactory;
+        this.pscDiscrepancyReportValidator = pscDiscrepancyReportValidator;
+        this.pscDiscrepancyValidator = pscDiscrepancyValidator;
     }
 
     public PscDiscrepancyReport findPscDiscrepancyReportById(String reportId) {

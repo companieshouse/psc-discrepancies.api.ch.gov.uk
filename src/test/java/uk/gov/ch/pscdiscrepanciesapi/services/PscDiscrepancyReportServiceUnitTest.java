@@ -37,6 +37,8 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscSubmission;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.ReportStatus;
 import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyReportRepository;
+import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyReportValidator;
+import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyValidator;
 import uk.gov.companieshouse.service.ServiceException;
 import uk.gov.companieshouse.service.ServiceResult;
 import uk.gov.companieshouse.service.ServiceResultStatus;
@@ -52,6 +54,7 @@ public class PscDiscrepancyReportServiceUnitTest {
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "Obliged Entity Contact Name";
     private static final String STATUS = "Status";
+    private static final String ETAG = "Etag";
     private static final String VALID_EMAIL = "m@m.com";
     private static final String INVALID_EMAIL = "mm.com";
     private static final String ETAG_1 = "1";
@@ -76,6 +79,12 @@ public class PscDiscrepancyReportServiceUnitTest {
     private PscDiscrepancyService mockDiscrepancyService;
     
     @Mock
+    private PscDiscrepancyReportValidator mockReportDiscrepancyValidator;
+    
+    @Mock
+    private PscDiscrepancyValidator mockDiscrepancyValidator;
+    
+    @Mock
     private LinkFactory mockLinkFactory;
 
     private PscDiscrepancyReportService pscDiscrepancyReportService;
@@ -85,7 +94,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         pscDiscrepancyReport = new PscDiscrepancyReport();
         pscDiscrepancyReportEntity = new PscDiscrepancyReportEntity();
         pscDiscrepancyReportService = new PscDiscrepancyReportService(mockReportRepo, mockReportMapper, mockSender,
-                mockDiscrepancyService, mockLinkFactory);
+                mockDiscrepancyService, mockLinkFactory, mockReportDiscrepancyValidator, mockDiscrepancyValidator);
     }
 
     private void setupMockRequestWithMockSession() {
@@ -131,6 +140,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         when(mockReportRepo.insert(pscDiscrepancyReportEntity)).thenReturn(pscDiscrepancyReportEntity);
         when(mockReportMapper.restToEntity(pscDiscrepancyReport)).thenReturn(pscDiscrepancyReportEntity);
         when(mockReportMapper.entityToRest(pscDiscrepancyReportEntity)).thenReturn(pscDiscrepancyReport);
+        when(mockReportDiscrepancyValidator.validateForCreation(eq(pscDiscrepancyReport), any(Errors.class))).thenReturn(new Errors());
 
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService
                 .createPscDiscrepancyReport(pscDiscrepancyReport, mockRequest);
@@ -148,6 +158,8 @@ public class PscDiscrepancyReportServiceUnitTest {
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
                 .withError(OBLIGED_ENTITY_EMAIL + " must not be empty or null").build();
         errData.addError(error);
+
+        when(mockReportDiscrepancyValidator.validateForCreation(eq(pscDiscrepancyReport), any(Errors.class))).thenReturn(errData);
 
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService
                 .createPscDiscrepancyReport(pscDiscrepancyReport, mockRequest);
@@ -167,6 +179,8 @@ public class PscDiscrepancyReportServiceUnitTest {
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL)
                 .withError(OBLIGED_ENTITY_EMAIL + " is not in the correct format").build();
         errData.addError(error);
+
+        when(mockReportDiscrepancyValidator.validateForCreation(eq(pscDiscrepancyReport), any(Errors.class))).thenReturn(errData);
 
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService
                 .createPscDiscrepancyReport(pscDiscrepancyReport, mockRequest);
@@ -191,6 +205,8 @@ public class PscDiscrepancyReportServiceUnitTest {
         when(mockReportRepo.insert(pscDiscrepancyReportEntity)).thenThrow(new MongoException(""));
         when(mockReportMapper.restToEntity(pscDiscrepancyReport)).thenReturn(pscDiscrepancyReportEntity);
 
+        when(mockReportDiscrepancyValidator.validateForCreation(eq(pscDiscrepancyReport), any(Errors.class))).thenReturn(new Errors());
+
         assertThrows(ServiceException.class,
                 () -> pscDiscrepancyReportService.createPscDiscrepancyReport(pscDiscrepancyReport, mockRequest));
     }
@@ -213,6 +229,9 @@ public class PscDiscrepancyReportServiceUnitTest {
         doReturn(savedReport).when(mockReportMapper).entityToRest(savedEntity);
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
         reportWithUpdatesToApply.setObligedEntityContactName(VALID_CONTACT_NAME);
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(new Errors());
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
@@ -238,6 +257,9 @@ public class PscDiscrepancyReportServiceUnitTest {
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
         reportWithUpdatesToApply.setObligedEntityContactName(INVALID_CONTACT_NAME);
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(errData);
+
         ServiceResult<PscDiscrepancyReport> result =
                 pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID, reportWithUpdatesToApply, mockRequest);
         assertNotNull(result);
@@ -263,6 +285,9 @@ public class PscDiscrepancyReportServiceUnitTest {
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
         reportWithUpdatesToApply.setObligedEntityContactName("");
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(errData);
+
         ServiceResult<PscDiscrepancyReport> result =
                 pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID, reportWithUpdatesToApply, mockRequest);
         assertNotNull(result);
@@ -287,6 +312,9 @@ public class PscDiscrepancyReportServiceUnitTest {
         errData.addError(error);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(INVALID_EMAIL, ReportStatus.INVALID.toString());
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(errData);
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
         assertNotNull(result);
@@ -310,6 +338,9 @@ public class PscDiscrepancyReportServiceUnitTest {
         errData.addError(error);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, null);
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(errData);
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
         assertNotNull(result);
@@ -333,6 +364,9 @@ public class PscDiscrepancyReportServiceUnitTest {
         errData.addError(error);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, "");
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(errData);
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
         assertNotNull(result);
@@ -357,6 +391,9 @@ public class PscDiscrepancyReportServiceUnitTest {
         errData.addError(error);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, "Bad status");
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(errData);
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
         assertNotNull(result);
@@ -375,8 +412,16 @@ public class PscDiscrepancyReportServiceUnitTest {
         when(mockReportRepo.findById(REPORT_ID)).thenReturn(Optional.of(preexistingReportEntity));
         when(mockReportMapper.entityToRest(preexistingReportEntity)).thenReturn(preexistingReport);
 
+        Errors errData = new Errors();
+        Err error = Err.invalidBodyBuilderWithLocation(ETAG).withError(ETAG + " etag does not match. etag in system")
+                .build();
+        errData.addError(error);
+
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, "Bad status");
         reportWithUpdatesToApply.setEtag("2");
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(errData);
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
         assertNotNull(result);
@@ -435,6 +480,10 @@ public class PscDiscrepancyReportServiceUnitTest {
         doReturn(mockSavedSentEntity).when(mockReportRepo).save(mockSavedEntity);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(new Errors());
+        when(mockReportDiscrepancyValidator.validate(eq(savedReport), any(Errors.class))).thenReturn(new Errors());
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
 
@@ -477,6 +526,10 @@ public class PscDiscrepancyReportServiceUnitTest {
         doReturn(mockSavedSentEntity).when(mockReportRepo).save(mockSavedEntity);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(new Errors());
+        when(mockReportDiscrepancyValidator.validate(eq(savedReport), any(Errors.class))).thenReturn(new Errors());
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
 
@@ -519,6 +572,9 @@ public class PscDiscrepancyReportServiceUnitTest {
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
 
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(new Errors());
+        when(mockReportDiscrepancyValidator.validate(eq(savedReport), any(Errors.class))).thenReturn(new Errors());
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
 
@@ -528,7 +584,7 @@ public class PscDiscrepancyReportServiceUnitTest {
     }
 
     @Test
-    @DisplayName("When update leads to a report being sent to chips and the send throws a ServiceException, then the exception is swallowed and report status is saved as FAILED_TO_SEND.")
+    @DisplayName("When update leads to a report being sent to chips and the send throws a ServiceException, then the exception is swallowed and report status is saved as FAILED_TO_SUBMIT.")
     void updatePscDiscrepancyReportSendReportCatchesServiceEx() throws ServiceException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
         PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
@@ -562,6 +618,10 @@ public class PscDiscrepancyReportServiceUnitTest {
         doReturn(mockSavedSentEntity).when(mockReportRepo).save(mockSavedEntity);
 
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(new Errors());
+        when(mockReportDiscrepancyValidator.validate(eq(savedReport), any(Errors.class))).thenReturn(new Errors());
+
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
 
