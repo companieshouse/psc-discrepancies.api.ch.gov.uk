@@ -37,8 +37,8 @@ public class PscDiscrepancyReportValidator extends Validators {
     }
 
     /**
-     * Validates that a prosecutionCase has all of its mandatory fields set and that those fields
-     * that are set are not set to bad values.
+     * Validates that a pscDiscrepancyReport has all of its mandatory fields set set (those that must be set at creation)
+     * and that those fields that are set are not set to bad values.
      * 
      * @param pscDiscrepancyReport
      * @param errs An Err instance is added to this for each validation problem.
@@ -90,9 +90,7 @@ public class PscDiscrepancyReportValidator extends Validators {
 
     private Errors validateStatus(Errors errors, String status) {
 
-        errors = validateNotBlank(status, STATUS, errors);
-
-        if (!errors.hasErrors() && !VALID_STATUSES.contains(status)) {
+        if (validateNotBlank(status, STATUS, errors) && !VALID_STATUSES.contains(status)) {
             Err error = Err.invalidBodyBuilderWithLocation(STATUS)
                     .withError(STATUS + " is not one of the correct values").build();
             errors.addError(error);
@@ -102,9 +100,8 @@ public class PscDiscrepancyReportValidator extends Validators {
 
     private Errors validateCompanyNumber(Errors errors, String companyNumber) {
 
-        errors = validateNotBlank(companyNumber, COMPANY_INCORPORATION_NUMBER, errors);
-
-        if (!errors.hasErrors() && companyNumber.length() != 8) {
+        if (validateNotBlank(companyNumber, COMPANY_INCORPORATION_NUMBER, errors)
+                && companyNumber.length() != 8) {
             Err error = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER)
                     .withError(COMPANY_INCORPORATION_NUMBER + " must be 8 characters").build();
             errors.addError(error);
@@ -121,9 +118,7 @@ public class PscDiscrepancyReportValidator extends Validators {
      */
     private Errors validateContactName(Errors errors, String contactName) {
 
-        errors = validateNotBlank(contactName, OBLIGED_ENTITY_CONTACT_NAME, errors);
-
-        if (!errors.hasErrors()
+        if (validateNotBlank(contactName, OBLIGED_ENTITY_CONTACT_NAME, errors)
                 && !charSetValidator.validateCharSet(CharSet.CHARACTER_SET_2, contactName)) {
             Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
                     .withError(OBLIGED_ENTITY_CONTACT_NAME + " contains an invalid character").build();
@@ -142,9 +137,7 @@ public class PscDiscrepancyReportValidator extends Validators {
      */
     private Errors validateEmail(Errors errors, String email) {
 
-        errors = validateNotBlank(email, OBLIGED_ENTITY_EMAIL, errors);
-        
-        if (!errors.hasErrors()) {
+        if (validateNotBlank(email, OBLIGED_ENTITY_EMAIL, errors)) {
             String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]+$";
 
             Pattern pattern = Pattern.compile(regex);

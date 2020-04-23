@@ -66,7 +66,6 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errors = new Errors();
         Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
                 .withError(OBLIGED_ENTITY_CONTACT_NAME + NOT_NULL_ERROR_MESSAGE).build();
-        errors.addError(err);
 
         pscDiscrepancyReport.setObligedEntityContactName(null);
         Errors errorsFromValidation =
@@ -82,7 +81,6 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errors = new Errors();
         Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
                 .withError(OBLIGED_ENTITY_CONTACT_NAME + NOT_EMPTY_ERROR_MESSAGE).build();
-        errors.addError(err);
 
         pscDiscrepancyReport.setObligedEntityContactName("");
         Errors errorsFromValidation =

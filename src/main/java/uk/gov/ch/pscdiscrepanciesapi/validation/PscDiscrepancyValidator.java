@@ -19,7 +19,8 @@ public class PscDiscrepancyValidator extends Validators {
      * @param errs An Err instance is added to this for each validation problem.
      */
     public Errors validateForCreation(PscDiscrepancy pscDiscrepancy, Errors errs) {
-        return validateNotBlank(pscDiscrepancy.getDetails(), DISCREPANCY_DETAILS, errs);
+        validateNotBlank(pscDiscrepancy.getDetails(), DISCREPANCY_DETAILS, errs);
+        return errs;
     }
     
     public Errors validateOnSubmission(List<PscDiscrepancy> pscDiscrepancies, Errors errs) {

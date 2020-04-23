@@ -31,9 +31,7 @@ public class ValidatorsUnitTest {
     @Test
     @DisplayName("Validate a string is not null and not empty successfully")
     void validateNotBlank_Successful() {
-        Errors errorsFromValidation = validators.validateNotBlank(TO_TEST, LOCATION, errors);
-
-        assertFalse(errorsFromValidation.hasErrors());
+        assertTrue(validators.validateNotBlank(TO_TEST, LOCATION, errors));
     }
 
     @Test
@@ -42,10 +40,10 @@ public class ValidatorsUnitTest {
         Err err = Err.invalidBodyBuilderWithLocation(LOCATION)
                 .withError(LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
 
-        Errors errorsFromValidation = validators.validateNotBlank("", LOCATION, errors);
+        boolean isNotBlank = validators.validateNotBlank("", LOCATION, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
-        assertTrue(errorsFromValidation.containsError(err));
+        assertFalse(isNotBlank);
+        assertTrue(errors.containsError(err));
     }
 
     @Test
@@ -54,18 +52,16 @@ public class ValidatorsUnitTest {
         Err err = Err.invalidBodyBuilderWithLocation(LOCATION)
                 .withError(LOCATION + NOT_NULL_ERROR_MESSAGE).build();
 
-        Errors errorsFromValidation = validators.validateNotBlank(null, LOCATION, errors);
+        boolean isNotBlank = validators.validateNotBlank(null, LOCATION, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
-        assertTrue(errorsFromValidation.containsError(err));
+        assertFalse(isNotBlank);
+        assertTrue(errors.containsError(err));
     }
 
     @Test
     @DisplayName("Validate a string is not null successfully")
     void validateNotNull_Successful() {
-        Errors errorsFromValidation = validators.validateNotNull(TO_TEST, LOCATION, errors);
-
-        assertFalse(errorsFromValidation.hasErrors());
+        assertTrue(validators.validateNotNull(TO_TEST, LOCATION, errors));
     }
 
     @Test
@@ -74,18 +70,16 @@ public class ValidatorsUnitTest {
         Err err = Err.invalidBodyBuilderWithLocation(LOCATION)
                 .withError(LOCATION + NOT_NULL_ERROR_MESSAGE).build();
 
-        Errors errorsFromValidation = validators.validateNotNull(null, LOCATION, errors);
+        boolean isNotNull = validators.validateNotNull(null, LOCATION, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
-        assertTrue(errorsFromValidation.containsError(err));
+        assertFalse(isNotNull);
+        assertTrue(errors.containsError(err));
     }
 
     @Test
     @DisplayName("Validate a string is not empty successfully")
     void validateNotEmpty_Successful() {
-        Errors errorsFromValidation = validators.validateNotEmpty(TO_TEST, LOCATION, errors);
-
-        assertFalse(errorsFromValidation.hasErrors());
+        assertTrue(validators.validateNotEmpty(TO_TEST, LOCATION, errors));
     }
 
     @Test
@@ -94,10 +88,10 @@ public class ValidatorsUnitTest {
         Err err = Err.invalidBodyBuilderWithLocation(LOCATION)
                 .withError(LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
 
-        Errors errorsFromValidation = validators.validateNotEmpty("", LOCATION, errors);
+        boolean isNotEmpty = validators.validateNotEmpty("", LOCATION, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
-        assertTrue(errorsFromValidation.containsError(err));
+        assertFalse(isNotEmpty);
+        assertTrue(errors.containsError(err));
     }
 
     @Test
@@ -105,9 +99,7 @@ public class ValidatorsUnitTest {
     void validateEquals_Successful() {
         String actual = "toTest";
 
-        Errors errorsFromValidation = validators.validateEquals(TO_TEST, actual, LOCATION, errors);
-
-        assertFalse(errorsFromValidation.hasErrors());
+        assertTrue(validators.validateEquals(TO_TEST, actual, LOCATION, errors));
     }
 
     @Test
@@ -117,9 +109,9 @@ public class ValidatorsUnitTest {
         Err err = Err.invalidBodyBuilderWithLocation(LOCATION).withError(
                 LOCATION + " must equal: '" + TO_TEST + " but is: '" + "'" + actual + "'").build();
 
-        Errors errorsFromValidation = validators.validateEquals(TO_TEST, actual, LOCATION, errors);
+        boolean isEqual = validators.validateEquals(TO_TEST, actual, LOCATION, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
-        assertTrue(errorsFromValidation.containsError(err));
+        assertFalse(isEqual);
+        assertTrue(errors.containsError(err));
     }
 }
