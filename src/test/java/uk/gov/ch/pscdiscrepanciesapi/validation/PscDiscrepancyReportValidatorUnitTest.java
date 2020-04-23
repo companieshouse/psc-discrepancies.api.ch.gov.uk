@@ -35,8 +35,8 @@ public class PscDiscrepancyReportValidatorUnitTest {
     private static final String NOT_EMPTY_ERROR_MESSAGE =
             " must not be empty and must not only consist of whitespace";
 
-    private PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
     private PscDiscrepancyReport pscDiscrepancyReport;
+    private PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
 
     @BeforeEach
     void setUp() {
