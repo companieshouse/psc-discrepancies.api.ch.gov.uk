@@ -39,7 +39,8 @@ public class ValidatorsUnitTest {
     @Test
     @DisplayName("Validate a string is not null and not empty unsuccessfully - empty string")
     void validateNotBlank_Unsuccessful_EmptyString() {
-        Err err = Err.invalidBodyBuilderWithLocation(LOCATION).withError(LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
+        Err err = Err.invalidBodyBuilderWithLocation(LOCATION)
+                .withError(LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
 
         Errors errorsFromValidation = validators.validateNotBlank("", LOCATION, errors);
 
@@ -50,7 +51,8 @@ public class ValidatorsUnitTest {
     @Test
     @DisplayName("Validate a string is not null and not empty unsuccessfully - null string")
     void validateNotBlank_Unsuccessful_NullString() {
-        Err err = Err.invalidBodyBuilderWithLocation(LOCATION).withError(LOCATION + NOT_NULL_ERROR_MESSAGE).build();
+        Err err = Err.invalidBodyBuilderWithLocation(LOCATION)
+                .withError(LOCATION + NOT_NULL_ERROR_MESSAGE).build();
 
         Errors errorsFromValidation = validators.validateNotBlank(null, LOCATION, errors);
 
@@ -69,7 +71,8 @@ public class ValidatorsUnitTest {
     @Test
     @DisplayName("Validate a string is not null unsuccessfully - null string")
     void validateNotNull_Unsuccessful() {
-        Err err = Err.invalidBodyBuilderWithLocation(LOCATION).withError(LOCATION + NOT_NULL_ERROR_MESSAGE).build();
+        Err err = Err.invalidBodyBuilderWithLocation(LOCATION)
+                .withError(LOCATION + NOT_NULL_ERROR_MESSAGE).build();
 
         Errors errorsFromValidation = validators.validateNotNull(null, LOCATION, errors);
 
@@ -88,7 +91,8 @@ public class ValidatorsUnitTest {
     @Test
     @DisplayName("Validate a string is not empty unsuccessfully - empty string")
     void validateNotEmpty_Unsuccessful() {
-        Err err = Err.invalidBodyBuilderWithLocation(LOCATION).withError(LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
+        Err err = Err.invalidBodyBuilderWithLocation(LOCATION)
+                .withError(LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
 
         Errors errorsFromValidation = validators.validateNotEmpty("", LOCATION, errors);
 
@@ -110,8 +114,8 @@ public class ValidatorsUnitTest {
     @DisplayName("Validate a string is equal unsuccessfully")
     void validateEquals_Unsuccessful() {
         String actual = "notToTest";
-        Err err = Err.invalidBodyBuilderWithLocation(LOCATION).withError(LOCATION + " must equal: '" + TO_TEST + " but is: '"
-                + "'" + actual + "'").build();
+        Err err = Err.invalidBodyBuilderWithLocation(LOCATION).withError(
+                LOCATION + " must equal: '" + TO_TEST + " but is: '" + "'" + actual + "'").build();
 
         Errors errorsFromValidation = validators.validateEquals(TO_TEST, actual, LOCATION, errors);
 
