@@ -144,8 +144,8 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid telephone number")
-    void validateUpdate_Unsuccessful_InvalidTelephoneNumber() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - empty telephone number")
+    void validateUpdate_Unsuccessful_EmptyTelephoneNumber() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setObligedEntityTelephoneNumber("");
