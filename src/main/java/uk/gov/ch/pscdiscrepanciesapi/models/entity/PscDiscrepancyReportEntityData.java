@@ -20,6 +20,9 @@ public class PscDiscrepancyReportEntityData {
     @Field("obliged_entity_email")
     private String obligedEntityEmail;
 
+    @Field("obliged_entity_telephone_number")
+    private String obligedEntityTelephoneNumber;
+
     @Field("company_number")
     private String companyNumber;
 
@@ -67,6 +70,14 @@ public class PscDiscrepancyReportEntityData {
 
     public void setObligedEntityEmail(String obligedEntityEmail) {
         this.obligedEntityEmail = obligedEntityEmail;
+    }
+
+    public String getObligedEntityTelephoneNumber() {
+        return obligedEntityTelephoneNumber;
+    }
+
+    public void setObligedEntityTelephoneNumber(String obligedEntityTelephoneNumber) {
+        this.obligedEntityTelephoneNumber = obligedEntityTelephoneNumber;
     }
 
     public String getCompanyNumber() {
