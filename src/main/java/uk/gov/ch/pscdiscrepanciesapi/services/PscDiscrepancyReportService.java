@@ -184,7 +184,8 @@ public class PscDiscrepancyReportService {
                     PscDiscrepancyReport storedReport = pscDiscrepancyReportMapper.entityToRest(storedReportEntity);
                     reportToReturn = ServiceResult.updated(storedReport);
 
-                    if (storedReport.getStatus().equals(ReportStatus.COMPLETE.toString())) {
+                    if (storedReport.getStatus() != null
+                            && storedReport.getStatus().equals(ReportStatus.COMPLETE.toString())) {
                         onReportCompleted(storedReport, storedReportEntity, request, reportId);
                     }
                 }
