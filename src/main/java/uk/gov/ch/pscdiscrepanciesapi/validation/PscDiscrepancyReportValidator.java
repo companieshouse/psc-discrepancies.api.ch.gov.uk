@@ -18,6 +18,7 @@ import uk.gov.companieshouse.service.rest.err.Errors;
 @Component
 public class PscDiscrepancyReportValidator extends Validators {
     private static final String OBLIGED_ENTITY_EMAIL = "obliged_entity_email";
+    private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER = "obliged_entity_telephone_number";
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "obliged_entity_contact_name";
     private static final String COMPANY_INCORPORATION_NUMBER = "company_number";
     private static final String STATUS = "status";
@@ -48,6 +49,8 @@ public class PscDiscrepancyReportValidator extends Validators {
         validateEmail(errs, pscDiscrepancyReport.getObligedEntityEmail());
         validateCompanyNumber(errs, pscDiscrepancyReport.getCompanyNumber());
         validateStatus(errs, pscDiscrepancyReport.getStatus());
+        validateNotEmpty(pscDiscrepancyReport.getObligedEntityTelephoneNumber(),
+                OBLIGED_ENTITY_TELEPHONE_NUMBER, errs);
         return errs;
     }
 
@@ -75,6 +78,10 @@ public class PscDiscrepancyReportValidator extends Validators {
         }
         if(updatedReport.getObligedEntityEmail() != null) {
             validateEmail(errData, updatedReport.getObligedEntityEmail());
+        }
+        if(updatedReport.getObligedEntityTelephoneNumber() != null) {
+            validateNotEmpty(updatedReport.getObligedEntityTelephoneNumber(),
+                    OBLIGED_ENTITY_TELEPHONE_NUMBER, errData);
         }
         if(updatedReport.getStatus() != null) {
             validateStatus(errData, updatedReport.getStatus());

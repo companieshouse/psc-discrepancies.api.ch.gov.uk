@@ -52,14 +52,19 @@ public class PscDiscrepancyReportServiceUnitTest {
     private static final String REPORT_ID = "reportId";
     private static final String SELF_LINK = "/parent/" + REPORT_ID;
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
+    private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION =
+            "obliged_entity_telephone_number";
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "Obliged Entity Contact Name";
     private static final String STATUS = "Status";
     private static final String ETAG = "Etag";
     private static final String VALID_EMAIL = "m@m.com";
     private static final String INVALID_EMAIL = "mm.com";
+    private static final String VALID_TELEPHONE_NUMBER = "08001234567";
     private static final String ETAG_1 = "1";
     private static final String VALID_CONTACT_NAME = "valid-contact-náme";
     private static final String INVALID_CONTACT_NAME = "^invalid-contact-name^";
+    private static final String NOT_EMPTY_ERROR_MESSAGE =
+            " must not be empty and must not only consist of whitespace";
     private PscDiscrepancyReport pscDiscrepancyReport;
     private PscDiscrepancyReportEntity pscDiscrepancyReportEntity;
 
@@ -229,6 +234,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         doReturn(savedReport).when(mockReportMapper).entityToRest(savedEntity);
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
         reportWithUpdatesToApply.setObligedEntityContactName(VALID_CONTACT_NAME);
+        reportWithUpdatesToApply.setObligedEntityTelephoneNumber(VALID_TELEPHONE_NUMBER);
 
         when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(new Errors());
 
@@ -317,6 +323,37 @@ public class PscDiscrepancyReportServiceUnitTest {
 
         ServiceResult<PscDiscrepancyReport> result = pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID,
                 reportWithUpdatesToApply, mockRequest);
+        assertNotNull(result);
+        assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
+        assertTrue(result.getErrors().containsError(error));
+    }
+
+    @Test
+    @DisplayName("When updatePscDiscrepancy is supplied with an empty telephone number, then it returns an invalid ServiceResult")
+    void updatePscDiscrepancyReport_EmptyTelephoneNumber() throws ServiceException{
+        PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
+        PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
+        preexistingReportEntity.setData(preexistingReportEntityData);
+        PscDiscrepancyReport preexistingReport = createReport(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
+        when(mockReportRepo.findById(REPORT_ID)).thenReturn(Optional.of(preexistingReportEntity));
+        when(mockReportMapper.entityToRest(preexistingReportEntity))
+                .thenReturn(preexistingReport);
+
+        Errors errData = new Errors();
+        Err error =
+                Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION)
+                        .withError(
+                                OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION + NOT_EMPTY_ERROR_MESSAGE)
+                        .build();
+        errData.addError(error);
+
+        PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
+        reportWithUpdatesToApply.setObligedEntityTelephoneNumber("");
+
+        when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(errData);
+
+        ServiceResult<PscDiscrepancyReport> result =
+                pscDiscrepancyReportService.updatePscDiscrepancyReport(REPORT_ID, reportWithUpdatesToApply, mockRequest);
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
         assertTrue(result.getErrors().containsError(error));
