@@ -250,7 +250,10 @@ public class PscDiscrepancyReportService {
             ServiceResult<List<PscDiscrepancy>> reportDiscrepancies = pscDiscrepancyService.getDiscrepancies(reportId,
                     request);
             if(reportDiscrepancies.getData() == null) {
-                Err err = Err.serviceErrBuilder().withError("No discrepancies exist for the report").build();
+                Err err = Err.serviceErrBuilder()
+                        .withError("No discrepancies could be found for the report - "
+                                + reportDiscrepancies.getStatus())
+                        .build();
                 validationErrors.addError(err);
             }
 
