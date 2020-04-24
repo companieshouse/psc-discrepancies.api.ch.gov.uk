@@ -262,6 +262,18 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
+    @DisplayName("Validate the whole PscDiscrepancyReport (without optional OE telephone set) before submission to CHIPS successfully")
+    void validateReport_SuccessfulOptionTelephoneNumberNotSet() {
+        Errors errors = new Errors();
+        pscDiscrepancyReport.setStatus("COMPLETE");
+        pscDiscrepancyReport.setObligedEntityTelephoneNumber(null);
+        Errors errorsFromValidation =
+                pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
+
+        assertFalse(errorsFromValidation.hasErrors());
+    }
+
+    @Test
     @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid email")
     void validateReport_Unsuccessful_InvalidEmail() {
         Errors errors = new Errors();
