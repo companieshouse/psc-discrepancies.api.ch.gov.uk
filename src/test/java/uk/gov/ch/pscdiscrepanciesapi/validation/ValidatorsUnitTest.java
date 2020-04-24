@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.service.rest.err.Err;
 import uk.gov.companieshouse.service.rest.err.Errors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,6 +44,7 @@ public class ValidatorsUnitTest {
         boolean isNotBlank = validators.validateNotBlank("", LOCATION, errors);
 
         assertFalse(isNotBlank);
+        assertEquals(1, errors.size());
         assertTrue(errors.containsError(err));
     }
 
@@ -55,6 +57,7 @@ public class ValidatorsUnitTest {
         boolean isNotBlank = validators.validateNotBlank(null, LOCATION, errors);
 
         assertFalse(isNotBlank);
+        assertEquals(1, errors.size());
         assertTrue(errors.containsError(err));
     }
 
@@ -73,6 +76,7 @@ public class ValidatorsUnitTest {
         boolean isNotNull = validators.validateNotNull(null, LOCATION, errors);
 
         assertFalse(isNotNull);
+        assertEquals(1, errors.size());
         assertTrue(errors.containsError(err));
     }
 
@@ -91,6 +95,7 @@ public class ValidatorsUnitTest {
         boolean isNotEmpty = validators.validateNotEmpty("", LOCATION, errors);
 
         assertFalse(isNotEmpty);
+        assertEquals(1, errors.size());
         assertTrue(errors.containsError(err));
     }
 
@@ -112,6 +117,7 @@ public class ValidatorsUnitTest {
         boolean isEqual = validators.validateEquals(TO_TEST, actual, LOCATION, errors);
 
         assertFalse(isEqual);
+        assertEquals(1, errors.size());
         assertTrue(errors.containsError(err));
     }
 }

@@ -12,6 +12,7 @@ import uk.gov.companieshouse.service.rest.err.Errors;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -57,7 +58,7 @@ public class PscDiscrepancyValidatorUnitTest {
         Errors errorsFromValidation =
                 pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(err));
     }
 
@@ -72,7 +73,7 @@ public class PscDiscrepancyValidatorUnitTest {
         Errors errorsFromValidation =
                 pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(err));
     }
 
@@ -100,7 +101,7 @@ public class PscDiscrepancyValidatorUnitTest {
         Errors errorsFromValidation =
                 pscDiscrepancyValidator.validateOnSubmission(pscDiscrepancies, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(err));
     }
 
@@ -118,7 +119,7 @@ public class PscDiscrepancyValidatorUnitTest {
         Errors errorsFromValidation =
                 pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(err));
     }
 
@@ -136,7 +137,7 @@ public class PscDiscrepancyValidatorUnitTest {
         Errors errorsFromValidation =
                 pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(err));
     }
 }

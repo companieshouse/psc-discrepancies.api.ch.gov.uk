@@ -9,6 +9,7 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 import uk.gov.companieshouse.service.rest.err.Err;
 import uk.gov.companieshouse.service.rest.err.Errors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -22,7 +23,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
 
     private static final String VALID_EMAIL = "valid_email@email.com";
     private static final String VALID_COMPANY_NUMBER = "12345678";
-    private static final String VALID_STATUS = "IMCOMPLETE";
+    private static final String VALID_STATUS = "COMPLETE";
     private static final String VALID_CONTACT_NAME = "ValidContactName";
     private static final String ETAG = "etag";
 
@@ -71,7 +72,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(err));
     }
 
@@ -86,7 +87,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(err));
     }
 
@@ -117,7 +118,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errorsFromValidation = pscDiscrepancyReportValidator
                 .validateForUpdate(pscDiscrepancyReport, updatedReport);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(nonMatchingEtag));
     }
 
@@ -134,7 +135,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errorsFromValidation = pscDiscrepancyReportValidator
                 .validateForUpdate(pscDiscrepancyReport, updatedReport);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(error));
     }
 
@@ -151,7 +152,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errorsFromValidation = pscDiscrepancyReportValidator
                 .validateForUpdate(pscDiscrepancyReport, updatedReport);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(error));
     }
 
@@ -168,7 +169,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errorsFromValidation = pscDiscrepancyReportValidator
                 .validateForUpdate(pscDiscrepancyReport, updatedReport);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(error));
     }
 
@@ -185,8 +186,37 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errorsFromValidation = pscDiscrepancyReportValidator
                 .validateForUpdate(pscDiscrepancyReport, updatedReport);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number, email, status and contact name")
+    void validateUpdate_Unsuccessful_InvalidCompanyNumberEmailStatusAndContactName() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setCompanyNumber(INVALID_COMPANY_NUMBER);
+        updatedReport.setObligedEntityEmail(INVALID_EMAIL);
+        updatedReport.setStatus(INVALID_STATUS);
+        updatedReport.setObligedEntityContactName(INVALID_CONTACT_NAME);
+
+        Err companyNumber = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER_LOCATION)
+                .withError(COMPANY_INCORPORATION_NUMBER_LOCATION + " must be 8 characters").build();
+        Err contactName = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
+                .withError(OBLIGED_ENTITY_CONTACT_NAME + " contains an invalid character").build();
+        Err status = Err.invalidBodyBuilderWithLocation(STATUS_LOCATION)
+                .withError(STATUS_LOCATION + " is not one of the correct values").build();
+        Err email = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
+                .withError(OBLIGED_ENTITY_EMAIL_LOCATION + " is not in the correct format").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(4, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(companyNumber));
+        assertTrue(errorsFromValidation.containsError(contactName));
+        assertTrue(errorsFromValidation.containsError(status));
+        assertTrue(errorsFromValidation.containsError(email));
     }
 
     @Test
@@ -205,16 +235,15 @@ public class PscDiscrepancyReportValidatorUnitTest {
     @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid email")
     void validateReport_Unsuccessful_InvalidEmail() {
         Errors errors = new Errors();
-        pscDiscrepancyReport.setStatus(INVALID_EMAIL);
+        pscDiscrepancyReport.setObligedEntityEmail(INVALID_EMAIL);
 
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
                 .withError(OBLIGED_ENTITY_EMAIL_LOCATION + " is not in the correct format").build();
-        errors.addError(error);
 
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(error));
     }
 
@@ -226,12 +255,11 @@ public class PscDiscrepancyReportValidatorUnitTest {
 
         Err error = Err.invalidBodyBuilderWithLocation(STATUS_LOCATION)
                 .withError(STATUS_LOCATION + " is not one of the correct values").build();
-        errors.addError(error);
 
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(error));
     }
 
@@ -243,12 +271,11 @@ public class PscDiscrepancyReportValidatorUnitTest {
 
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
                 .withError(OBLIGED_ENTITY_CONTACT_NAME + " contains an invalid character").build();
-        errors.addError(error);
 
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(error));
     }
 
@@ -260,12 +287,40 @@ public class PscDiscrepancyReportValidatorUnitTest {
 
         Err error = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER_LOCATION)
                 .withError(COMPANY_INCORPORATION_NUMBER_LOCATION + " must be 8 characters").build();
-        errors.addError(error);
 
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
 
-        assertTrue(errorsFromValidation.hasErrors());
+        assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
+    @DisplayName("Validate the whole PscDiscrepanctReport before submission to CHIPS - invalid company number, email, status and contact name")
+    void validateReport_Unsuccessful_InvalidCompanyNumberEmailStatusAndContactName() {
+        Errors errors = new Errors();
+
+        pscDiscrepancyReport.setCompanyNumber(INVALID_COMPANY_NUMBER);
+        pscDiscrepancyReport.setObligedEntityEmail(INVALID_EMAIL);
+        pscDiscrepancyReport.setStatus(INVALID_STATUS);
+        pscDiscrepancyReport.setObligedEntityContactName(INVALID_CONTACT_NAME);
+
+        Err companyNumber = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER_LOCATION)
+                .withError(COMPANY_INCORPORATION_NUMBER_LOCATION + " must be 8 characters").build();
+        Err contactName = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
+                .withError(OBLIGED_ENTITY_CONTACT_NAME + " contains an invalid character").build();
+        Err status = Err.invalidBodyBuilderWithLocation(STATUS_LOCATION)
+                .withError(STATUS_LOCATION + " is not one of the correct values").build();
+        Err email = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
+                .withError(OBLIGED_ENTITY_EMAIL_LOCATION + " is not in the correct format").build();
+
+        Errors errorsFromValidation =
+                pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
+
+        assertEquals(4, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(companyNumber));
+        assertTrue(errorsFromValidation.containsError(contactName));
+        assertTrue(errorsFromValidation.containsError(status));
+        assertTrue(errorsFromValidation.containsError(email));
     }
 }
