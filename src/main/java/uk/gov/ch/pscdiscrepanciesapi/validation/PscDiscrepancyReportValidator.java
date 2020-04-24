@@ -37,7 +37,7 @@ public class PscDiscrepancyReportValidator extends Validators {
     }
 
     /**
-     * Validates that a pscDiscrepancyReport has all of its mandatory fields set set (those that must be set at creation)
+     * Validates that a pscDiscrepancyReport has all of its mandatory fields set
      * and that those fields that are set are not set to bad values.
      * 
      * @param pscDiscrepancyReport
@@ -52,8 +52,8 @@ public class PscDiscrepancyReportValidator extends Validators {
     }
 
     /**
-     * Validates that a pscDiscrepancyReport has all of its mandatory fields set and that those fields
-     * that are set are not set to bad values.
+     * Validates that a pscDiscrepancyReport has all of its mandatory fields set (those that must be set at creation)
+     * and that those fields that are set are not set to bad values.
      * 
      * @param pscDiscrepancyReport test subject.
      * @param errs An Err instance is added to this for each validation problem.

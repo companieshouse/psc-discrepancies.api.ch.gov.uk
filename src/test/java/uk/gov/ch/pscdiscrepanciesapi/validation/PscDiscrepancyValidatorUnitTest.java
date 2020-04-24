@@ -95,7 +95,7 @@ public class PscDiscrepancyValidatorUnitTest {
         Errors errors = new Errors();
         pscDiscrepancies = new ArrayList<>();
         Err err =
-                Err.serviceErrBuilder().withError("No discrepancies exist for the report").build();
+                Err.serviceErrBuilder().withError("No discrepancies could be found for the report").build();
 
         Errors errorsFromValidation =
                 pscDiscrepancyValidator.validateOnSubmission(pscDiscrepancies, errors);
