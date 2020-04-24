@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -33,6 +35,7 @@ import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyEntity;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyEntityData;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancy;
 import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyRepository;
+import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyValidator;
 import uk.gov.companieshouse.service.ServiceException;
 import uk.gov.companieshouse.service.ServiceResult;
 import uk.gov.companieshouse.service.ServiceResultStatus;
@@ -72,6 +75,9 @@ public class PscDiscrepancyServiceUnitTest {
 
     @Mock
     private LinkFactory linkFactory;
+    
+    @Mock
+    private PscDiscrepancyValidator mockDiscrepancyValidator;
 
     @InjectMocks
     private PscDiscrepancyService pscDiscrepancyService;
@@ -97,6 +103,7 @@ public class PscDiscrepancyServiceUnitTest {
         when(mockDiscrepancyRepo.insert(pscDiscrepancyEntity)).thenReturn(pscDiscrepancyEntity);
         when(mockDiscrepancyMapper.restToEntity(pscDiscrepancy)).thenReturn(pscDiscrepancyEntity);
         when(mockDiscrepancyMapper.entityToRest(pscDiscrepancyEntity)).thenReturn(pscDiscrepancy);
+        when(mockDiscrepancyValidator.validateForCreation(eq(pscDiscrepancy), any(Errors.class))).thenReturn(new Errors());
 
         ServiceResult<PscDiscrepancy> result = pscDiscrepancyService.createPscDiscrepancy(pscDiscrepancy, REPORT_ID,
                 request);
@@ -114,6 +121,8 @@ public class PscDiscrepancyServiceUnitTest {
         Err error = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS)
                 .withError(DISCREPANCY_DETAILS + " must not be null").build();
         errData.addError(error);
+
+        when(mockDiscrepancyValidator.validateForCreation(eq(pscDiscrepancy), any(Errors.class))).thenReturn(errData);
 
         ServiceResult<PscDiscrepancy> result = 
                 pscDiscrepancyService.createPscDiscrepancy(pscDiscrepancy, REPORT_ID, request);
@@ -137,6 +146,7 @@ public class PscDiscrepancyServiceUnitTest {
 
         when(mockDiscrepancyRepo.insert(pscDiscrepancyEntity)).thenThrow(new MongoException(""));
         when(mockDiscrepancyMapper.restToEntity(pscDiscrepancy)).thenReturn(pscDiscrepancyEntity);
+        when(mockDiscrepancyValidator.validateForCreation(eq(pscDiscrepancy), any(Errors.class))).thenReturn(new Errors());
 
         assertThrows(ServiceException.class,
                 () -> pscDiscrepancyService.createPscDiscrepancy(pscDiscrepancy, REPORT_ID, request));

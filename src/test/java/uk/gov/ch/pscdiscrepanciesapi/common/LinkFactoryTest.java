@@ -19,27 +19,27 @@ class LinkFactoryTest {
 
     @Test
     @DisplayName("createLinkPscDiscrepancyReports Test")
-    void createLinkProsecutionCasesTest() {
+    void createLinkPscDiscrepancyReportsTest() {
         assertEquals(BASE_URL, underTest.createLinkPscDiscrepancyReports());
     }
 
     @Test
     @DisplayName("createLinkPscDiscrepancyReport Test")
-    void createLinkProsecutionCaseTest() {
+    void createLinkPscDiscrepancyReportTest() {
         assertEquals(BASE_URL + "/" + PSC_DISCREPANCY_REPORT_ID,
                 underTest.createLinkPscDiscrepancyReport(PSC_DISCREPANCY_REPORT_ID));
     }
 
     @Test
     @DisplayName("createLinkPscDiscrepancies Test")
-    void createLinkDefendants() {
+    void createLinkPscDiscrepanciesTest() {
         assertEquals(BASE_URL + "/" + PSC_DISCREPANCY_REPORT_ID + "/discrepancies",
                 underTest.createLinkPscDiscrepancies(PSC_DISCREPANCY_REPORT_ID));
     }
 
     @Test
     @DisplayName("createLinkPscDiscrepancy Test")
-    void createLinkDefendant() {
+    void createLinkPscDiscrepancyTest() {
         assertEquals(
                 BASE_URL + "/" + PSC_DISCREPANCY_REPORT_ID + "/discrepancies/" + PSC_DISCREPANCY_ID,
                 underTest.createLinkPscDiscrepancy(PSC_DISCREPANCY_ID, PSC_DISCREPANCY_REPORT_ID));

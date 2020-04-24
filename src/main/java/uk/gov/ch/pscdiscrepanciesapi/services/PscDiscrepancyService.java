@@ -7,14 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.mongodb.MongoException;
-
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
 import uk.gov.ch.pscdiscrepanciesapi.common.Kind;
 import uk.gov.ch.pscdiscrepanciesapi.common.LinkFactory;
@@ -23,6 +19,7 @@ import uk.gov.ch.pscdiscrepanciesapi.mappers.PscDiscrepancyMapper;
 import uk.gov.ch.pscdiscrepanciesapi.models.entity.PscDiscrepancyEntity;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancy;
 import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyRepository;
+import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyValidator;
 import uk.gov.companieshouse.GenerateEtagUtil;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
@@ -52,6 +49,9 @@ public class PscDiscrepancyService {
     @Autowired
     private LinkFactory linkFactory;
 
+    @Autowired
+    private PscDiscrepancyValidator validator;
+
     /**
      * Create a PSC Discrepancy record.
      * 
@@ -65,7 +65,9 @@ public class PscDiscrepancyService {
     public ServiceResult<PscDiscrepancy> createPscDiscrepancy(PscDiscrepancy pscDiscrepancy,
             String pscDiscrepancyReportId, HttpServletRequest request) throws ServiceException {
 
-        if (pscDiscrepancy.getDetails() == null || pscDiscrepancy.getDetails().isEmpty()) {
+        Errors validationErrors = validator.validateForCreation(pscDiscrepancy, new Errors());
+        if (validationErrors.hasErrors()) {
+            LOG.error("Validation errors", createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy));
             return ServiceResult.invalid(createErrors(DISCREPANCY_DETAILS, MUST_NOT_BE_NULL));
         }
         
