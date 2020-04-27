@@ -171,7 +171,7 @@ public class PscDiscrepancyReportService {
                     preexistingReportEntityData.setStatus(reportWithUpdatesToApply.getStatus());
                     preexistingReportEntityData.setObligedEntityEmail(
                                     reportWithUpdatesToApply.getObligedEntityEmail());
-                    preexistingReport.setObligedEntityTelephoneNumber(
+                    preexistingReportEntityData.setObligedEntityTelephoneNumber(
                             reportWithUpdatesToApply.getObligedEntityTelephoneNumber());
                     preexistingReportEntityData
                                     .setCompanyNumber(reportWithUpdatesToApply.getCompanyNumber());

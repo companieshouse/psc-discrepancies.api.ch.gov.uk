@@ -49,8 +49,10 @@ public class PscDiscrepancyReportValidator extends Validators {
         validateEmail(errs, pscDiscrepancyReport.getObligedEntityEmail());
         validateCompanyNumber(errs, pscDiscrepancyReport.getCompanyNumber());
         validateStatus(errs, pscDiscrepancyReport.getStatus());
-        validateNotEmpty(pscDiscrepancyReport.getObligedEntityTelephoneNumber(),
-                OBLIGED_ENTITY_TELEPHONE_NUMBER, errs);
+        if (pscDiscrepancyReport.getObligedEntityTelephoneNumber() != null) {
+            validateNotEmpty(pscDiscrepancyReport.getObligedEntityTelephoneNumber(),
+                            OBLIGED_ENTITY_TELEPHONE_NUMBER, errs);
+        }
         return errs;
     }
 
