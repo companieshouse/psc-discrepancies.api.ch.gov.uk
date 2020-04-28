@@ -12,25 +12,25 @@ In order to build this service locally you need:
 - [Git](https://git-scm.com/downloads)
 - [MongoDB](https://www.mongodb.com)
 
-### Getting Started
+## Installation
 
-Run the following from the command line to download the repository and change into the directory:
+To download this repository, run the following from the command line and change into the directory:
 
 ```
 git clone git@github.com:companieshouse/psc-discrepancies.api.ch.gov.uk.git
 
 cd psc-discrepancies.api.ch.gov.uk
 ```
+### Vagrant
 
-## Installation
+Installing and running this API in vagrant requires an update of the `vagrant-development-v2` repository and then running `./clean.sh` and `./setup.sh`.
+### Other Environments
 
-Installing and running this API requires an update of the `vagrant-development-v2` repository and then running `./clean.sh` and `./setup.sh`. 
+The API is deployed via Concourse or by the release team.
 
 ## Usage
 
-The usage of this API is primarily done via accessing the web app. This API is currently not fit for purpose for internal staff, and requires a
-someone who is obliged to report discrepancies (e.g. bank staff members) to fill and complete the form in the `psc-discrepancies.web.ch.gov.uk` 
-service.
+The usage of this API is primarily through accessing the web app `psc-discrepancies.web.ch.gov.uk`. At this time there is no requirement to make this a public API.
 
 ## Support
 
@@ -39,3 +39,4 @@ The support process for dealing with a bug in this API follows the same process 
 ## Design
 
 This API follows Companies House design standards, and the swagger specification can be found in this repository within the `spec` directory.
+Built on the REST architecture, there are two controllers. The first has endpoints to allow the creation, update and retrieving of PSC discrepancy report(s). The second controller has endpoints to create and retrieve discrepancies for a report.
