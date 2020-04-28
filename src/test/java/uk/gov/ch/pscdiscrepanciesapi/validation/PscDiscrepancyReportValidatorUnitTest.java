@@ -144,26 +144,6 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - empty telephone number")
-    void validateUpdate_Unsuccessful_EmptyTelephoneNumber() {
-        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
-        updatedReport.setEtag(ETAG);
-        updatedReport.setObligedEntityTelephoneNumber("");
-
-        Err error =
-                Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION)
-                        .withError(
-                                OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION + NOT_EMPTY_ERROR_MESSAGE)
-                        .build();
-
-        Errors errorsFromValidation =
-                pscDiscrepancyReportValidator.validateForUpdate(pscDiscrepancyReport, updatedReport);
-
-        assertEquals(1, errorsFromValidation.size());
-        assertTrue(errorsFromValidation.containsError(error));
-    }
-
-    @Test
     @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid status")
     void validateUpdate_Unsuccessful_InvalidStatus() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
@@ -221,7 +201,6 @@ public class PscDiscrepancyReportValidatorUnitTest {
         updatedReport.setEtag(ETAG);
         updatedReport.setCompanyNumber(INVALID_COMPANY_NUMBER);
         updatedReport.setObligedEntityEmail(INVALID_EMAIL);
-        updatedReport.setObligedEntityTelephoneNumber("");
         updatedReport.setStatus(INVALID_STATUS);
         updatedReport.setObligedEntityContactName(INVALID_CONTACT_NAME);
 
@@ -233,20 +212,15 @@ public class PscDiscrepancyReportValidatorUnitTest {
                 .withError(STATUS_LOCATION + " is not one of the correct values").build();
         Err email = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
                 .withError(OBLIGED_ENTITY_EMAIL_LOCATION + " is not in the correct format").build();
-        Err telephoneNumber = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION)
-                .withError(
-                        OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION + NOT_EMPTY_ERROR_MESSAGE)
-                .build();
 
         Errors errorsFromValidation = pscDiscrepancyReportValidator
                 .validateForUpdate(pscDiscrepancyReport, updatedReport);
 
-        assertEquals(5, errorsFromValidation.size());
+        assertEquals(4, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(companyNumber));
         assertTrue(errorsFromValidation.containsError(contactName));
         assertTrue(errorsFromValidation.containsError(status));
         assertTrue(errorsFromValidation.containsError(email));
-        assertTrue(errorsFromValidation.containsError(telephoneNumber));
     }
 
     @Test
@@ -281,25 +255,6 @@ public class PscDiscrepancyReportValidatorUnitTest {
 
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
                 .withError(OBLIGED_ENTITY_EMAIL_LOCATION + " is not in the correct format").build();
-
-        Errors errorsFromValidation =
-                pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
-
-        assertEquals(1, errorsFromValidation.size());
-        assertTrue(errorsFromValidation.containsError(error));
-    }
-
-    @Test
-    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid telephone number")
-    void validateReport_Unsuccessful_InvalidTelephoneNumber() {
-        Errors errors = new Errors();
-        pscDiscrepancyReport.setObligedEntityTelephoneNumber("");
-
-        Err error =
-                Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION)
-                        .withError(
-                                OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION + NOT_EMPTY_ERROR_MESSAGE)
-                        .build();
 
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
@@ -375,20 +330,14 @@ public class PscDiscrepancyReportValidatorUnitTest {
                 .withError(STATUS_LOCATION + " is not one of the correct values").build();
         Err email = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
                 .withError(OBLIGED_ENTITY_EMAIL_LOCATION + " is not in the correct format").build();
-        Err telephoneNumber =
-                Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION)
-                        .withError(
-                                OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION + NOT_EMPTY_ERROR_MESSAGE)
-                        .build();
 
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
 
-        assertEquals(5, errorsFromValidation.size());
+        assertEquals(4, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(companyNumber));
         assertTrue(errorsFromValidation.containsError(contactName));
         assertTrue(errorsFromValidation.containsError(status));
         assertTrue(errorsFromValidation.containsError(email));
-        assertTrue(errorsFromValidation.containsError(telephoneNumber));
     }
 }
