@@ -21,16 +21,71 @@ git clone git@github.com:companieshouse/psc-discrepancies.api.ch.gov.uk.git
 
 cd psc-discrepancies.api.ch.gov.uk
 ```
-### Vagrant
+#### Vagrant
 
 Installing and running this API in vagrant requires an update of the `vagrant-development-v2` repository and then running `./clean.sh` and `./setup.sh`.
-### Other Environments
+
+To start this API in vagrant, use the following command: `ubic start psc.psc-discrepancy-api`
+
+It is recommended to run this API in vagrant rather than outside of vagrant because of the necessary environment variables, which can be found in: `resources/application.properties`
+
+#### Other Environments
 
 The API is deployed via Concourse or by the release team.
 
 ## Usage
 
 The usage of this API is primarily through accessing the web app `psc-discrepancies.web.ch.gov.uk`. At this time there is no requirement to make this a public API.
+
+#### POSTMAN
+
+##### PSC Discrepancy Report
+
+HTTP requests can be sent to the API via the POSTMAN application with the following URL as the base URL: 
+
+`http://api.chs-dev.internal:18553/psc-discrepancy-reports`
+
+This URL can be used to create a new PSC Discrepancy Report via a POST request and the following request body:
+```json
+{
+  "obliged_entity_contact_name" : "John Smith"
+}
+```
+
+`http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}` can then be used to update the report with any combination the following fields:
+```json
+{
+    "etag": "724a80e7235c29a4fa1c849bef36198b3c220561",
+    "obliged_entity_email": "mreis@email.co.uk",
+    "company_number": "00006400",
+    "obliged_entity_telephone_number": "07788991122",
+    "status": "COMPLETE"
+}
+```
+
+GET requests can also be executed to retrieve individual reports
+
+##### PSC Discrepancy
+
+A record can be created for each discrepancy the obliged entity has found on a company's PSCs.
+
+To create a PSC Discrepancy record, a POST request can be executed on the following URL: 
+
+`http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}/discrepancies`
+
+With the following request body:
+
+```json
+{
+  "details": "Wrong birthday on John Smith. Should be 01/01/1991 instead of 01/01/1992"
+}
+```
+
+A GET request can also be done on the above URL to list all discrepancies recorded within a report.
+
+Furthermore, a GET request can be done on the following URL to retrieve an individual report: 
+
+`http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}/discrepancies/{discrepancy-id}`
 
 ## Support
 
