@@ -56,7 +56,7 @@ This URL can be used to create a new PSC Discrepancy Report via a __POST__ reque
 ```json
 {
     "etag": "724a80e7235c29a4fa1c849bef36198b3c220561",
-    "obliged_entity_email": "mreis@email.co.uk",
+    "obliged_entity_email": "jsmith@email.co.uk",
     "company_number": "00006400",
     "obliged_entity_telephone_number": "07788991122",
     "status": "COMPLETE"
