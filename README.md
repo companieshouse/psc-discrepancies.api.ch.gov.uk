@@ -45,14 +45,14 @@ HTTP requests can be sent to the API via the POSTMAN application with the follow
 
 `http://api.chs-dev.internal:18553/psc-discrepancy-reports`
 
-This URL can be used to create a new PSC Discrepancy Report via a POST request and the following request body:
+This URL can be used to create a new PSC Discrepancy Report via a __POST__ request and the following request body:
 ```json
 {
   "obliged_entity_contact_name" : "John Smith"
 }
 ```
 
-`http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}` can then be used to update the report with any combination the following fields:
+`http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}` can then be used to update the report (via a __PUT__ request) with any combination the following fields:
 ```json
 {
     "etag": "724a80e7235c29a4fa1c849bef36198b3c220561",
@@ -63,13 +63,13 @@ This URL can be used to create a new PSC Discrepancy Report via a POST request a
 }
 ```
 
-GET requests can also be executed to retrieve individual reports
+__GET__ requests can also be executed to retrieve individual reports
 
 ##### PSC Discrepancy
 
 A record can be created for each discrepancy the obliged entity has found on a company's PSCs.
 
-To create a PSC Discrepancy record, a POST request can be executed on the following URL: 
+To create a PSC Discrepancy record, a __POST__ request can be executed on the following URL: 
 
 `http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}/discrepancies`
 
@@ -81,9 +81,9 @@ With the following request body:
 }
 ```
 
-A GET request can also be done on the above URL to list all discrepancies recorded within a report.
+A __GET__ request can also be done on the above URL to list all discrepancies recorded within a report.
 
-Furthermore, a GET request can be done on the following URL to retrieve an individual report: 
+Furthermore, a __GET__ request can be done on the following URL to retrieve an individual report: 
 
 `http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}/discrepancies/{discrepancy-id}`
 
