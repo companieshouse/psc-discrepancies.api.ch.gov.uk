@@ -27,7 +27,7 @@ Installing and running this API in vagrant requires an update of the `vagrant-de
 
 To start this API in vagrant, use the following command: `ubic start psc.psc-discrepancy-api`
 
-It is recommended to run this API in vagrant rather than outside of vagrant because of the necessary environment variables, which can be found in: `resources/application.properties`
+It is recommended to run this API in vagrant rather than outside of vagrant because of the necessary environment variables, which can be found in: `src/main/resources/application.properties`
 
 #### Other Environments
 
