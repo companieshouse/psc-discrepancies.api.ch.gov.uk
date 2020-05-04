@@ -80,7 +80,7 @@ public class PscDiscrepancyReportService {
         Optional<PscDiscrepancyReportEntity> storedReport = pscDiscrepancyReportRepository.findById(reportId);
 
         return storedReport
-                .map(pscDiscrepancyReportEntity -> pscDiscrepancyReportMapper.entityToRest(pscDiscrepancyReportEntity))
+                .map(pscDiscrepancyReportMapper::entityToRest)
                 .orElse(null);
     }
 
