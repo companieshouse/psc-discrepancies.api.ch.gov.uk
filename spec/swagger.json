@@ -503,9 +503,13 @@
       "DiscrepancyReport" : {
         "type" : "object",
         "properties" : {
-          "obliged-entity-contact-name" : {
+          "obliged-entity-name" : {
             "type" : "string",
             "example" : "Barclays Bank"
+          },
+          "obliged-entity-contact-name" : {
+            "type" : "string",
+            "example" : "Joe Bloggs"
           },
           "obliged-entity-email" : {
             "type" : "string",
@@ -517,7 +521,7 @@
           },
           "company-number" : {
             "type" : "string",
-            "example" : "AB export"
+            "example" : "02345678"
           },
           "status" : {
             "type" : "string",
