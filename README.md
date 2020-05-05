@@ -21,6 +21,23 @@ git clone git@github.com:companieshouse/psc-discrepancies.api.ch.gov.uk.git
 
 cd psc-discrepancies.api.ch.gov.uk
 ```
+
+#### Configuration
+
+The following are environment variables necessary to run the API:
+
+##### chs-configs/(environment)/psc.discrepancies.api.ch.gov.uk/env:
+
+* _PSC_DISCREPANCIES_API_APPLICATION_NAME_: Used in structured logging to display the application the log line belongs to
+* _PSC_DISCREPANCIES_MONGODB_URL_: Points at the MongoDB instance for that environment
+* _PSC_DISCREPANCIES_DATABASE__: Refers to the database that holds the collections for the application data 
+* _PSC_DISCREPANCY_REPORT_SUBISSION_URI_: The link to the CHIPS REST interfaces submission for a PSC Discrepancy for the corresponding CHIPS environment
+
+##### chs-configs/(environment)/global_env:
+
+* _PSC_DISCREPANCIES_API_PORT_: Port number for where the API is deployed
+* _PSC_DISCREPANCIES_API_CH_GOV_UK_URL_: Used to allow ERIC to route requests through the API
+
 #### Vagrant
 
 Installing and running this API in vagrant requires an update of the `vagrant-development-v2` repository and then running `./clean.sh` and `./setup.sh`.
@@ -35,7 +52,7 @@ The API is deployed via Concourse or by the release team.
 
 ## Usage
 
-The usage of this API is primarily through accessing the web app `psc-discrepancies.web.ch.gov.uk`. At this time there is no requirement to make this a public API.
+The usage of this API is primarily through accessing the web app `psc-discrepancies.web.ch.gov.uk`. At this time (May 12, 2020) there is no requirement to make this a public API.
 
 #### POSTMAN
 
