@@ -31,7 +31,7 @@ The following are environment variables necessary to run the API:
 * _PSC_DISCREPANCIES_API_APPLICATION_NAME_: Used in structured logging to display the application the log line belongs to
 * _PSC_DISCREPANCIES_MONGODB_URL_: Points at the MongoDB instance for that environment
 * _PSC_DISCREPANCIES_DATABASE__: Refers to the database that holds the collections for the application data 
-* _PSC_DISCREPANCY_REPORT_SUBISSION_URI_: The link to the CHIPS REST interfaces submission for a PSC Discrepancy for the corresponding CHIPS environment
+* _PSC_DISCREPANCY_REPORT_SUBMISSION_URI_: The link to the CHIPS REST interfaces submission for a PSC Discrepancy for the corresponding CHIPS environment
 
 ##### chs-configs/(environment)/global_env:
 
