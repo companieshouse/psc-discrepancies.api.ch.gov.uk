@@ -485,6 +485,21 @@
       }
     },
     "schemas" : {
+      "Submission" : {
+        "type" : "object",
+        "properties" : {
+          "requestId" : {
+            "type" : "string",
+            "example" : "89EB417ED5AC6BFE93256E900A30E663"
+          },
+          "DiscrepancyReport" : {
+            "$ref" : "#/components/schemas/DiscrepancyReport"
+          },
+          "Discrepancies" : {
+            "$ref" : "#/components/schemas/Discrepancy"
+          }
+        }
+      },
       "DiscrepancyReport" : {
         "type" : "object",
         "properties" : {
@@ -492,13 +507,21 @@
             "type" : "string",
             "example" : "Barclays Bank"
           },
+          "obliged-entity-contact-name" : {
+            "type" : "string",
+            "example" : "Joe Bloggs"
+          },
           "obliged-entity-email" : {
             "type" : "string",
             "example" : "bob.holness@barclaysbank.com"
           },
+          "obliged-entity-telephone-number" : {
+            "type" : "string",
+            "example" : "01234 567891"
+          },
           "company-number" : {
             "type" : "string",
-            "example" : "AB export"
+            "example" : "02345678"
           },
           "status" : {
             "type" : "string",
