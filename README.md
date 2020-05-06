@@ -110,5 +110,8 @@ The support process for dealing with a bug in this API follows the same process 
 
 ## Design
 
+Below is the process flow for creating a PSC Discrepancy report, updating the report, creating discrepancies for a report and submitting the report with it's discrepancies to CHIPS:
+![alt text](design/PscDiscrepancyAPIDesign.svg)
+
 This API follows Companies House design standards, and the swagger specification can be found in this repository within the `spec` directory.
 Built on the REST architecture, there are two controllers. The first has endpoints to allow the creation, update and retrieving of PSC discrepancy report(s). The second controller has endpoints to create and retrieve discrepancies for a report.
