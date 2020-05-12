@@ -239,18 +239,3 @@ updated to SUBMITTED - given this, should we allow further PUTs on the report?
 fields for created_at and modified_at, then this collection could be filtered for
 reports with a status of INVALID or FAILED_TO_SUBMIT or
 (status=COMPLETE and modified_at is older than dateX), which would be useful for support.
-
-Tickets to check:
-Better merging
-Interceptors
-Exception handler
-Structured logging
-POST with any fields
-Spike: how do we stop an UPDATE from changing stuff that has already been sent? Should we?
-Idempotency in CHIPS service
-Design docs for pipeline
-CHIPS REST Interfaces: Change back to plain text? Ask Les, Bruce.
-Multiple submission issue on web
-Config - what other projects should have config on them?
-
-Config - what about the config in chs-config? On a side-note, are there any comments that we could add to the existing config files in chs-config and the application.properties?
