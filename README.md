@@ -58,27 +58,41 @@ The usage of this API is primarily through accessing the web app `psc-discrepanc
 
 ##### PSC Discrepancy Report
 
-HTTP requests can be sent to the API via the POSTMAN application with the following URL as the base URL: 
+HTTP requests can be sent to the API via a REST client, e.g. Postman, with the following URL as the base URL: 
 
 `http://api.chs-dev.internal:18553/psc-discrepancy-reports`
 
-This URL can be used to create a new PSC Discrepancy Report via a __POST__ request and the following request body:
+This URL can be used to create a new PSC Discrepancy Report via a __POST__ request with a Content-Type header of `application/json`
+and a body of a PscDiscrepancyReport with only its `obliged_entity_contact_name`
+field filled in, for example:
 ```json
 {
   "obliged_entity_contact_name" : "John Smith"
 }
 ```
 
-`http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}` can then be used to update the report (via a __PUT__ request) with any combination the following fields:
+A successful 201 Created response will hold the location of the created report in
+a Location header and a copy of the created report in its body. This created report
+is important, as it contains the `etag` value necessary for any subsequent PUTs.
+
+The location of the resource will take the form
+`http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}` and can then be used to
+update the report (via a __PUT__ request) with any combination the following fields:
 ```json
 {
-    "etag": "724a80e7235c29a4fa1c849bef36198b3c220561",
+    "etag": "see note below",
     "obliged_entity_email": "jsmith@email.co.uk",
     "company_number": "00006400",
     "obliged_entity_telephone_number": "07788991122",
     "status": "COMPLETE"
 }
 ```
+
+__etag__ note that the etag is initialised in the first POST and changes with each
+successful PUT. Thus the __current etag value__ in the system can be found in the
+PscDiscrepancyReport or PscDiscrepancy in the body of the response to a POST or PUT.
+You can also retrieve it by using a GET for that resource. You must use the current
+etag value in any PUT, or you will get an error response. 
 
 __GET__ requests can also be executed to retrieve individual reports
 
@@ -100,18 +114,96 @@ With the following request body:
 
 A __GET__ request can also be done on the above URL to list all discrepancies recorded within a report.
 
-Furthermore, a __GET__ request can be done on the following URL to retrieve an individual report: 
+Furthermore, a __GET__ request can be done on the following URL to retrieve an individual discrepancy: 
 
 `http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}/discrepancies/{discrepancy-id}`
 
 ## Support
 
 The support process for dealing with a bug in this API follows the same process as all other CHS services.
+TODO: more here
 
 ## Design
+The sequence diagram below shows a high-level overview of the interactions between the user, web service, API service and CHIPS.
+![alt text](design/OverviewSequence.svg)
 
-Below is the process flow for creating a PSC Discrepancy report, updating the report, creating discrepancies for a report and submitting the report with it's discrepancies to CHIPS:
-![alt text](design/PscDiscrepancyAPIDesign.svg)
+Note that some elements are missing from the diagram, to keep the diagram simple.
+
+### An overview of how the different systems interact.
+In order to keep the web service as stateless as possible, the REST service
+ is used to store the growing model. In a different design, the growing report and
+ its discrepancy data would be stored in a web-service specific session store. We
+ rejected this as the session store is not really fit for purpose at the moment
+ (see TODO). It simplifies the design to keep the growing report in the API and
+ have the web service add to it incrementally. Each webscreen contains one or two
+ pieces of information that are added to the growing report. When the web journey
+ is finished and the report is complete, the web service updates the status of the
+ report, using a PUT to change the status to COMPLETE. This signals to the API to
+ validate the report as a whole and send it on to CHIPS.
+
+### Model
+TODO: one discrepancy at the moment.
+
+### Data storage
+1. The API Service, like most other Companies House services, stores its back-end
+ data in MongoDB, and that is not shown here. Each successful POST or PUT causes
+ data to be stored in MongoDB.
+ 
+### Validation
+1. JSON data submitted to the API is validated: invalid data is rejected, leaving
+the stored model unchanged.
+1. In the incremental design of growing the report with POSTs and PUTs, each POST
+ and PUT validates the individual fields that are currently set there, leaving unset
+ fields unvalidated.
+1. Only when the status is changed to COMPLETE are the whole report and its child
+ discrepancies validated. At this point, all mandatory fields in the report and any
+ child discrepancies must be set and there must be at least at least one report.
+
+### Whitelist copying of data into API
+Data submitted to the API by POST and PUT is not blindly saved into the API.
+
+Specifically: each API object consists of a mixture of:
+* 'client-settable' fields that may be set by the API client (such as the
+PscDiscrepancyReport's companyNumber)
+* 'non-client-settable' fields that are only meant to be set by the API, such as
+`kind`, `etag`, or `links`.
+By copying the client-settable fields in and skipping the non-client-settable
+fields, we prevent malicious or inadvertent alteration of those non-client-settable
+fields.
+
+TODOs:
+etag notes
+support notes
+
+Tickets to check:
+Better merging
+Interceptors
+Exception handler
+Structured logging
+POST with any fields
+Spike: how do we stop an UPDATE from changing stuff that has already been sent? Should we?
+Idempotency in CHIPS service
+Design docs for pipeline
+CHIPS REST Interfaces: Change back to plain text? Ask Les, Bruce.
+Multiple submission issue on web
+
+
+There is no notion of the flow of POST a report… iterative PUT… PUT PUT, POST a discrepancy, PUT with status=COMPLETE… no overview of the lifecycle of a report, in other words.
+
+The support section could refer to this lifecycle with regard to what could go wrong in normal operation.
+
+We probably need an overview of how all our services fit together somewhere. This project is as good a place as any.
+
+Config - what about the config in chs-config? On a side-note, are there any comments that we could add to the existing config files in chs-config and the application.properties?
+
+The path to application.properties is wrong.
+
+The Usage/Postman section: good, but needs to talk about what happens with etag. Possibly refer out to a doc on etag. We need to be clear that etag must match what is in system.
+
+
+![alt text](design/StatusCompleteAction.svg)
 
 This API follows Companies House design standards, and the swagger specification can be found in this repository within the `spec` directory.
 Built on the REST architecture, there are two controllers. The first has endpoints to allow the creation, update and retrieving of PSC discrepancy report(s). The second controller has endpoints to create and retrieve discrepancies for a report.
+
+TODO More detail here.

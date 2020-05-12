@@ -1,0 +1,27 @@
+start
+title "PSC Discrepancy API: action diagram for status=COMPLETE"
+
+
+:PUT discrepancy report\nwith status=COMPLETE;
+if (valid report and discrepancy) then (no)
+    :set report.status=INVALID
+    :store in Mongo;
+    :respond with error response;
+else (yes)
+    :update in MongoDB;
+    :submit to CHIPS;
+    if (submit succeeded) then (yes)
+        :set report.status=SUBMITTED;
+        :store in Mongo;
+    else (no)
+        :set report.status=FAILED_TO_SUBMIT;
+        :store in Mongo;
+    endif
+    :respond with success response\nwith report.status=COMPLETE;
+endif
+
+stop
+
+@enduml
+
+
