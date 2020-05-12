@@ -30,7 +30,7 @@ The following are environment variables necessary to run the API:
 
 * _PSC_DISCREPANCIES_API_APPLICATION_NAME_: Used in structured logging to display the application the log line belongs to
 * _PSC_DISCREPANCIES_MONGODB_URL_: Points at the MongoDB instance for that environment
-* _PSC_DISCREPANCIES_DATABASE__: Refers to the database that holds the collections for the application data 
+* _PSC_DISCREPANCIES_DATABASE_: Refers to the database that holds the collections for the application data
 * _PSC_DISCREPANCY_REPORT_SUBMISSION_URI_: The link to the CHIPS REST interfaces submission for a PSC Discrepancy for the corresponding CHIPS environment
 
 ##### chs-configs/(environment)/global_env:
@@ -40,11 +40,11 @@ The following are environment variables necessary to run the API:
 
 #### Vagrant
 
-Installing and running this API in vagrant requires an update of the `vagrant-development-v2` repository and then running `./clean.sh` and `./setup.sh`.
+Installing and running this API in Vagrant requires an update of the `vagrant-development-v2` repository and then running `./clean.sh` and `./setup.sh`.
 
-To start this API in vagrant, use the following command: `ubic start psc.psc-discrepancy-api`
+To start this API in Vagrant, use the following command: `ubic start psc.psc-discrepancy-api`
 
-It is recommended to run this API in vagrant rather than outside of vagrant because of the necessary environment variables, which can be found in: `src/main/resources/application.properties`
+It is recommended to run this API in Vagrant rather than outside of Vagrant because of the necessary environment variables, which can be found in: `src/main/resources/application.properties`
 
 #### Other Environments
 
@@ -62,8 +62,8 @@ HTTP requests can be sent to the API via a REST client, e.g. Postman, with the f
 
 `http://api.chs-dev.internal:18553/psc-discrepancy-reports`
 
-This URL can be used to create a new PSC Discrepancy Report via a __POST__ request with a Content-Type header of `application/json`
-and a body of a PscDiscrepancyReport with only its `obliged_entity_contact_name`
+This URL can be used to create a new PSC Discrepancy Report via a __POST__ request
+with a body of a PscDiscrepancyReport with only its `obliged_entity_contact_name`
 field filled in, for example:
 ```json
 {
@@ -71,7 +71,7 @@ field filled in, for example:
 }
 ```
 
-A successful 201 Created response will hold the location of the created report in
+A successful 201 Created response will hold the URL of the created report in
 a Location header and a copy of the created report in its body. This created report
 is important, as it contains the `etag` value necessary for any subsequent PUTs.
 
@@ -92,19 +92,30 @@ __etag__ note that the etag is initialised in the first POST and changes with ea
 successful PUT. Thus the __current etag value__ in the system can be found in the
 PscDiscrepancyReport or PscDiscrepancy in the body of the response to a POST or PUT.
 You can also retrieve it by using a GET for that resource. You must use the current
-etag value in any PUT, or you will get an error response. 
+etag value in any PUT, or you will get an error response. The use of etag in this
+way is standard Companies House design and is meant to prevent races between
+different clients on the same resource. This is unlikely to happen with just a
+single web client for a given resource, but nevertheless this is CH best practice.
 
 __GET__ requests can also be executed to retrieve individual reports
 
 ##### PSC Discrepancy
 
-A record can be created for each discrepancy the obliged entity has found on a company's PSCs.
+A report for a company may, within the model, have multiple discrepancies. The
+current web design only allows for one discrepancy to be raised, but the design
+of the API allows multiple discrepancies to exist within a report.
 
-To create a PSC Discrepancy record, a __POST__ request can be executed on the following URL: 
+Given a PSC Discrepancy Report existing at URL that looks like:
+
+`http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}`
+
+... to create a PSC Discrepancy for that report, __POST__ the PscDiscrepancy to
+the following URL: 
 
 `http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}/discrepancies`
 
-With the following request body:
+The body of the POST needs to contain the PscDiscrepancy JSON, but you should only
+fill out the details field, for example:
 
 ```json
 {
@@ -112,7 +123,8 @@ With the following request body:
 }
 ```
 
-A __GET__ request can also be done on the above URL to list all discrepancies recorded within a report.
+A __GET__ request can also be done on the discrepancies URL shown above to list
+all discrepancies recorded within a report.
 
 Furthermore, a __GET__ request can be done on the following URL to retrieve an individual discrepancy: 
 
@@ -131,23 +143,30 @@ Note that some elements are missing from the diagram, to keep the diagram simple
 
 ### An overview of how the different systems interact.
 In order to keep the web service as stateless as possible, the REST service
- is used to store the growing model. In a different design, the growing report and
+ is used to store the growing model. Each webscreen contains one or two
+ pieces of information that are added to the growing report; when that page's data
+ is submitted to the web service, the web service in turn stores that pages information
+ in the API.
+
+In a different design, the growing report and
  its discrepancy data would be stored in a web-service specific session store. We
  rejected this as the session store is not really fit for purpose at the moment
- (see TODO). It simplifies the design to keep the growing report in the API and
- have the web service add to it incrementally. Each webscreen contains one or two
- pieces of information that are added to the growing report. When the web journey
+ (see TODO).
+ 
+The design of the system is simplified by storing the growing report in the API and
+ having the web service add to it incrementally. When the web journey
  is finished and the report is complete, the web service updates the status of the
- report, using a PUT to change the status to COMPLETE. This signals to the API to
- validate the report as a whole and send it on to CHIPS.
+ report, using a PUT on the API to change the status to COMPLETE. This signals the
+ API to validate the report as a whole and send it on to CHIPS.
 
 ### Model
 TODO: one discrepancy at the moment.
 
 ### Data storage
-1. The API Service, like most other Companies House services, stores its back-end
+The API Service, like most other Companies House services, stores its back-end
  data in MongoDB, and that is not shown here. Each successful POST or PUT causes
- data to be stored in MongoDB.
+ data to be stored in MongoDB. The model used by the DB can be found in the Java
+ package `uk.gov.ch.psciscrepanciesapi.models.entity`.
  
 ### Validation
 1. JSON data submitted to the API is validated: invalid data is rejected, leaving
@@ -175,6 +194,9 @@ TODOs:
 etag notes
 support notes
 
+Links to other projects
+https://companieshouse.atlassian.net/wiki/spaces/TC/pages/1625456764/5MLD+CHIPS+Design+Documentation+-+PscDiscrepancyService
+https://github.com/companieshouse/psc-discrepancies.web.ch.gov.uk/
 Tickets to check:
 Better merging
 Interceptors
