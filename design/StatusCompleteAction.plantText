@@ -1,5 +1,5 @@
 start
-title "PSC Discrepancy API: action diagram for status=COMPLETE"
+title PSC Discrepancy API: action diagram for status=COMPLETE
 
 
 :PUT discrepancy report\nwith status=COMPLETE;

@@ -54,8 +54,8 @@ The API is deployed via Concourse or by the release team.
 
 The usage of this API is primarily through accessing the web app `psc-discrepancies.web.ch.gov.uk`. At this time (May 12, 2020) there is no requirement to make this a public API.
 
-#### POSTMAN
-
+#### Using the REST API directly
+The API specification can be found in the `spec` directory.
 ##### PSC Discrepancy Report
 
 HTTP requests can be sent to the API via a REST client, e.g. Postman, with the following URL as the base URL: 
@@ -131,9 +131,17 @@ Furthermore, a __GET__ request can be done on the following URL to retrieve an i
 `http://api.chs-dev.internal:18553/psc-discrepancy-reports/{report-id}/discrepancies/{discrepancy-id}`
 
 ## Support
-
 The support process for dealing with a bug in this API follows the same process as all other CHS services.
-TODO: more here
+The following are the main problems that could occur with the services.
+1. Web service has a POST or PUT rejected: this could occur if there is a validation failure in the
+API that causes it to reject the web services request. This is unlikely as the web service has
+its own validation, but the issue could occur.
+1. Web service sets report status to COMPLETE, causing validation of the complete report and that fails for
+some reason. Again, this is unlikely, but it would result in the status of the report being set to
+INVALID.
+1. Web service sets report status to COMPLETE, the report is valid and the API attempts to send the report
+to CHIPS REST Interfaces, but the attempt fails, either because of an error inside CHIPS REST Interfaces or
+because it is unavailable. In this case, the report status will be set to FAILED_TO_SUBMIT.
 
 ## Design
 The sequence diagram below shows a high-level overview of the interactions between the user, web service, API service and CHIPS.
@@ -142,6 +150,13 @@ The sequence diagram below shows a high-level overview of the interactions betwe
 Note that some elements are missing from the diagram, to keep the diagram simple.
 
 ### An overview of how the different systems interact.
+The CHIPS portion of the design can be found at:
+https://companieshouse.atlassian.net/wiki/spaces/TC/pages/1625456764/5MLD+CHIPS+Design+Documentation+-+PscDiscrepancyService
+... which may not be accessible, unless you are inside the Companies House network.
+
+The web service design can be found here:
+https://github.com/companieshouse/psc-discrepancies.web.ch.gov.uk/
+
 In order to keep the web service as stateless as possible, the REST service
  is used to store the growing model. Each webscreen contains one or two
  pieces of information that are added to the growing report; when that page's data
@@ -150,17 +165,13 @@ In order to keep the web service as stateless as possible, the REST service
 
 In a different design, the growing report and
  its discrepancy data would be stored in a web-service specific session store. We
- rejected this as the session store is not really fit for purpose at the moment
- (see TODO).
+ rejected this as the session store is not really fit for purpose at the moment.
  
 The design of the system is simplified by storing the growing report in the API and
  having the web service add to it incrementally. When the web journey
  is finished and the report is complete, the web service updates the status of the
  report, using a PUT on the API to change the status to COMPLETE. This signals the
  API to validate the report as a whole and send it on to CHIPS.
-
-### Model
-TODO: one discrepancy at the moment.
 
 ### Data storage
 The API Service, like most other Companies House services, stores its back-end
@@ -190,13 +201,45 @@ By copying the client-settable fields in and skipping the non-client-settable
 fields, we prevent malicious or inadvertent alteration of those non-client-settable
 fields.
 
-TODOs:
-etag notes
-support notes
+### Status=COMPLETE: a more detailed flow
+Here we can see a more detailed flow within the API for what happens when the status
+of a report changes to COMPLETE.
+![alt text](design/StatusCompleteAction.svg)
 
-Links to other projects
-https://companieshouse.atlassian.net/wiki/spaces/TC/pages/1625456764/5MLD+CHIPS+Design+Documentation+-+PscDiscrepancyService
-https://github.com/companieshouse/psc-discrepancies.web.ch.gov.uk/
+### API project code structure
+* The project uses an old-fashioned directory structure for a RESTful service, with the
+project directories being split according to  component nature, e.g. MongoDB entity,
+Spring REST controller... rather than by REST endpoint.
+* The project is essentially a standard Spring Boot REST app, using code from the
+Companies House REST Service common library (https://github.com/companieshouse/rest-service-common-library)
+to simplify some of the code, e.g. making it easier to get the Errors payload right.
+* There are two endpoints, each with a controller and service, for
+PscDiscrepancyReport and PscDiscrepancy respectively.
+
+### Missing from the current design
+1. Authentication, particularly role-based authentication allowing privileged operations
+such as listing all reports, DELETE of a report...
+1. Exception handler.
+1. Interceptors. Specifically, there are no interceptors for authentication, logging,
+or to check that a POSTed PscDiscrepancy actually has the parent PscDiscrepancyReport
+implied by its path.
+1. DELETE from any endpoint, though that would be dangerous without some for of
+role based authentication.
+1. UPDATE of a PscDiscrepancy, as it was not needed. It would be useful for support though.
+1. A more flexible design would allow you to POST a
+PscDiscrepancyReport that had any combination of settable fields set, including none.
+We had to refactor the PscDiscrepancyReport creation code when the first page that
+created the PscDiscrepancyReport changed, as this changed the nature of the POST
+made from that web page to the API.
+1. Structured logging
+1. We do not cater for the following scenario: if a PscDiscrepancyReport has been
+marked as COMPLETE and has been successfully submitted to CHIPS, then its status
+updated to SUBMITTED - given this, should we allow further PUTs on the report?
+1. Filtered requests on the reports collection, filtering by report status. If we added
+fields for created_at and modified_at, then this collection could be filtered for
+reports with a status of INVALID or FAILED_TO_SUBMIT or
+(status=COMPLETE and modified_at is older than dateX), which would be useful for support.
+
 Tickets to check:
 Better merging
 Interceptors
@@ -208,24 +251,6 @@ Idempotency in CHIPS service
 Design docs for pipeline
 CHIPS REST Interfaces: Change back to plain text? Ask Les, Bruce.
 Multiple submission issue on web
-
-
-There is no notion of the flow of POST a report… iterative PUT… PUT PUT, POST a discrepancy, PUT with status=COMPLETE… no overview of the lifecycle of a report, in other words.
-
-The support section could refer to this lifecycle with regard to what could go wrong in normal operation.
-
-We probably need an overview of how all our services fit together somewhere. This project is as good a place as any.
+Config - what other projects should have config on them?
 
 Config - what about the config in chs-config? On a side-note, are there any comments that we could add to the existing config files in chs-config and the application.properties?
-
-The path to application.properties is wrong.
-
-The Usage/Postman section: good, but needs to talk about what happens with etag. Possibly refer out to a doc on etag. We need to be clear that etag must match what is in system.
-
-
-![alt text](design/StatusCompleteAction.svg)
-
-This API follows Companies House design standards, and the swagger specification can be found in this repository within the `spec` directory.
-Built on the REST architecture, there are two controllers. The first has endpoints to allow the creation, update and retrieving of PSC discrepancy report(s). The second controller has endpoints to create and retrieve discrepancies for a report.
-
-TODO More detail here.
