@@ -1,0 +1,12 @@
+The diagrams in this dir are generated from a PlantUML text file.
+Many editors and digram generators exist for this format.
+This website has an editor/diagram generator that you can use:
+https://www.planttext.com
+For a given diagram there are a pair of files: the SVG diagram and the plantText file used to generate it.
+Given a pair of files for diagram XXX, take XXX.plantText and paste it into a PlantUML editor.
+1. Paste the text in the edit box
+2. Make your changes
+3. Click the refresh button
+4. Below the diagram, you will see an SVG link. Click that.
+5. Save the resulting page as design/XXX.svg
+6. Save the revised plantText file in design/XXX.plantText
