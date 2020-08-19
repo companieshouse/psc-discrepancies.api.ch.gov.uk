@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/psc-discrepancies.api.ch.gov.uk.iml" filepath="$PROJECT_DIR$/psc-discrepancies.api.ch.gov.uk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../psc-discrepancies.web.ch.gov.uk/psc-discrepancies.web.ch.gov.uk.iml" filepath="$PROJECT_DIR$/../psc-discrepancies.web.ch.gov.uk/psc-discrepancies.web.ch.gov.uk.iml" />
+    </modules>
+  </component>
+</project>

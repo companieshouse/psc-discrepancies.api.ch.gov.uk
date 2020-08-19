@@ -11,6 +11,9 @@ public class PscDiscrepancyReportEntityData {
     @Field("etag")
     private String etag;
 
+    @Field("obliged_entity_organisation_name")
+    private String obligedEntityOrganisationName;
+
     @Field("obliged_entity_contact_name")
     private String obligedEntityContactName;
 
@@ -46,6 +49,14 @@ public class PscDiscrepancyReportEntityData {
 
     public void setEtag(String etag) {
         this.etag = etag;
+    }
+
+    public String getObligedEntityOrganisationName() {
+        return obligedEntityOrganisationName;
+    }
+
+    public void setObligedEntityOrganisationName(String obligedEntityOrganisationName) {
+        this.obligedEntityOrganisationName = obligedEntityOrganisationName;
     }
 
     public String getObligedEntityName() {
@@ -124,14 +135,18 @@ public class PscDiscrepancyReportEntityData {
                         && Objects.equals(links, other.links)
                         && Objects.equals(obligedEntityEmail, other.obligedEntityEmail)
                         && Objects.equals(obligedEntityName, other.obligedEntityName)
+                        && Objects.equals(obligedEntityOrganisationName, other.obligedEntityOrganisationName)
                         && Objects.equals(status, other.status);
     }
 
     @Override
     public String toString() {
         return "PscDiscrepancyReportEntityData [kind=" + kind + ", etag=" + etag
-                        + ", obligedEntityName=" + obligedEntityName + ", obligedEntityEmail="
-                        + obligedEntityEmail + ", companyNumber=" + companyNumber + ", status="
-                        + status + ", links=" + links + "]";
+                        + ", obligedEntityOrganisationName=" + obligedEntityOrganisationName
+                        + ", obligedEntityName=" + obligedEntityName
+                        + ", obligedEntityEmail=" + obligedEntityEmail
+                        + ", companyNumber=" + companyNumber
+                        + ", status=" + status
+                        + ", links=" + links + "]";
     }
 }

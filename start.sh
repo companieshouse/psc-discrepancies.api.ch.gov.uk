@@ -27,4 +27,11 @@ else
     source "${APP_DIR}/app_env"
 fi
 
-exec java ${JAVA_MEM_ARGS} -jar -Dserver.port="${PORT}" "${APP_DIR}/psc-discrepancies.api.ch.gov.uk.jar"
+#exec java ${JAVA_MEM_ARGS} -jar -Dserver.port="${PORT}" "${APP_DIR}/psc-discrepancies.api.ch.gov.uk.jar"
+DEBUG=true
+
+if [[ ${DEBUG+x} ]] ; then
+    exec java ${JAVA_MEM_ARGS} -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=11092 -jar -Dserver.port="${PORT}" "${APP_DIR}/psc-discrepancies.api.ch.gov.uk.jar"
+else
+    exec java ${JAVA_MEM_ARGS} -jar -Dserver.port="${PORT}" "${APP_DIR}/psc-discrepancies.api.ch.gov.uk.jar"
+fi

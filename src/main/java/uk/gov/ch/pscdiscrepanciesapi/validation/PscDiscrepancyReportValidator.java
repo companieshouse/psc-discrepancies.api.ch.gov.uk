@@ -19,6 +19,7 @@ import uk.gov.companieshouse.service.rest.err.Errors;
 public class PscDiscrepancyReportValidator extends Validators {
     private static final String OBLIGED_ENTITY_EMAIL = "obliged_entity_email";
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "obliged_entity_contact_name";
+    private static final String OBLIGED_ENTITY_ORGANISATION_NAME = "obliged_entity_organisation_name";
     private static final String COMPANY_INCORPORATION_NUMBER = "company_number";
     private static final String STATUS = "status";
     private static final String ETAG = "etag";
@@ -44,6 +45,7 @@ public class PscDiscrepancyReportValidator extends Validators {
      * @param errs An Err instance is added to this for each validation problem.
      */
     public Errors validate(PscDiscrepancyReport pscDiscrepancyReport, Errors errs) {
+        validateOrganisationName(errs, pscDiscrepancyReport.getObligedEntityOrganisationName());
         validateContactName(errs, pscDiscrepancyReport.getObligedEntityContactName());
         validateEmail(errs, pscDiscrepancyReport.getObligedEntityEmail());
         validateCompanyNumber(errs, pscDiscrepancyReport.getCompanyNumber());
@@ -85,11 +87,13 @@ public class PscDiscrepancyReportValidator extends Validators {
         if(updatedReport.getCompanyNumber() != null) {
             validateCompanyNumber(errData, updatedReport.getCompanyNumber());
         }
+        if(updatedReport.getObligedEntityOrganisationName() != null) {
+            validateOrganisationName(errData, updatedReport.getObligedEntityOrganisationName());
+        }
         return errData;
     }
 
     private Errors validateStatus(Errors errors, String status) {
-
         if (validateNotBlank(status, STATUS, errors) && !VALID_STATUSES.contains(status)) {
             Err error = Err.invalidBodyBuilderWithLocation(STATUS)
                     .withError(STATUS + " is not one of the correct values").build();
@@ -99,11 +103,19 @@ public class PscDiscrepancyReportValidator extends Validators {
     }
 
     private Errors validateCompanyNumber(Errors errors, String companyNumber) {
-
         if (validateNotBlank(companyNumber, COMPANY_INCORPORATION_NUMBER, errors)
                 && companyNumber.length() != 8) {
             Err error = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER)
                     .withError(COMPANY_INCORPORATION_NUMBER + " must be 8 characters").build();
+            errors.addError(error);
+        }
+        return errors;
+    }
+
+    private Errors validateOrganisationName(Errors errors, String organisationName) {
+        if (validateNotBlank(organisationName, OBLIGED_ENTITY_ORGANISATION_NAME, errors)) {
+            Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_ORGANISATION_NAME)
+                    .withError(OBLIGED_ENTITY_ORGANISATION_NAME + " must not be empty").build();
             errors.addError(error);
         }
         return errors;
@@ -117,7 +129,6 @@ public class PscDiscrepancyReportValidator extends Validators {
      * @return Errors object containing any errors
      */
     private Errors validateContactName(Errors errors, String contactName) {
-
         if (validateNotBlank(contactName, OBLIGED_ENTITY_CONTACT_NAME, errors)
                 && !charSetValidator.validateCharSet(CharSet.CHARACTER_SET_2, contactName)) {
             Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
@@ -136,7 +147,6 @@ public class PscDiscrepancyReportValidator extends Validators {
      * @return Errors object containing any errors
      */
     private Errors validateEmail(Errors errors, String email) {
-
         if (validateNotBlank(email, OBLIGED_ENTITY_EMAIL, errors)) {
             String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]+$";
 
