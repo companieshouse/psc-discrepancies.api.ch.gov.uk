@@ -132,8 +132,8 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid email")
-    void validateUpdate_Unsuccessful_InvalidEmail() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid email - invalid format")
+    void validateUpdate_Unsuccessful_InvalidEmailInvalidFormat() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setObligedEntityEmail(INVALID_EMAIL);
@@ -149,8 +149,25 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid status")
-    void validateUpdate_Unsuccessful_InvalidStatus() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid email - blank")
+    void validateUpdate_Unsuccessful_InvalidEmailBlank() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setObligedEntityEmail("");
+
+        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
+                .withError(OBLIGED_ENTITY_EMAIL_LOCATION + " must not be empty and must not only consist of whitespace").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid status - not a valid status")
+    void validateUpdate_Unsuccessful_InvalidStatusNotAValidValue() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setStatus(INVALID_STATUS);
@@ -165,9 +182,27 @@ public class PscDiscrepancyReportValidatorUnitTest {
         assertTrue(errorsFromValidation.containsError(error));
     }
 
+
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid contact name")
-    void validateUpdate_Unsuccessful_InvalidContactName() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid status - blank")
+    void validateUpdate_Unsuccessful_InvalidStatusBlank() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setStatus("");
+
+        Err error = Err.invalidBodyBuilderWithLocation(STATUS_LOCATION)
+                .withError(STATUS_LOCATION + " must not be empty and must not only consist of whitespace").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid contact name - invalid char")
+    void validateUpdate_Unsuccessful_InvalidContactNameInvalidChar() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setObligedEntityContactName(INVALID_CONTACT_NAME);
@@ -183,14 +218,48 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number")
-    void validateUpdate_Unsuccessful_InvalidCompanyNumber() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid contact name - blank")
+    void validateUpdate_Unsuccessful_InvalidContactNameBlank() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setObligedEntityContactName("");
+
+        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
+                .withError(OBLIGED_ENTITY_CONTACT_NAME + " must not be empty and must not only consist of whitespace").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number - not 8 chars")
+    void validateUpdate_Unsuccessful_InvalidCompanyNumberNot8Chars() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setCompanyNumber(INVALID_COMPANY_NUMBER);
 
         Err error = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER_LOCATION)
                 .withError(COMPANY_INCORPORATION_NUMBER_LOCATION + " must be 8 characters").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number - blank")
+    void validateUpdate_Unsuccessful_InvalidCompanyNumberBlank() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setCompanyNumber("");
+
+        Err error = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER_LOCATION)
+                .withError(COMPANY_INCORPORATION_NUMBER_LOCATION + " must not be empty and must not only consist of whitespace").build();
 
         Errors errorsFromValidation = pscDiscrepancyReportValidator
                 .validateForUpdate(pscDiscrepancyReport, updatedReport);
