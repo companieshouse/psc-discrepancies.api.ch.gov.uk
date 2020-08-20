@@ -35,7 +35,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
 
     private static final String INVALID_CONTACT_NAME = "^InvalidConctactName^";
     private static final String INVALID_COMPANY_NUMBER = "InvalidCompanyNumber";
-    private static final String INVALID_OBLIGED_ENTITY_TYPE = "InvalidObligedEntityType";
+    private static final String INVALID_OBLIGED_ENTITY_TYPE = "";
     private static final String INVALID_STATUS = "NOT_A_VALID_STATUS";
     private static final String INVALID_EMAIL = "Invalid_Email";
 
@@ -240,21 +240,21 @@ public class PscDiscrepancyReportValidatorUnitTest {
         assertFalse(errorsFromValidation.hasErrors());
     }
 
-//    @Test
-//    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid obliged entity type")
-//    void validateReport_Unsuccessful_InvalidObligedEntityType() {
-//        Errors errors = new Errors();
-//        pscDiscrepancyReport.setObligedEntityType(INVALID_OBLIGED_ENTITY_TYPE);
-//
-//        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
-//                .withError(OBLIGED_ENTITY_TYPE + " must must not be null").build();
-//
-//        Errors errorsFromValidation =
-//                pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
-//
-//        assertEquals(1, errorsFromValidation.size());
-//        assertTrue(errorsFromValidation.containsError(error));
-//    }
+    @Test
+    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid obliged entity type")
+    void validateReport_Unsuccessful_InvalidObligedEntityType() {
+        Errors errors = new Errors();
+        pscDiscrepancyReport.setObligedEntityType(INVALID_OBLIGED_ENTITY_TYPE);
+
+        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                .withError(OBLIGED_ENTITY_TYPE + " must not be empty and must not only consist of whitespace").build();
+
+        Errors errorsFromValidation =
+                pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
 
     @Test
     @DisplayName("Validate the whole PscDiscrepancyReport (without optional OE telephone set) before submission to CHIPS successfully")
