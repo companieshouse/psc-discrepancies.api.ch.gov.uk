@@ -2,6 +2,7 @@ package uk.gov.ch.pscdiscrepanciesapi.models.entity;
 
 import java.util.Map;
 import java.util.Objects;
+
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class PscDiscrepancyReportEntityData {
@@ -22,6 +23,9 @@ public class PscDiscrepancyReportEntityData {
 
     @Field("obliged_entity_telephone_number")
     private String obligedEntityTelephoneNumber;
+
+    @Field("obliged_entity_type")
+    private String obligedEntityType;
 
     @Field("company_number")
     private String companyNumber;
@@ -80,6 +84,14 @@ public class PscDiscrepancyReportEntityData {
         this.obligedEntityTelephoneNumber = obligedEntityTelephoneNumber;
     }
 
+    public String getObligedEntityType() {
+        return obligedEntityType;
+    }
+
+    public void setObligedEntityType(String obligedEntityType) {
+        this.obligedEntityType = obligedEntityType;
+    }
+
     public String getCompanyNumber() {
         return companyNumber;
     }
@@ -105,33 +117,36 @@ public class PscDiscrepancyReportEntityData {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(companyNumber, etag, kind, links, obligedEntityEmail, obligedEntityName,
-                        status);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PscDiscrepancyReportEntityData that = (PscDiscrepancyReportEntityData) o;
+        return Objects.equals(kind, that.kind) &&
+                Objects.equals(etag, that.etag) &&
+                Objects.equals(obligedEntityContactName, that.obligedEntityContactName) &&
+                Objects.equals(obligedEntityName, that.obligedEntityName) &&
+                Objects.equals(obligedEntityEmail, that.obligedEntityEmail) &&
+                Objects.equals(obligedEntityTelephoneNumber, that.obligedEntityTelephoneNumber) &&
+                Objects.equals(obligedEntityType, that.obligedEntityType) &&
+                Objects.equals(companyNumber, that.companyNumber) &&
+                Objects.equals(status, that.status) &&
+                Objects.equals(links, that.links);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof PscDiscrepancyReportEntityData)) {
-            return false;
-        }
-        PscDiscrepancyReportEntityData other = (PscDiscrepancyReportEntityData) obj;
-        return Objects.equals(companyNumber, other.companyNumber)
-                        && Objects.equals(etag, other.etag) && Objects.equals(kind, other.kind)
-                        && Objects.equals(links, other.links)
-                        && Objects.equals(obligedEntityEmail, other.obligedEntityEmail)
-                        && Objects.equals(obligedEntityName, other.obligedEntityName)
-                        && Objects.equals(status, other.status);
+    public int hashCode() {
+        return Objects.hash(kind, etag, obligedEntityContactName, obligedEntityName, obligedEntityEmail, obligedEntityTelephoneNumber, obligedEntityType, companyNumber, status, links);
     }
 
     @Override
     public String toString() {
-        return "PscDiscrepancyReportEntityData [kind=" + kind + ", etag=" + etag
-                        + ", obligedEntityName=" + obligedEntityName + ", obligedEntityEmail="
-                        + obligedEntityEmail + ", companyNumber=" + companyNumber + ", status="
-                        + status + ", links=" + links + "]";
+        return "PscDiscrepancyReportEntityData [kind=" + kind
+                + ", etag=" + etag
+                + ", obligedEntityName=" + obligedEntityName
+                + ", obligedEntityEmail=" + obligedEntityEmail
+                + ", companyNumber=" + companyNumber
+                + ", status=" + status
+                + ", links=" + links + "]";
     }
+
 }

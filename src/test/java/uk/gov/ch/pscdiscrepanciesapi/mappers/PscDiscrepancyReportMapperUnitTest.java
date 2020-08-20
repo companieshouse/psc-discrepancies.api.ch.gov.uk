@@ -26,6 +26,7 @@ public class PscDiscrepancyReportMapperUnitTest {
     private static final String OBLIGED_ENTITY_NAME = "obligedEntityName";
     private static final String OBLIGED_ENTITY_EMAIL = "obligedEntityEmail";
     private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER = "obligedEntityTelephoneNumber";
+    private static final String OBLIGED_ENTITY_TYPE = "obligedEntityType";
     private static final String COMPANY_NUMBER = "companyNumber";
     private static final Links LINKS = new Links();
     private static final Map<String, String> MAP_LINKS = new HashMap<>();
@@ -46,6 +47,7 @@ public class PscDiscrepancyReportMapperUnitTest {
         pscDiscrepancyReportData.setObligedEntityContactName(OBLIGED_ENTTIY_CONTACT_NAME);
         pscDiscrepancyReportData.setObligedEntityEmail(OBLIGED_ENTITY_EMAIL);
         pscDiscrepancyReportData.setObligedEntityTelephoneNumber(OBLIGED_ENTITY_TELEPHONE_NUMBER);
+        pscDiscrepancyReportData.setObligedEntityType(OBLIGED_ENTITY_TYPE);
         pscDiscrepancyReportData.setCompanyNumber(COMPANY_NUMBER);
         pscDiscrepancyReportData.setLinks(MAP_LINKS);
         pscDiscrepancyReportEntity.setData(pscDiscrepancyReportData);
@@ -57,6 +59,7 @@ public class PscDiscrepancyReportMapperUnitTest {
         pscDiscrepancyReport.setObligedEntityContactName(OBLIGED_ENTTIY_CONTACT_NAME);
         pscDiscrepancyReport.setObligedEntityEmail(OBLIGED_ENTITY_EMAIL);
         pscDiscrepancyReport.setObligedEntityTelephoneNumber(OBLIGED_ENTITY_TELEPHONE_NUMBER);
+        pscDiscrepancyReport.setObligedEntityType(OBLIGED_ENTITY_TYPE);
         pscDiscrepancyReport.setCompanyNumber(COMPANY_NUMBER);
         pscDiscrepancyReport.setLinks(LINKS);
     }
@@ -74,6 +77,7 @@ public class PscDiscrepancyReportMapperUnitTest {
         assertEquals(pscDiscrepancyReport.getObligedEntityEmail(), result.getObligedEntityEmail());
         assertEquals(pscDiscrepancyReport.getObligedEntityTelephoneNumber(),
                 result.getObligedEntityTelephoneNumber());
+        assertEquals(pscDiscrepancyReport.getObligedEntityType(), result.getObligedEntityType());
         assertEquals(pscDiscrepancyReport.getCompanyNumber(), result.getCompanyNumber());
         assertEquals(pscDiscrepancyReport.getLinks(), result.getLinks());
     }
@@ -91,6 +95,7 @@ public class PscDiscrepancyReportMapperUnitTest {
         assertEquals(pscDiscrepancyReportEntity.getData().getObligedEntityEmail(), result.getData().getObligedEntityEmail());
         assertEquals(pscDiscrepancyReportEntity.getData().getObligedEntityTelephoneNumber(),
                 result.getData().getObligedEntityTelephoneNumber());
+        assertEquals(pscDiscrepancyReportEntity.getData().getObligedEntityType(), result.getData().getObligedEntityType());
         assertEquals(pscDiscrepancyReportEntity.getData().getCompanyNumber(), result.getData().getCompanyNumber());
         assertEquals(pscDiscrepancyReportEntity.getData().getLinks(), result.getData().getLinks());
     }

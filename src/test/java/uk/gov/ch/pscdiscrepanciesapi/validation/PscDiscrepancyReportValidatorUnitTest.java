@@ -19,12 +19,15 @@ public class PscDiscrepancyReportValidatorUnitTest {
     private static final String OBLIGED_ENTITY_EMAIL_LOCATION = "obliged_entity_email";
     private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION =
             "obliged_entity_telephone_number";
+    private static final String OBLIGED_ENTITY_TYPE = "obliged_entity_type";
     private static final String COMPANY_INCORPORATION_NUMBER_LOCATION = "company_number";
     private static final String STATUS_LOCATION = "status";
 
 
+    private static final String VALID_OBLIGED_ENTITY_TYPE = "valid_oliged_entity_type";
     private static final String VALID_EMAIL = "valid_email@email.com";
     private static final String VALID_TELEPHONE_NUMBER = "08001234567";
+    private static final String VALID_TYPE = "obliged_entity_type";
     private static final String VALID_COMPANY_NUMBER = "12345678";
     private static final String VALID_STATUS = "COMPLETE";
     private static final String VALID_CONTACT_NAME = "ValidContactName";
@@ -32,6 +35,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
 
     private static final String INVALID_CONTACT_NAME = "^InvalidConctactName^";
     private static final String INVALID_COMPANY_NUMBER = "InvalidCompanyNumber";
+    private static final String INVALID_OBLIGED_ENTITY_TYPE = "InvalidObligedEntityType";
     private static final String INVALID_STATUS = "NOT_A_VALID_STATUS";
     private static final String INVALID_EMAIL = "Invalid_Email";
 
@@ -50,6 +54,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         pscDiscrepancyReport.setObligedEntityContactName(VALID_CONTACT_NAME);
         pscDiscrepancyReport.setObligedEntityEmail(VALID_EMAIL);
         pscDiscrepancyReport.setObligedEntityTelephoneNumber(VALID_TELEPHONE_NUMBER);
+        pscDiscrepancyReport.setObligedEntityType(VALID_TYPE);
         pscDiscrepancyReport.setCompanyNumber(VALID_COMPANY_NUMBER);
         pscDiscrepancyReport.setStatus(VALID_STATUS);
         pscDiscrepancyReport.setEtag(ETAG);
@@ -66,13 +71,13 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - null contactName")
-    void validateCreate_Unsuccessful_NullContactName() {
+    @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - null obliged entity type")
+    void validateCreate_Unsuccessful_NullObligedEntityType() {
         Errors errors = new Errors();
-        Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
-                .withError(OBLIGED_ENTITY_CONTACT_NAME + NOT_NULL_ERROR_MESSAGE).build();
+        Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                .withError(OBLIGED_ENTITY_TYPE + NOT_NULL_ERROR_MESSAGE).build();
 
-        pscDiscrepancyReport.setObligedEntityContactName(null);
+        pscDiscrepancyReport.setObligedEntityType(null);
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, errors);
 
@@ -81,13 +86,13 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - empty contact name")
-    void validateCreate_Unsuccessful_EmptyContactName() {
+    @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - empty obliged entity type")
+    void validateCreate_Unsuccessful_EmptyObligedEntityType() {
         Errors errors = new Errors();
-        Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
-                .withError(OBLIGED_ENTITY_CONTACT_NAME + NOT_EMPTY_ERROR_MESSAGE).build();
+        Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                .withError(OBLIGED_ENTITY_TYPE + NOT_EMPTY_ERROR_MESSAGE).build();
 
-        pscDiscrepancyReport.setObligedEntityContactName("");
+        pscDiscrepancyReport.setObligedEntityType("");
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, errors);
 
@@ -233,6 +238,22 @@ public class PscDiscrepancyReportValidatorUnitTest {
                 pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
 
         assertFalse(errorsFromValidation.hasErrors());
+    }
+
+    @Test
+    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid obliged entity type")
+    void validateReport_Unsuccessful_InvalidObligedEntityType() {
+        Errors errors = new Errors();
+        pscDiscrepancyReport.setObligedEntityType(INVALID_OBLIGED_ENTITY_TYPE);
+
+        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                .withError(OBLIGED_ENTITY_TYPE + " must must not be null").build();
+
+        Errors errorsFromValidation =
+                pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
     }
 
     @Test
