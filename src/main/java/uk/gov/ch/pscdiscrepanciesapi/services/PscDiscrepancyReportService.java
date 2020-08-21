@@ -136,7 +136,7 @@ public class PscDiscrepancyReportService {
      * details of all the problems found.
      * 
      * @param reportId                 ID of the report to update.
-     * @param reportWithUpdatesToApply Contains the changes
+     * @param updatedReport Contains the changes
      * @param request                  The original request that lead to this method
      *                                 being called.
      * @return The updated and stored report, with a new etag.
@@ -144,9 +144,9 @@ public class PscDiscrepancyReportService {
      *                          underlying database throws an exception.
      */
     public ServiceResult<PscDiscrepancyReport> updatePscDiscrepancyReport(String reportId,
-            PscDiscrepancyReport reportWithUpdatesToApply, HttpServletRequest request) throws ServiceException {
+            PscDiscrepancyReport updatedReport, HttpServletRequest request) throws ServiceException {
 
-        LOG.infoContext(reportWithUpdatesToApply.getCompanyNumber(), "Update a PSC discrepancy report", createPscDiscrepancyReportDebugMap(reportWithUpdatesToApply));
+        LOG.infoContext(updatedReport.getCompanyNumber(), "Update a PSC discrepancy report", createPscDiscrepancyReportDebugMap(updatedReport));
 
         final ServiceResult<PscDiscrepancyReport> reportToReturn;
         try {
@@ -158,27 +158,26 @@ public class PscDiscrepancyReportService {
                 PscDiscrepancyReport preexistingReport = pscDiscrepancyReportMapper
                         .entityToRest(preexistingReportEntity);
 
-                Errors validationErrors = pscDiscrepancyReportValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply);
+                Errors validationErrors = pscDiscrepancyReportValidator.validateForUpdate(preexistingReport, updatedReport);
                 
                 if (validationErrors.hasErrors()) {
                     LOG.error("PSC Discrepancy Report update validation errors", buildErrorLogMap(validationErrors));
                     reportToReturn = ServiceResult.invalid(validationErrors);
                 } else {
-                    PscDiscrepancyReportEntityData preexistingReportEntityData = preexistingReportEntity.getData();
+                    PscDiscrepancyReportEntityData existingReport = preexistingReportEntity.getData();
+
                     // Now copy over all values that are allowed to be updated
                     // We do this to prevent malicious/inadvertent changing of values that must
                     // not be set by anything other than this service, e.g. kind, links, etag...
-                    preexistingReportEntityData.setStatus(reportWithUpdatesToApply.getStatus());
-                    preexistingReportEntityData.setObligedEntityEmail(
-                                    reportWithUpdatesToApply.getObligedEntityEmail());
-                    preexistingReportEntityData.setObligedEntityTelephoneNumber(
-                            reportWithUpdatesToApply.getObligedEntityTelephoneNumber());
-                    preexistingReportEntityData
-                                    .setCompanyNumber(reportWithUpdatesToApply.getCompanyNumber());
-                    preexistingReportEntityData.setObligedEntityContactName(
-                            reportWithUpdatesToApply.getObligedEntityContactName());
+                    existingReport.setStatus(updatedReport.getStatus());
+                    existingReport.setObligedEntityEmail(updatedReport.getObligedEntityEmail());
+                    existingReport.setObligedEntityTelephoneNumber(updatedReport.getObligedEntityTelephoneNumber());
+                    existingReport.setCompanyNumber(updatedReport.getCompanyNumber());
+                    existingReport.setObligedEntityContactName(updatedReport.getObligedEntityContactName());
+                    existingReport.setObligedEntityOrganisationName(updatedReport.getObligedEntityOrganisationName());
+
                     // Update the etag value, as this has changed
-                    preexistingReportEntityData.setEtag(createEtag());
+                    existingReport.setEtag(createEtag());
 
                     PscDiscrepancyReportEntity storedReportEntity = pscDiscrepancyReportRepository
                             .save(preexistingReportEntity);
@@ -194,7 +193,7 @@ public class PscDiscrepancyReportService {
             }
         } catch (MongoException me) {
             ServiceException serviceException = new ServiceException("Exception storing PSC discrepancy report: ", me);
-            LOG.errorRequest(request, serviceException, createPscDiscrepancyReportDebugMap(reportWithUpdatesToApply));
+            LOG.errorRequest(request, serviceException, createPscDiscrepancyReportDebugMap(updatedReport));
             throw serviceException;
         }
         return reportToReturn;

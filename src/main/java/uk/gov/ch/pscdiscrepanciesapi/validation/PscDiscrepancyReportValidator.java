@@ -113,9 +113,10 @@ public class PscDiscrepancyReportValidator extends Validators {
     }
 
     private Errors validateOrganisationName(Errors errors, String organisationName) {
-        if (validateNotBlank(organisationName, OBLIGED_ENTITY_ORGANISATION_NAME, errors)) {
+        if (validateNotBlank(organisationName, OBLIGED_ENTITY_ORGANISATION_NAME, errors)
+                && !charSetValidator.validateCharSet(CharSet.CHARACTER_SET_2, organisationName)) {
             Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_ORGANISATION_NAME)
-                    .withError(OBLIGED_ENTITY_ORGANISATION_NAME + " must not be empty").build();
+                    .withError(OBLIGED_ENTITY_ORGANISATION_NAME + " contains an invalid character").build();
             errors.addError(error);
         }
         return errors;
