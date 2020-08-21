@@ -30,3 +30,4 @@ target/
 
 # IntelliJ files
 .idea/
+*.iml
