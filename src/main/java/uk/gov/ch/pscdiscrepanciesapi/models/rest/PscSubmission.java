@@ -76,9 +76,7 @@ public class PscSubmission {
     
     /**
      * Create a debug map for structured logging
-     * 
-     * @param pscDiscrepancySubmission
-     * 
+     *
      * @return Debug map
      */
     public Map<String, Object> debugMap() {

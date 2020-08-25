@@ -19,6 +19,7 @@ import uk.gov.companieshouse.service.rest.err.Errors;
 public class PscDiscrepancyReportValidator extends Validators {
     private static final String OBLIGED_ENTITY_EMAIL = "obliged_entity_email";
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "obliged_entity_contact_name";
+    private static final String OBLIGED_ENTITY_TYPE = "obliged_entity_type";
     private static final String COMPANY_INCORPORATION_NUMBER = "company_number";
     private static final String STATUS = "status";
     private static final String ETAG = "etag";
@@ -44,6 +45,7 @@ public class PscDiscrepancyReportValidator extends Validators {
      * @param errs An Err instance is added to this for each validation problem.
      */
     public Errors validate(PscDiscrepancyReport pscDiscrepancyReport, Errors errs) {
+        validateObligedEntityType(errs, pscDiscrepancyReport.getObligedEntityType());
         validateContactName(errs, pscDiscrepancyReport.getObligedEntityContactName());
         validateEmail(errs, pscDiscrepancyReport.getObligedEntityEmail());
         validateCompanyNumber(errs, pscDiscrepancyReport.getCompanyNumber());
@@ -59,7 +61,7 @@ public class PscDiscrepancyReportValidator extends Validators {
      * @param errs An Err instance is added to this for each validation problem.
      */
     public Errors validateForCreation(PscDiscrepancyReport pscDiscrepancyReport, Errors errs) {
-        validateContactName(errs, pscDiscrepancyReport.getObligedEntityContactName());
+        validateObligedEntityType(errs, pscDiscrepancyReport.getObligedEntityType());
         return errs;
     }
     
@@ -127,6 +129,19 @@ public class PscDiscrepancyReportValidator extends Validators {
 
         return errors;
     }
+
+    /**
+     * Validate obliged entity type
+     *
+     * @param obligedEntityType Type to validate
+     *
+     * @return Errors object containing any errors
+     */
+    private Errors validateObligedEntityType(Errors errors, String obligedEntityType) {
+        validateNotBlank(obligedEntityType, OBLIGED_ENTITY_TYPE, errors);
+        return errors;
+    }
+
 
     /**
      * Validate obliged entity email.

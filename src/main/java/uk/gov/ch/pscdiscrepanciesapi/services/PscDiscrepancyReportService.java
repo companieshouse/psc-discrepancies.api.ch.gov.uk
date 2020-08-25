@@ -173,6 +173,7 @@ public class PscDiscrepancyReportService {
                                     reportWithUpdatesToApply.getObligedEntityEmail());
                     preexistingReportEntityData.setObligedEntityTelephoneNumber(
                             reportWithUpdatesToApply.getObligedEntityTelephoneNumber());
+                    preexistingReportEntityData.setObligedEntityType(reportWithUpdatesToApply.getObligedEntityType());
                     preexistingReportEntityData
                                     .setCompanyNumber(reportWithUpdatesToApply.getCompanyNumber());
                     preexistingReportEntityData.setObligedEntityContactName(
