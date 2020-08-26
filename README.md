@@ -63,11 +63,11 @@ HTTP requests can be sent to the API via a REST client, e.g. Postman, with the f
 `http://api.chs-dev.internal:18553/psc-discrepancy-reports`
 
 This URL can be used to create a new PSC Discrepancy Report via a __POST__ request
-with a body of a PscDiscrepancyReport with only its `obliged_entity_contact_name`
+with a body of a PscDiscrepancyReport with only its `obliged_entity_type`
 field filled in, for example:
 ```json
 {
-  "obliged_entity_contact_name" : "John Smith"
+  "obliged_entity_type" : "Financial institution"
 }
 ```
 
@@ -81,6 +81,7 @@ update the report (via a __PUT__ request) with any combination the following fie
 ```json
 {
     "etag": "see note below",
+    "obliged_entity_type": "Financial institution",
     "obliged_entity_email": "jsmith@email.co.uk",
     "company_number": "00006400",
     "obliged_entity_telephone_number": "07788991122",

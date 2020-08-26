@@ -7,19 +7,21 @@ participant "PSC Discrepancy Web" as Web
 participant "PSC Discrepancy API" as Api
 participant "CHIPS REST\nInterfaces service" as ChipsRest
 
-User -> Web : User fills in contact name
-Web -> Api  : POST PscDiscrepancyReport\nwith contact name
+User -> Web : User selects obliged entity type
+Web -> Api  : POST PscDiscrepancyReport\nwith obliged entity type
 Api - -> Web : 201 Created response\nwith Location header set and\ncreated PscDiscrepancyReport in body
+
+User -> Web : User fills in contact name
+Web -> Api  : PUT PscDiscrepancyReport\nwith new info added
+Api - -> Web : OK with updated\nPscDiscrepancyReport in body
 
 User -> Web : User fills in email address\nand (optionally) phone
 Web -> Api  : PUT PscDiscrepancyReport\nwith new info added
 Api - -> Web : OK with updated\nPscDiscrepancyReport in body
 
-
 User -> Web : User fills in company number
 Web -> Api  : PUT PscDiscrepancyReport\nwith new info added
 Api - -> Web : OK with updated\nPscDiscrepancyReport in body
-
 
 User -> Web : User fills in discrepancy info
 Web -> Api  : POST PscDiscrepancy
