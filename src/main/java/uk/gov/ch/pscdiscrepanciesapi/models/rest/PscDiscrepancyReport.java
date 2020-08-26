@@ -21,6 +21,9 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
     @JsonProperty("obliged_entity_telephone_number")
     private String obligedEntityTelephoneNumber;
 
+    @JsonProperty("obliged_entity_type")
+    private String obligedEntityType;
+
     @JsonProperty("company_number")
     private String companyNumber;
 
@@ -67,6 +70,14 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
         this.obligedEntityTelephoneNumber = obligedEntityTelephoneNumber;
     }
 
+    public String getObligedEntityType() {
+        return obligedEntityType;
+    }
+
+    public void setObligedEntityType(String obligedEntityType) {
+        this.obligedEntityType = obligedEntityType;
+    }
+
     public String getCompanyNumber() {
         return companyNumber;
     }
@@ -83,53 +94,35 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
         this.status = status;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((companyNumber == null) ? 0 : companyNumber.hashCode());
-        result = prime * result + ((obligedEntityOrganisationName == null) ? 0 : obligedEntityOrganisationName.hashCode());
-        result = prime * result + ((obligedEntityEmail == null) ? 0 : obligedEntityEmail.hashCode());
-        result = prime * result + ((obligedEntityName == null) ? 0 : obligedEntityName.hashCode());
-        result = prime * result + ((status == null) ? 0 : status.hashCode());
-        return result;
+        return Objects.hash(super.hashCode(), obligedEntityOrganisationName, obligedEntityName, obligedEntityContactName,
+        obligedEntityEmail, obligedEntityTelephoneNumber, obligedEntityType, companyNumber, status);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof PscDiscrepancyReport)) {
-            return false;
-        }
-        PscDiscrepancyReport other = (PscDiscrepancyReport) obj;
-        
-        return Objects.equals(super.getEtag(), other.getEtag())
-            && Objects.equals(super.getKind(), other.getKind())
-            && Objects.deepEquals(super.getLinks(), other.getLinks())
-            && Objects.equals(companyNumber, other.companyNumber)
-            && Objects.equals(obligedEntityOrganisationName, other.obligedEntityOrganisationName)
-            && Objects.equals(obligedEntityEmail, other.obligedEntityEmail)
-            && Objects.equals(obligedEntityName, other.obligedEntityName)
-            && Objects.equals(status, other.status);
-        }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        PscDiscrepancyReport that = (PscDiscrepancyReport) o;
+        return Objects.equals(obligedEntityName, that.obligedEntityName) &&
+                Objects.equals(obligedEntityOrganisationName, that.obligedEntityOrganisationName) &&
+                Objects.equals(obligedEntityContactName, that.obligedEntityContactName) &&
+                Objects.equals(obligedEntityEmail, that.obligedEntityEmail) &&
+                Objects.equals(obligedEntityTelephoneNumber, that.obligedEntityTelephoneNumber) &&
+                Objects.equals(obligedEntityType, that.obligedEntityType) &&
+                Objects.equals(companyNumber, that.companyNumber) &&
+                Objects.equals(status, that.status);
+    }
 
     @Override
     public String toString() {
         return "PscDiscrepancyReport [obligedEntityName=" + obligedEntityName
-                        + ", obligedEntityOrganisationName=" + obligedEntityOrganisationName
-                        + ", obligedEntityEmail=" + obligedEntityEmail
-                        + ", companyNumber=" + companyNumber
-                        + ", status=" + status + "]";
+                + ", obligedEntityOrganisationName=" + obligedEntityOrganisationName
+                + ", obligedEntityEmail=" + obligedEntityEmail
+                + ", companyNumber=" + companyNumber
+                + ", status=" + status + "]";
     }
+
 }

@@ -60,6 +60,7 @@ public class PscDiscrepancyReportServiceUnitTest {
     private static final String VALID_EMAIL = "m@m.com";
     private static final String INVALID_EMAIL = "mm.com";
     private static final String VALID_TELEPHONE_NUMBER = "08001234567";
+    private static final String VALID_TYPE= "obliged entity type";
     private static final String ETAG_1 = "1";
     private static final String VALID_CONTACT_NAME = "valid-contact-náme";
     private static final String INVALID_CONTACT_NAME = "^invalid-contact-name^";
@@ -235,6 +236,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         PscDiscrepancyReport reportWithUpdatesToApply = createReport(VALID_EMAIL, ReportStatus.INVALID.toString());
         reportWithUpdatesToApply.setObligedEntityContactName(VALID_CONTACT_NAME);
         reportWithUpdatesToApply.setObligedEntityTelephoneNumber(VALID_TELEPHONE_NUMBER);
+        reportWithUpdatesToApply.setObligedEntityType(VALID_TYPE);
 
         when(mockReportDiscrepancyValidator.validateForUpdate(preexistingReport, reportWithUpdatesToApply)).thenReturn(new Errors());
 

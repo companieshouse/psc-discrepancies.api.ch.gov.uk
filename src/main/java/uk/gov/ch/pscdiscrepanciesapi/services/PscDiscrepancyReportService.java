@@ -1,5 +1,8 @@
 package uk.gov.ch.pscdiscrepanciesapi.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.MongoException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -12,10 +15,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.MongoException;
-import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
 import uk.gov.ch.pscdiscrepanciesapi.common.Kind;
 import uk.gov.ch.pscdiscrepanciesapi.common.LinkFactory;
@@ -176,6 +175,7 @@ public class PscDiscrepancyReportService {
                     existingReport.setCompanyNumber(updatedReport.getCompanyNumber());
                     existingReport.setObligedEntityContactName(updatedReport.getObligedEntityContactName());
                     existingReport.setObligedEntityOrganisationName(updatedReport.getObligedEntityOrganisationName());
+                    existingReport.setObligedEntityType(updatedReport.getObligedEntityType());
 
                     // Update the etag value, as this has changed
                     existingReport.setEtag(createEtag());

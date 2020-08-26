@@ -1,5 +1,9 @@
 package uk.gov.ch.pscdiscrepanciesapi.validation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,23 +13,21 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 import uk.gov.companieshouse.service.rest.err.Err;
 import uk.gov.companieshouse.service.rest.err.Errors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @ExtendWith(MockitoExtension.class)
 public class PscDiscrepancyReportValidatorUnitTest {
     private static final String OBLIGED_ENTITY_ORGANISATION_NAME = "obliged_entity_organisation_name";
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "obliged_entity_contact_name";
     private static final String OBLIGED_ENTITY_EMAIL_LOCATION = "obliged_entity_email";
-    private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION =
-            "obliged_entity_telephone_number";
+    private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION = "obliged_entity_telephone_number";
+    private static final String OBLIGED_ENTITY_TYPE = "obliged_entity_type";
     private static final String COMPANY_INCORPORATION_NUMBER_LOCATION = "company_number";
     private static final String STATUS_LOCATION = "status";
 
 
+    private static final String VALID_OBLIGED_ENTITY_TYPE = "valid_oliged_entity_type";
     private static final String VALID_EMAIL = "valid_email@email.com";
     private static final String VALID_TELEPHONE_NUMBER = "08001234567";
+    private static final String VALID_TYPE = "obliged_entity_type";
     private static final String VALID_COMPANY_NUMBER = "12345678";
     private static final String VALID_STATUS = "COMPLETE";
     private static final String VALID_CONTACT_NAME = "ValidContactName";
@@ -35,6 +37,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     private static final String INVALID_ORGANISATION_NAME = "^InvalidOrganisationName^";
     private static final String INVALID_CONTACT_NAME = "^InvalidConctactName^";
     private static final String INVALID_COMPANY_NUMBER = "InvalidCompanyNumber";
+    private static final String INVALID_OBLIGED_ENTITY_TYPE = "";
     private static final String INVALID_STATUS = "NOT_A_VALID_STATUS";
     private static final String INVALID_EMAIL = "Invalid_Email";
 
@@ -54,6 +57,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         pscDiscrepancyReport.setObligedEntityContactName(VALID_CONTACT_NAME);
         pscDiscrepancyReport.setObligedEntityEmail(VALID_EMAIL);
         pscDiscrepancyReport.setObligedEntityTelephoneNumber(VALID_TELEPHONE_NUMBER);
+        pscDiscrepancyReport.setObligedEntityType(VALID_TYPE);
         pscDiscrepancyReport.setCompanyNumber(VALID_COMPANY_NUMBER);
         pscDiscrepancyReport.setStatus(VALID_STATUS);
         pscDiscrepancyReport.setEtag(ETAG);
@@ -70,13 +74,13 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - null contactName")
-    void validateCreate_Unsuccessful_NullContactName() {
+    @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - null obliged entity type")
+    void validateCreate_Unsuccessful_NullObligedEntityType() {
         Errors errors = new Errors();
-        Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
-                .withError(OBLIGED_ENTITY_CONTACT_NAME + NOT_NULL_ERROR_MESSAGE).build();
+        Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                .withError(OBLIGED_ENTITY_TYPE + NOT_NULL_ERROR_MESSAGE).build();
 
-        pscDiscrepancyReport.setObligedEntityContactName(null);
+        pscDiscrepancyReport.setObligedEntityType(null);
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, errors);
 
@@ -85,13 +89,13 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - empty contact name")
-    void validateCreate_Unsuccessful_EmptyContactName() {
+    @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - empty obliged entity type")
+    void validateCreate_Unsuccessful_EmptyObligedEntityType() {
         Errors errors = new Errors();
-        Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
-                .withError(OBLIGED_ENTITY_CONTACT_NAME + NOT_EMPTY_ERROR_MESSAGE).build();
+        Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                .withError(OBLIGED_ENTITY_TYPE + NOT_EMPTY_ERROR_MESSAGE).build();
 
-        pscDiscrepancyReport.setObligedEntityContactName("");
+        pscDiscrepancyReport.setObligedEntityType("");
         Errors errorsFromValidation =
                 pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, errors);
 
@@ -131,8 +135,8 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid email")
-    void validateUpdate_Unsuccessful_InvalidEmail() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid email - invalid format")
+    void validateUpdate_Unsuccessful_InvalidEmailInvalidFormat() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setObligedEntityEmail(INVALID_EMAIL);
@@ -148,8 +152,25 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid status")
-    void validateUpdate_Unsuccessful_InvalidStatus() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid email - blank")
+    void validateUpdate_Unsuccessful_InvalidEmailBlank() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setObligedEntityEmail("");
+
+        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
+                .withError(OBLIGED_ENTITY_EMAIL_LOCATION + " must not be empty and must not only consist of whitespace").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid status - not a valid status")
+    void validateUpdate_Unsuccessful_InvalidStatusNotAValidValue() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setStatus(INVALID_STATUS);
@@ -164,9 +185,27 @@ public class PscDiscrepancyReportValidatorUnitTest {
         assertTrue(errorsFromValidation.containsError(error));
     }
 
+
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid contact name")
-    void validateUpdate_Unsuccessful_InvalidContactName() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid status - blank")
+    void validateUpdate_Unsuccessful_InvalidStatusBlank() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setStatus("");
+
+        Err error = Err.invalidBodyBuilderWithLocation(STATUS_LOCATION)
+                .withError(STATUS_LOCATION + " must not be empty and must not only consist of whitespace").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid contact name - invalid char")
+    void validateUpdate_Unsuccessful_InvalidContactNameInvalidChar() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setObligedEntityContactName(INVALID_CONTACT_NAME);
@@ -199,8 +238,25 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number")
-    void validateUpdate_Unsuccessful_InvalidCompanyNumber() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid contact name - blank")
+    void validateUpdate_Unsuccessful_InvalidContactNameBlank() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setObligedEntityContactName("");
+
+        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
+                .withError(OBLIGED_ENTITY_CONTACT_NAME + " must not be empty and must not only consist of whitespace").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number - not 8 chars")
+    void validateUpdate_Unsuccessful_InvalidCompanyNumberNot8Chars() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setCompanyNumber(INVALID_COMPANY_NUMBER);
@@ -216,8 +272,25 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number - blank")
+    void validateUpdate_Unsuccessful_InvalidCompanyNumberBlank() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setCompanyNumber("");
+
+        Err error = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER_LOCATION)
+                .withError(COMPANY_INCORPORATION_NUMBER_LOCATION + " must not be empty and must not only consist of whitespace").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
     @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number, organisation name, email, status and contact name")
-    void validateUpdate_Unsuccessful_InvalidCompanyNumberEmailStatusAndContactName() {
+    void validateUpdate_Unsuccessful_InvalidCompanyNumberOrganisationNameEmailStatusAndContactName() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setCompanyNumber(INVALID_COMPANY_NUMBER);
@@ -258,6 +331,22 @@ public class PscDiscrepancyReportValidatorUnitTest {
                 pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
 
         assertFalse(errorsFromValidation.hasErrors());
+    }
+
+    @Test
+    @DisplayName("Validate the whole PscDiscrepancyReport before submission to CHIPS - invalid obliged entity type")
+    void validateReport_Unsuccessful_InvalidObligedEntityType() {
+        Errors errors = new Errors();
+        pscDiscrepancyReport.setObligedEntityType(INVALID_OBLIGED_ENTITY_TYPE);
+
+        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                .withError(OBLIGED_ENTITY_TYPE + " must not be empty and must not only consist of whitespace").build();
+
+        Errors errorsFromValidation =
+                pscDiscrepancyReportValidator.validate(pscDiscrepancyReport, errors);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
     }
 
     @Test
