@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoException;
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
 import uk.gov.ch.pscdiscrepanciesapi.common.Kind;
 import uk.gov.ch.pscdiscrepanciesapi.common.LinkFactory;
@@ -270,6 +271,9 @@ public class PscDiscrepancyReportService {
         } catch (IOException e) {
             LOG.error("ERROR closing client when sending JSON to CHIPS Rest Interfaces ", e);
         }
+
+
+
 
         try {
             PscDiscrepancyReportEntityData sentReportEntityData = storedReportEntity.getData();
