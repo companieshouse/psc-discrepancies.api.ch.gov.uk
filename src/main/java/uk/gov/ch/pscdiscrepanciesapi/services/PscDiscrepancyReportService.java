@@ -272,9 +272,6 @@ public class PscDiscrepancyReportService {
             LOG.error("ERROR closing client when sending JSON to CHIPS Rest Interfaces ", e);
         }
 
-
-
-
         try {
             PscDiscrepancyReportEntityData sentReportEntityData = storedReportEntity.getData();
             if(validationErrors.hasErrors()) {
