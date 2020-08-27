@@ -503,6 +503,10 @@
       "DiscrepancyReport" : {
         "type" : "object",
         "properties" : {
+          "obliged-entity-type" : {
+            "type" : "string",
+            "example" : "Financial institution"
+          },
           "obliged-entity-name" : {
             "type" : "string",
             "example" : "Barclays Bank"
