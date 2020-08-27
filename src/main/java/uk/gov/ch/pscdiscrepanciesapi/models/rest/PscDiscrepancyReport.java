@@ -1,11 +1,13 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
-import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 import uk.gov.companieshouse.service.rest.ApiObjectImpl;
 
 public class PscDiscrepancyReport extends ApiObjectImpl {
+
+    @JsonProperty("obliged_entity_organisation_name")
+    private String obligedEntityOrganisationName;
 
     @JsonProperty("obliged_entity_name")
     private String obligedEntityName;
@@ -27,6 +29,14 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
 
     @JsonProperty("status")
     private String status;
+
+    public String getObligedEntityOrganisationName() {
+        return obligedEntityOrganisationName;
+    }
+
+    public void setObligedEntityOrganisationName(String obligedEntityOrganisationName) {
+        this.obligedEntityOrganisationName = obligedEntityOrganisationName;
+    }
 
     public String getObligedEntityName() {
         return obligedEntityName;
@@ -86,7 +96,8 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), obligedEntityName, obligedEntityContactName, obligedEntityEmail, obligedEntityTelephoneNumber, obligedEntityType, companyNumber, status);
+        return Objects.hash(super.hashCode(), obligedEntityOrganisationName, obligedEntityName, obligedEntityContactName,
+        obligedEntityEmail, obligedEntityTelephoneNumber, obligedEntityType, companyNumber, status);
     }
 
     @Override
@@ -96,6 +107,7 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
         if (!super.equals(o)) return false;
         PscDiscrepancyReport that = (PscDiscrepancyReport) o;
         return Objects.equals(obligedEntityName, that.obligedEntityName) &&
+                Objects.equals(obligedEntityOrganisationName, that.obligedEntityOrganisationName) &&
                 Objects.equals(obligedEntityContactName, that.obligedEntityContactName) &&
                 Objects.equals(obligedEntityEmail, that.obligedEntityEmail) &&
                 Objects.equals(obligedEntityTelephoneNumber, that.obligedEntityTelephoneNumber) &&
@@ -107,6 +119,7 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
     @Override
     public String toString() {
         return "PscDiscrepancyReport [obligedEntityName=" + obligedEntityName
+                + ", obligedEntityOrganisationName=" + obligedEntityOrganisationName
                 + ", obligedEntityEmail=" + obligedEntityEmail
                 + ", companyNumber=" + companyNumber
                 + ", status=" + status + "]";

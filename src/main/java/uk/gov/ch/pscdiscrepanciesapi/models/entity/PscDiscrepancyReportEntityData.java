@@ -2,7 +2,6 @@ package uk.gov.ch.pscdiscrepanciesapi.models.entity;
 
 import java.util.Map;
 import java.util.Objects;
-
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class PscDiscrepancyReportEntityData {
@@ -11,6 +10,9 @@ public class PscDiscrepancyReportEntityData {
 
     @Field("etag")
     private String etag;
+
+    @Field("obliged_entity_organisation_name")
+    private String obligedEntityOrganisationName;
 
     @Field("obliged_entity_contact_name")
     private String obligedEntityContactName;
@@ -50,6 +52,14 @@ public class PscDiscrepancyReportEntityData {
 
     public void setEtag(String etag) {
         this.etag = etag;
+    }
+
+    public String getObligedEntityOrganisationName() {
+        return obligedEntityOrganisationName;
+    }
+
+    public void setObligedEntityOrganisationName(String obligedEntityOrganisationName) {
+        this.obligedEntityOrganisationName = obligedEntityOrganisationName;
     }
 
     public String getObligedEntityName() {
@@ -123,6 +133,7 @@ public class PscDiscrepancyReportEntityData {
         PscDiscrepancyReportEntityData that = (PscDiscrepancyReportEntityData) o;
         return Objects.equals(kind, that.kind) &&
                 Objects.equals(etag, that.etag) &&
+                Objects.equals(obligedEntityOrganisationName, that.obligedEntityOrganisationName) &&
                 Objects.equals(obligedEntityContactName, that.obligedEntityContactName) &&
                 Objects.equals(obligedEntityName, that.obligedEntityName) &&
                 Objects.equals(obligedEntityEmail, that.obligedEntityEmail) &&
@@ -135,18 +146,20 @@ public class PscDiscrepancyReportEntityData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(kind, etag, obligedEntityContactName, obligedEntityName, obligedEntityEmail, obligedEntityTelephoneNumber, obligedEntityType, companyNumber, status, links);
+        return Objects.hash(kind, etag, obligedEntityOrganisationName, obligedEntityContactName, obligedEntityName,
+                obligedEntityEmail, obligedEntityTelephoneNumber, obligedEntityType, companyNumber, status, links);
     }
 
     @Override
     public String toString() {
         return "PscDiscrepancyReportEntityData [kind=" + kind
-                + ", etag=" + etag
-                + ", obligedEntityName=" + obligedEntityName
-                + ", obligedEntityEmail=" + obligedEntityEmail
-                + ", companyNumber=" + companyNumber
-                + ", status=" + status
-                + ", links=" + links + "]";
+                        + ", etag=" + etag
+                        + ", obligedEntityOrganisationName=" + obligedEntityOrganisationName
+                        + ", obligedEntityName=" + obligedEntityName
+                        + ", obligedEntityEmail=" + obligedEntityEmail
+                        + ", companyNumber=" + companyNumber
+                        + ", status=" + status
+                        + ", links=" + links + "]";
     }
 
 }

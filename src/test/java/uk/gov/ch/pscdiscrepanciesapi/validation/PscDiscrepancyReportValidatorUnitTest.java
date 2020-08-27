@@ -1,5 +1,9 @@
 package uk.gov.ch.pscdiscrepanciesapi.validation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,16 +13,12 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 import uk.gov.companieshouse.service.rest.err.Err;
 import uk.gov.companieshouse.service.rest.err.Errors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @ExtendWith(MockitoExtension.class)
 public class PscDiscrepancyReportValidatorUnitTest {
+    private static final String OBLIGED_ENTITY_ORGANISATION_NAME = "obliged_entity_organisation_name";
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "obliged_entity_contact_name";
     private static final String OBLIGED_ENTITY_EMAIL_LOCATION = "obliged_entity_email";
-    private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION =
-            "obliged_entity_telephone_number";
+    private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION = "obliged_entity_telephone_number";
     private static final String OBLIGED_ENTITY_TYPE = "obliged_entity_type";
     private static final String COMPANY_INCORPORATION_NUMBER_LOCATION = "company_number";
     private static final String STATUS_LOCATION = "status";
@@ -31,8 +31,10 @@ public class PscDiscrepancyReportValidatorUnitTest {
     private static final String VALID_COMPANY_NUMBER = "12345678";
     private static final String VALID_STATUS = "COMPLETE";
     private static final String VALID_CONTACT_NAME = "ValidContactName";
+    private static final String VALID_ORGANISATION_NAME = "ValidOrganisationName";
     private static final String ETAG = "etag";
 
+    private static final String INVALID_ORGANISATION_NAME = "^InvalidOrganisationName^";
     private static final String INVALID_CONTACT_NAME = "^InvalidConctactName^";
     private static final String INVALID_COMPANY_NUMBER = "InvalidCompanyNumber";
     private static final String INVALID_OBLIGED_ENTITY_TYPE = "";
@@ -51,6 +53,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         pscDiscrepancyReportValidator = new PscDiscrepancyReportValidator();
 
         pscDiscrepancyReport = new PscDiscrepancyReport();
+        pscDiscrepancyReport.setObligedEntityOrganisationName(VALID_ORGANISATION_NAME);
         pscDiscrepancyReport.setObligedEntityContactName(VALID_CONTACT_NAME);
         pscDiscrepancyReport.setObligedEntityEmail(VALID_EMAIL);
         pscDiscrepancyReport.setObligedEntityTelephoneNumber(VALID_TELEPHONE_NUMBER);
@@ -218,6 +221,23 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid organisation name")
+    void validateUpdate_Unsuccessful_InvalidOrganisationName() {
+        PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setEtag(ETAG);
+        updatedReport.setObligedEntityOrganisationName(INVALID_ORGANISATION_NAME);
+
+        Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_ORGANISATION_NAME)
+                .withError(OBLIGED_ENTITY_ORGANISATION_NAME + " contains an invalid character").build();
+
+        Errors errorsFromValidation = pscDiscrepancyReportValidator
+                .validateForUpdate(pscDiscrepancyReport, updatedReport);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(error));
+    }
+
+    @Test
     @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid contact name - blank")
     void validateUpdate_Unsuccessful_InvalidContactNameBlank() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
@@ -269,12 +289,13 @@ public class PscDiscrepancyReportValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number, email, status and contact name")
-    void validateUpdate_Unsuccessful_InvalidCompanyNumberEmailStatusAndContactName() {
+    @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid company number, organisation name, email, status and contact name")
+    void validateUpdate_Unsuccessful_InvalidCompanyNumberOrganisationNameEmailStatusAndContactName() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setCompanyNumber(INVALID_COMPANY_NUMBER);
         updatedReport.setObligedEntityEmail(INVALID_EMAIL);
+        updatedReport.setObligedEntityOrganisationName(INVALID_ORGANISATION_NAME);
         updatedReport.setStatus(INVALID_STATUS);
         updatedReport.setObligedEntityContactName(INVALID_CONTACT_NAME);
 
@@ -282,6 +303,8 @@ public class PscDiscrepancyReportValidatorUnitTest {
                 .withError(COMPANY_INCORPORATION_NUMBER_LOCATION + " must be 8 characters").build();
         Err contactName = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
                 .withError(OBLIGED_ENTITY_CONTACT_NAME + " contains an invalid character").build();
+        Err organisationName = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_ORGANISATION_NAME)
+                .withError(OBLIGED_ENTITY_ORGANISATION_NAME + " contains an invalid character").build();
         Err status = Err.invalidBodyBuilderWithLocation(STATUS_LOCATION)
                 .withError(STATUS_LOCATION + " is not one of the correct values").build();
         Err email = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
@@ -290,7 +313,8 @@ public class PscDiscrepancyReportValidatorUnitTest {
         Errors errorsFromValidation = pscDiscrepancyReportValidator
                 .validateForUpdate(pscDiscrepancyReport, updatedReport);
 
-        assertEquals(4, errorsFromValidation.size());
+        assertEquals(5, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(organisationName));
         assertTrue(errorsFromValidation.containsError(companyNumber));
         assertTrue(errorsFromValidation.containsError(contactName));
         assertTrue(errorsFromValidation.containsError(status));

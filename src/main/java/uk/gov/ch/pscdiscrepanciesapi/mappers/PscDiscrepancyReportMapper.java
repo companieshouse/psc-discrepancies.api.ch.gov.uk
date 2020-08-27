@@ -14,6 +14,7 @@ public interface PscDiscrepancyReportMapper {
     @Mapping(source = "pscDiscrepancyReportEntity.data.kind", target = "kind")
     @Mapping(source = "pscDiscrepancyReportEntity.data.etag", target = "etag")
     @Mapping(source = "pscDiscrepancyReportEntity.data.obligedEntityName", target = "obligedEntityName")
+    @Mapping(source = "pscDiscrepancyReportEntity.data.obligedEntityOrganisationName", target = "obligedEntityOrganisationName")
     @Mapping(source = "pscDiscrepancyReportEntity.data.obligedEntityContactName", target = "obligedEntityContactName")
     @Mapping(source = "pscDiscrepancyReportEntity.data.obligedEntityEmail", target = "obligedEntityEmail")
     @Mapping(source = "pscDiscrepancyReportEntity.data.obligedEntityTelephoneNumber", target = "obligedEntityTelephoneNumber")
