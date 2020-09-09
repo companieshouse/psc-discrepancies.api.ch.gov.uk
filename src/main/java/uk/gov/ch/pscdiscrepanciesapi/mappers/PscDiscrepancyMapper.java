@@ -15,6 +15,7 @@ public interface PscDiscrepancyMapper {
     @Mapping(source = "pscDiscrepancyEntity.data.kind", target = "kind")
     @Mapping(source = "pscDiscrepancyEntity.data.etag", target = "etag")
     @Mapping(source = "pscDiscrepancyEntity.data.details", target = "details")
+    @Mapping(source = "pscDiscrepancyEntity.data.pscName", target = "pscName")
     @Mapping(source = "pscDiscrepancyEntity.data.links", target = "links.links")
 
     PscDiscrepancy entityToRest(PscDiscrepancyEntity pscDiscrepancyEntity);

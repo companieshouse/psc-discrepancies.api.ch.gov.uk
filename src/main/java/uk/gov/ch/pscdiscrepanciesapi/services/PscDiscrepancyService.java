@@ -36,6 +36,7 @@ public class PscDiscrepancyService {
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
     private static final String MUST_NOT_BE_NULL = " must not be null";
     private static final String DISCREPANCY_DETAILS = "details";
+    private static final String PSC_NAME = "psc_name";
     private static final String DISCREPANCY_ID = "discrepancy-id";
     private static final String DISCREPANCY_REPORT_ID = "discrepancy-report-id";
     private static final String REPORT_URI = "/psc-discrepancy-reports/";
@@ -68,7 +69,7 @@ public class PscDiscrepancyService {
         Errors validationErrors = validator.validateForCreation(pscDiscrepancy, new Errors());
         if (validationErrors.hasErrors()) {
             LOG.error("Validation errors", createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy));
-            return ServiceResult.invalid(createErrors(DISCREPANCY_DETAILS, MUST_NOT_BE_NULL));
+            return ServiceResult.invalid(validationErrors);
         }
         
         try {
@@ -197,6 +198,7 @@ public class PscDiscrepancyService {
         final Map<String, Object> debugMap = new HashMap<>();
         debugMap.put(DISCREPANCY_REPORT_ID, pscDiscrepancyReportId);
         debugMap.put(DISCREPANCY_DETAILS, pscDiscrepancy.getDetails());
+        debugMap.put(PSC_NAME, pscDiscrepancy.getPscName());
         return debugMap;
     }
     
