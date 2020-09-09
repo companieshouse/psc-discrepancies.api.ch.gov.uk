@@ -20,9 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PscDiscrepancyValidatorUnitTest {
     private static final String DISCREPANCY_DETAILS_LOCATION = "details";
     private static final String VALID_DISCREPANCY_DETAILS = "someDetails";
+    private static final String PSC_NAME_LOCATION = "psc_name";
+    private static final String VALID_PSC_NAME = "Name";
 
     private static final String NOT_EMPTY_ERROR_MESSAGE = " must not be empty and must not only consist of whitespace";
     private static final String NOT_NULL_ERROR_MESSAGE = " must not be null";
+    private static final String INVALID_CHAR_ERROR_MESSAGE = " contains an invalid character";
 
     private PscDiscrepancy pscDiscrepancy;
     private List<PscDiscrepancy> pscDiscrepancies;
@@ -34,6 +37,7 @@ public class PscDiscrepancyValidatorUnitTest {
 
         pscDiscrepancy = new PscDiscrepancy();
         pscDiscrepancy.setDetails(VALID_DISCREPANCY_DETAILS);
+        pscDiscrepancy.setPscName(VALID_PSC_NAME);
     }
 
     @Test
@@ -75,6 +79,66 @@ public class PscDiscrepancyValidatorUnitTest {
 
         assertEquals(1, errorsFromValidation.size());
         assertTrue(errorsFromValidation.containsError(err));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful creation of a PscDiscrepancy - empty name")
+    void validateCreate_Unsuccessful_EmptyName() {
+        Errors errors = new Errors();
+        Err err = Err.invalidBodyBuilderWithLocation(PSC_NAME_LOCATION)
+                .withError(PSC_NAME_LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
+        pscDiscrepancy.setPscName("");
+
+        Errors errorsFromValidation = pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(err));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful creation of a PscDiscrepancy - null name")
+    void validateCreate_Unsuccessful_NullName() {
+        Errors errors = new Errors();
+        Err err = Err.invalidBodyBuilderWithLocation(PSC_NAME_LOCATION)
+                .withError(PSC_NAME_LOCATION + NOT_NULL_ERROR_MESSAGE).build();
+        pscDiscrepancy.setPscName(null);
+
+        Errors errorsFromValidation = pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(err));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful creation of a PscDiscrepancy - invalid name")
+    void validateCreate_Unsuccessful_InvalidName() {
+        Errors errors = new Errors();
+        Err err = Err.invalidBodyBuilderWithLocation(PSC_NAME_LOCATION)
+                .withError(PSC_NAME_LOCATION + INVALID_CHAR_ERROR_MESSAGE).build();
+        pscDiscrepancy.setPscName("N^@!M");
+
+        Errors errorsFromValidation = pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
+
+        assertEquals(1, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(err));
+    }
+
+    @Test
+    @DisplayName("Validate unsuccessful creation of a PscDiscrepancy - invalid name and empty details")
+    void validateCreate_Unsuccessful_InvalidNameAndEmptyDetails() {
+        Errors errors = new Errors();
+        Err pscNameErr = Err.invalidBodyBuilderWithLocation(PSC_NAME_LOCATION)
+                .withError(PSC_NAME_LOCATION + INVALID_CHAR_ERROR_MESSAGE).build();
+        Err detailsErr = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS_LOCATION)
+                .withError(DISCREPANCY_DETAILS_LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
+        pscDiscrepancy.setPscName("N^@!M");
+        pscDiscrepancy.setDetails("");
+
+        Errors errorsFromValidation = pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
+
+        assertEquals(2, errorsFromValidation.size());
+        assertTrue(errorsFromValidation.containsError(pscNameErr));
+        assertTrue(errorsFromValidation.containsError(detailsErr));
     }
 
     @Test

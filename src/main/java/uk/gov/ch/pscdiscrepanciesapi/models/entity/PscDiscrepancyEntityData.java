@@ -10,6 +10,9 @@ public class PscDiscrepancyEntityData {
     @Field("etag")
     private String etag;
 
+    @Field("psc_name")
+    private String pscName;
+
     @Field("details")
     private String details;
 
@@ -30,6 +33,14 @@ public class PscDiscrepancyEntityData {
 
     public void setEtag(String etag) {
         this.etag = etag;
+    }
+
+    public String getPscName() {
+        return pscName;
+    }
+
+    public void setPscName(String pscName) {
+        this.pscName = pscName;
     }
 
     public String getDetails() {

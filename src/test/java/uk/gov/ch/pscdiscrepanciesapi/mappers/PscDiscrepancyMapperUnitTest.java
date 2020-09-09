@@ -22,6 +22,7 @@ public class PscDiscrepancyMapperUnitTest {
     private static final String KIND = "kind";
     private static final String ETAG = "etag";
     private static final String DISCREPANCY_DETAILS = "details";
+    private static final String PSC_NAME = "Name";
     private static final Map<String, String> MAP_LINKS = new HashMap<>();
     private static final Links LINKS = new Links();
 
@@ -38,6 +39,7 @@ public class PscDiscrepancyMapperUnitTest {
         pscDiscrepancyData.setKind(KIND);
         pscDiscrepancyData.setEtag(ETAG);
         pscDiscrepancyData.setDetails(DISCREPANCY_DETAILS);
+        pscDiscrepancyData.setPscName(PSC_NAME);
         pscDiscrepancyData.setLinks(MAP_LINKS);
         pscDiscrepancyEntity.setData(pscDiscrepancyData);
 
@@ -45,6 +47,7 @@ public class PscDiscrepancyMapperUnitTest {
         pscDiscrepancy.setKind(KIND);
         pscDiscrepancy.setEtag(ETAG);
         pscDiscrepancy.setDetails(DISCREPANCY_DETAILS);
+        pscDiscrepancy.setPscName(PSC_NAME);
         pscDiscrepancy.setLinks(LINKS);
     }
 
