@@ -37,6 +37,7 @@ public class PscDiscrepancyService {
     private static final String MUST_NOT_BE_NULL = " must not be null";
     private static final String DISCREPANCY_DETAILS = "details";
     private static final String PSC_NAME = "psc_name";
+    private static final String PSC_DOB = "psc_date_of_birth";
     private static final String DISCREPANCY_ID = "discrepancy-id";
     private static final String DISCREPANCY_REPORT_ID = "discrepancy-report-id";
     private static final String REPORT_URI = "/psc-discrepancy-reports/";
@@ -199,6 +200,7 @@ public class PscDiscrepancyService {
         debugMap.put(DISCREPANCY_REPORT_ID, pscDiscrepancyReportId);
         debugMap.put(DISCREPANCY_DETAILS, pscDiscrepancy.getDetails());
         debugMap.put(PSC_NAME, pscDiscrepancy.getPscName());
+        debugMap.put(PSC_DOB, pscDiscrepancy.getPscDateOfBirth());
         return debugMap;
     }
     
