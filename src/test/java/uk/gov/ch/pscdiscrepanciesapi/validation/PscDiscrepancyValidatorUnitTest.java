@@ -127,20 +127,6 @@ public class PscDiscrepancyValidatorUnitTest {
     }
 
     @Test
-    @DisplayName("Validate unsuccessful creation of a PscDiscrepancy - empty date of birth")
-    void validateCreate_Unsuccessful_EmptyDOB() {
-        Errors errors = new Errors();
-        Err err = Err.invalidBodyBuilderWithLocation(PSC_DOB_LOCATION)
-                .withError(PSC_DOB_LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
-        pscDiscrepancy.setPscDateOfBirth("");
-
-        Errors errorsFromValidation = pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
-
-        assertEquals(1, errorsFromValidation.size());
-        assertTrue(errorsFromValidation.containsError(err));
-    }
-
-    @Test
     @DisplayName("Validate unsuccessful creation of a PscDiscrepancy - null date of birth")
     void validateCreate_Unsuccessful_NullDOB() {
         Errors errors = new Errors();
@@ -163,10 +149,10 @@ public class PscDiscrepancyValidatorUnitTest {
         Err detailsErr = Err.invalidBodyBuilderWithLocation(DISCREPANCY_DETAILS_LOCATION)
                 .withError(DISCREPANCY_DETAILS_LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
         Err dobErr = Err.invalidBodyBuilderWithLocation(PSC_DOB_LOCATION)
-                .withError(PSC_DOB_LOCATION + NOT_EMPTY_ERROR_MESSAGE).build();
+                .withError(PSC_DOB_LOCATION + NOT_NULL_ERROR_MESSAGE).build();
         pscDiscrepancy.setPscName("N^@!M");
         pscDiscrepancy.setDetails("");
-        pscDiscrepancy.setPscDateOfBirth("");
+        pscDiscrepancy.setPscDateOfBirth(null);
 
         Errors errorsFromValidation = pscDiscrepancyValidator.validateForCreation(pscDiscrepancy, errors);
 

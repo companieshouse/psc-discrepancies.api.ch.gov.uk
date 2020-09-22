@@ -27,7 +27,7 @@ public class PscDiscrepancyValidator extends Validators {
      */
     public Errors validateForCreation(PscDiscrepancy pscDiscrepancy, Errors errs) {
         validatePscName(errs, pscDiscrepancy.getPscName());
-        validateNotBlank(pscDiscrepancy.getPscDateOfBirth(), PSC_DOB, errs);
+        validateNotNull(pscDiscrepancy.getPscDateOfBirth(), PSC_DOB, errs);
         validateNotBlank(pscDiscrepancy.getDetails(), DISCREPANCY_DETAILS, errs);
         return errs;
     }
