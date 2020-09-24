@@ -12,6 +12,9 @@ public class PscDiscrepancy extends ApiObjectImpl {
     @JsonProperty("psc_name")
     private String pscName;
 
+    @JsonProperty("psc_date_of_birth")
+    private String pscDateOfBirth;
+
     public String getDetails() {
         return details;
     }
@@ -26,6 +29,14 @@ public class PscDiscrepancy extends ApiObjectImpl {
 
     public void setPscName(String pscName) {
         this.pscName = pscName;
+    }
+
+    public String getPscDateOfBirth() {
+        return pscDateOfBirth;
+    }
+
+    public void setPscDateOfBirth(String pscDateOfBirth) {
+        this.pscDateOfBirth = pscDateOfBirth;
     }
 
     @Override
@@ -52,11 +63,13 @@ public class PscDiscrepancy extends ApiObjectImpl {
             && Objects.equals(super.getKind(), other.getKind())
             && Objects.deepEquals(super.getLinks(), other.getLinks())
             && Objects.equals(details, other.details)
-            && Objects.equals(pscName, other.pscName);
+            && Objects.equals(pscName, other.pscName)
+            && Objects.equals(pscDateOfBirth, other.pscDateOfBirth);
     }
 
     @Override
     public String toString() {
-        return "PscDiscrepancy [details=" + details + "psc_name=" + pscName + "]";
+        return "PscDiscrepancy [details=" + details + "psc_name=" + pscName + "psc_date_of_birth="
+                + pscDateOfBirth + "]";
     }
 }

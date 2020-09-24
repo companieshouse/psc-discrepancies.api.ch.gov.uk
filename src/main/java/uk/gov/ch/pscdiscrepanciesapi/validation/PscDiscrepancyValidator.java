@@ -13,6 +13,7 @@ import uk.gov.companieshouse.service.rest.err.Errors;
 public class PscDiscrepancyValidator extends Validators {
     
     private static final String DISCREPANCY_DETAILS = "details";
+    private static final String PSC_DOB = "psc_date_of_birth";
     private static final String PSC_NAME = "psc_name";
 
     private CharSetValidation charSetValidator = new CharSetValidationImpl();
@@ -26,6 +27,7 @@ public class PscDiscrepancyValidator extends Validators {
      */
     public Errors validateForCreation(PscDiscrepancy pscDiscrepancy, Errors errs) {
         validatePscName(errs, pscDiscrepancy.getPscName());
+        validateNotNull(pscDiscrepancy.getPscDateOfBirth(), PSC_DOB, errs);
         validateNotBlank(pscDiscrepancy.getDetails(), DISCREPANCY_DETAILS, errs);
         return errs;
     }

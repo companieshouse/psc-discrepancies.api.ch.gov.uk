@@ -13,6 +13,9 @@ public class PscDiscrepancyEntityData {
     @Field("psc_name")
     private String pscName;
 
+    @Field("psc_date_of_birth")
+    private String pscDateOfBirth;
+
     @Field("details")
     private String details;
 
@@ -41,6 +44,14 @@ public class PscDiscrepancyEntityData {
 
     public void setPscName(String pscName) {
         this.pscName = pscName;
+    }
+
+    public String getPscDateOfBirth() {
+        return pscDateOfBirth;
+    }
+
+    public void setPscDateOfBirth(String pscDateOfBirth) {
+        this.pscDateOfBirth = pscDateOfBirth;
     }
 
     public String getDetails() {
