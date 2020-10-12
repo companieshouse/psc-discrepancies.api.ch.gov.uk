@@ -32,6 +32,9 @@ public class PscDiscrepancyReportEntityData {
     @Field("company_number")
     private String companyNumber;
 
+    @Field("submission_reference")
+    private String submissionReference;
+
     @Field("status")
     private String status;
 
@@ -110,6 +113,14 @@ public class PscDiscrepancyReportEntityData {
         this.companyNumber = companyNumber;
     }
 
+    public String getSubmissionReference() {
+        return submissionReference;
+    }
+
+    public void setSubmissionReference(String submissionReference) {
+        this.submissionReference = submissionReference;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -140,14 +151,16 @@ public class PscDiscrepancyReportEntityData {
                 Objects.equals(obligedEntityTelephoneNumber, that.obligedEntityTelephoneNumber) &&
                 Objects.equals(obligedEntityType, that.obligedEntityType) &&
                 Objects.equals(companyNumber, that.companyNumber) &&
+                Objects.equals(submissionReference, that.submissionReference) &&
                 Objects.equals(status, that.status) &&
                 Objects.equals(links, that.links);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(kind, etag, obligedEntityOrganisationName, obligedEntityContactName, obligedEntityName,
-                obligedEntityEmail, obligedEntityTelephoneNumber, obligedEntityType, companyNumber, status, links);
+        return Objects.hash(kind, etag, obligedEntityOrganisationName, obligedEntityContactName,
+                obligedEntityName, obligedEntityEmail, obligedEntityTelephoneNumber,
+                obligedEntityType, companyNumber, submissionReference, status, links);
     }
 
     @Override
@@ -158,6 +171,7 @@ public class PscDiscrepancyReportEntityData {
                         + ", obligedEntityName=" + obligedEntityName
                         + ", obligedEntityEmail=" + obligedEntityEmail
                         + ", companyNumber=" + companyNumber
+                        + ", submissionReference=" + submissionReference
                         + ", status=" + status
                         + ", links=" + links + "]";
     }
