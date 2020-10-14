@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoException;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,6 +172,10 @@ public class PscDiscrepancyReportService {
                     // We do this to prevent malicious/inadvertent changing of values that must
                     // not be set by anything other than this service, e.g. kind, links, etag...
                     existingReport.setStatus(updatedReport.getStatus());
+                    // Generate and store submission reference when report has been fully completed
+                    if(updatedReport.getStatus().equals(ReportStatus.COMPLETE.toString())) {
+                        existingReport.setSubmissionReference(generateSubmissionReference());
+                    }
                     existingReport.setObligedEntityEmail(updatedReport.getObligedEntityEmail());
                     existingReport.setObligedEntityTelephoneNumber(updatedReport.getObligedEntityTelephoneNumber());
                     existingReport.setCompanyNumber(updatedReport.getCompanyNumber());
@@ -198,6 +204,17 @@ public class PscDiscrepancyReportService {
             throw serviceException;
         }
         return reportToReturn;
+    }
+
+    private static String generateSubmissionReference() {
+        SecureRandom random = new SecureRandom();
+        byte[] values = new byte[4];
+        random.nextBytes(values);
+        String rand = String.format("%010d", random.nextInt(Integer.MAX_VALUE));
+        String time = String.format("%06d", Calendar.getInstance().getTimeInMillis() / 10000000L);
+        String rawId = rand + time;
+        String[] submissionReference = rawId.split("(?<=\\G.{4})");
+        return String.join("-", submissionReference);
     }
 
     private Map<String, Object> buildErrorLogMap(Errors validationErrors) {
