@@ -213,8 +213,8 @@ public class PscDiscrepancyReportService {
         String rand = String.format("%010d", random.nextInt(Integer.MAX_VALUE));
         String time = String.format("%06d", Calendar.getInstance().getTimeInMillis() / 10000000L);
         String rawId = rand + time;
-        String[] tranId = rawId.split("(?<=\\G.{4})");
-        return String.join("-", tranId);
+        String[] submissionReference = rawId.split("(?<=\\G.{4})");
+        return String.join("-", submissionReference);
     }
 
     private Map<String, Object> buildErrorLogMap(Errors validationErrors) {
