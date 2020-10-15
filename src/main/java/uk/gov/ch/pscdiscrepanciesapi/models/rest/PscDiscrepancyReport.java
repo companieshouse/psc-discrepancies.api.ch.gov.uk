@@ -1,6 +1,5 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import uk.gov.companieshouse.service.rest.ApiObjectImpl;
