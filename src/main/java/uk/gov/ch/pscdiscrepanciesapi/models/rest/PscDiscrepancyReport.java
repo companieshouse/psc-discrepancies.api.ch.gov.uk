@@ -1,5 +1,6 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import uk.gov.companieshouse.service.rest.ApiObjectImpl;
@@ -26,9 +27,6 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
 
     @JsonProperty("company_number")
     private String companyNumber;
-
-    @JsonProperty("submission_reference")
-    private String submissionReference;
 
     @JsonProperty("status")
     private String status;
@@ -87,14 +85,6 @@ public class PscDiscrepancyReport extends ApiObjectImpl {
 
     public void setCompanyNumber(String companyNumber) {
         this.companyNumber = companyNumber;
-    }
-
-    public String getSubmissionReference() {
-        return submissionReference;
-    }
-
-    public void setSubmissionReference(String submissionReference) {
-        this.submissionReference = submissionReference;
     }
 
     public String getStatus() {
