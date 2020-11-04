@@ -36,7 +36,6 @@
 
         <!-- Maven -->
         <spring-boot-maven-plugin.version>2.2.0.RELEASE</spring-boot-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
         <maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
