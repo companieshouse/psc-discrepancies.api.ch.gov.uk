@@ -1,5 +1,6 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.entity;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -18,6 +19,9 @@ public class PscDiscrepancyEntityData {
 
     @Field("details")
     private String details;
+
+    @Field("psc_discrepancy_types")
+    private List<String> pscDiscrepancyTypes;
 
     @Field("links")
     private Map<String, String> links;
@@ -41,6 +45,10 @@ public class PscDiscrepancyEntityData {
     public String getPscName() {
         return pscName;
     }
+
+    public List<String> getPscDiscrepancyTypes() {return pscDiscrepancyTypes; }
+
+    public void setPscDiscrepancyTypes(List<String> pscDiscrepancyTypes) { this.pscDiscrepancyTypes = pscDiscrepancyTypes; }
 
     public void setPscName(String pscName) {
         this.pscName = pscName;

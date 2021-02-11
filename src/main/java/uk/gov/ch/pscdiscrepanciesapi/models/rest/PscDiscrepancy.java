@@ -1,5 +1,6 @@
 package uk.gov.ch.pscdiscrepanciesapi.models.rest;
 
+import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.companieshouse.service.rest.ApiObjectImpl;
@@ -15,12 +16,23 @@ public class PscDiscrepancy extends ApiObjectImpl {
     @JsonProperty("psc_date_of_birth")
     private String pscDateOfBirth;
 
+    @JsonProperty("psc_discrepancy_types")
+    private List<String> pscDiscrepancyTypes;
+
     public String getDetails() {
         return details;
     }
 
     public void setDetails(String details) {
         this.details = details;
+    }
+
+    public List<String> getPscDiscrepancyTypes() {
+        return pscDiscrepancyTypes;
+    }
+
+    public void setPscDiscrepancyTypes(List<String> pscDiscrepancyTypes) {
+        this.pscDiscrepancyTypes = pscDiscrepancyTypes;
     }
 
     public String getPscName() {
@@ -40,36 +52,35 @@ public class PscDiscrepancy extends ApiObjectImpl {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + Objects.hash(details);
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        PscDiscrepancy that = (PscDiscrepancy) o;
+        return Objects.equals(details, that.details) &&
+                Objects.equals(pscName, that.pscName) &&
+                Objects.equals(pscDateOfBirth, that.pscDateOfBirth) &&
+                Objects.equals(pscDiscrepancyTypes, that.pscDiscrepancyTypes);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof PscDiscrepancy)) {
-            return false;
-        }
-        PscDiscrepancy other = (PscDiscrepancy) obj;
-        return Objects.equals(super.getEtag(), other.getEtag())
-            && Objects.equals(super.getKind(), other.getKind())
-            && Objects.deepEquals(super.getLinks(), other.getLinks())
-            && Objects.equals(details, other.details)
-            && Objects.equals(pscName, other.pscName)
-            && Objects.equals(pscDateOfBirth, other.pscDateOfBirth);
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), details, pscName, pscDateOfBirth, pscDiscrepancyTypes);
     }
 
     @Override
     public String toString() {
-        return "PscDiscrepancy [details=" + details + "psc_name=" + pscName + "psc_date_of_birth="
-                + pscDateOfBirth + "]";
+        return "PscDiscrepancy{" +
+                "details='" + details + '\'' +
+                ", pscName='" + pscName + '\'' +
+                ", pscDateOfBirth='" + pscDateOfBirth + '\'' +
+                ", pscDiscrepancyType=" + pscDiscrepancyTypes +
+                '}';
     }
 }
