@@ -16,6 +16,7 @@ public interface PscDiscrepancyMapper {
     @Mapping(source = "pscDiscrepancyEntity.data.etag", target = "etag")
     @Mapping(source = "pscDiscrepancyEntity.data.details", target = "details")
     @Mapping(source = "pscDiscrepancyEntity.data.pscName", target = "pscName")
+    @Mapping(source = "pscDiscrepancyEntity.data.pscDiscrepancyTypes", target = "pscDiscrepancyTypes")
     @Mapping(source = "pscDiscrepancyEntity.data.pscDateOfBirth", target = "pscDateOfBirth")
     @Mapping(source = "pscDiscrepancyEntity.data.links", target = "links.links")
 

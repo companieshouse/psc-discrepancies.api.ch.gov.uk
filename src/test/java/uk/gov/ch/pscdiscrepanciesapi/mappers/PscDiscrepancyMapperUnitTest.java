@@ -2,6 +2,7 @@ package uk.gov.ch.pscdiscrepanciesapi.mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +31,7 @@ public class PscDiscrepancyMapperUnitTest {
     private PscDiscrepancy pscDiscrepancy;
     private PscDiscrepancyEntity pscDiscrepancyEntity;
     private PscDiscrepancyEntityData pscDiscrepancyData;
+    private List<String> pscDiscrepancyTypes;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -42,6 +44,7 @@ public class PscDiscrepancyMapperUnitTest {
         pscDiscrepancyData.setDetails(DISCREPANCY_DETAILS);
         pscDiscrepancyData.setPscName(PSC_NAME);
         pscDiscrepancyData.setPscDateOfBirth(PSC_DOB);
+        pscDiscrepancyData.setPscDiscrepancyTypes(pscDiscrepancyTypes);
         pscDiscrepancyData.setLinks(MAP_LINKS);
         pscDiscrepancyEntity.setData(pscDiscrepancyData);
 
@@ -50,6 +53,7 @@ public class PscDiscrepancyMapperUnitTest {
         pscDiscrepancy.setEtag(ETAG);
         pscDiscrepancy.setDetails(DISCREPANCY_DETAILS);
         pscDiscrepancy.setPscName(PSC_NAME);
+        pscDiscrepancy.setPscDiscrepancyTypes(pscDiscrepancyTypes);
         pscDiscrepancy.setPscDateOfBirth(PSC_DOB);
         pscDiscrepancy.setLinks(LINKS);
     }
@@ -65,6 +69,7 @@ public class PscDiscrepancyMapperUnitTest {
         assertEquals(pscDiscrepancy.getPscName(), result.getPscName());
         assertEquals(pscDiscrepancy.getPscDateOfBirth(), result.getPscDateOfBirth());
         assertEquals(pscDiscrepancy.getLinks(), result.getLinks());
+        assertEquals(pscDiscrepancy.getPscDiscrepancyTypes(), result.getPscDiscrepancyTypes());
     }
 
     @Test
@@ -78,6 +83,7 @@ public class PscDiscrepancyMapperUnitTest {
         assertEquals(pscDiscrepancyEntity.getData().getPscName(), result.getData().getPscName());
         assertEquals(pscDiscrepancyEntity.getData().getPscDateOfBirth(), result.getData().getPscDateOfBirth());
         assertEquals(pscDiscrepancyEntity.getData().getLinks(), result.getData().getLinks());
+        assertEquals(pscDiscrepancyEntity.getData().getPscDiscrepancyTypes(), result.getData().getPscDiscrepancyTypes());
     }
 
 }

@@ -39,6 +39,7 @@ public class PscDiscrepancyService {
     private static final String PSC_NAME = "psc_name";
     private static final String PSC_DOB = "psc_date_of_birth";
     private static final String DISCREPANCY_ID = "discrepancy-id";
+    private static final String PSC_DISCREPANCY_TYPES = "psc_discrepancy_types";
     private static final String DISCREPANCY_REPORT_ID = "discrepancy-report-id";
     private static final String REPORT_URI = "/psc-discrepancy-reports/";
 
@@ -76,7 +77,6 @@ public class PscDiscrepancyService {
         try {
             PscDiscrepancyEntity pscDiscrepancyEntity =
                     pscDiscrepancyMapper.restToEntity(pscDiscrepancy);
-
             String pscDiscrepancyId = UUID.randomUUID().toString();
             pscDiscrepancyEntity.setId(pscDiscrepancyId);
             pscDiscrepancyEntity.setCreatedAt(LocalDateTime.now());
@@ -201,6 +201,7 @@ public class PscDiscrepancyService {
         debugMap.put(DISCREPANCY_DETAILS, pscDiscrepancy.getDetails());
         debugMap.put(PSC_NAME, pscDiscrepancy.getPscName());
         debugMap.put(PSC_DOB, pscDiscrepancy.getPscDateOfBirth());
+        debugMap.put(PSC_DISCREPANCY_TYPES, pscDiscrepancy.getPscDiscrepancyTypes());
         return debugMap;
     }
     

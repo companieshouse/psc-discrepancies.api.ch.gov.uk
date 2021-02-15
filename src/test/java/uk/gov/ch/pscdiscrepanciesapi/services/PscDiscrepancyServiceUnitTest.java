@@ -63,6 +63,7 @@ public class PscDiscrepancyServiceUnitTest {
     private PscDiscrepancyEntity pscDiscrepancyEntity;
     private List<PscDiscrepancyEntity> pscDiscrepancyEntityList;
     private List<PscDiscrepancy> pscDiscrepancyList;
+    private List<String> pscDiscrepancyTypes;
 
     @Mock
     private PscDiscrepancyMapper mockDiscrepancyMapper;
@@ -157,7 +158,7 @@ public class PscDiscrepancyServiceUnitTest {
     void getDiscrepanciesIsSuccessful() throws ServiceException {
         pscDiscrepancyEntityList = new ArrayList<>();
         pscDiscrepancyEntityList.add(createTestDiscrepancyEntity(DETAILS_DATA, ETAG, KIND));
-        pscDiscrepancy = createTestDiscrepancy(DETAILS_DATA, ETAG, KIND);
+        pscDiscrepancy = createTestDiscrepancy(DETAILS_DATA, ETAG, KIND, pscDiscrepancyTypes);
         pscDiscrepancyList = new ArrayList<>();
         pscDiscrepancyList.add(pscDiscrepancy);
 
@@ -211,7 +212,7 @@ public class PscDiscrepancyServiceUnitTest {
     @Test
     @DisplayName("Test getDiscrepancies repository returns empty list which returns not found")
     void getDiscrepanciesEmptyListReturnsNotFound() throws ServiceException {
-        when(mockDiscrepancyRepo.getDiscrepancies(PARENT_LINK)).thenReturn(new ArrayList<PscDiscrepancyEntity>());
+        when(mockDiscrepancyRepo.getDiscrepancies(PARENT_LINK)).thenReturn(new ArrayList<>());
 
         ServiceResult<List<PscDiscrepancy>> result = pscDiscrepancyService.getDiscrepancies(REPORT_ID, request);
 
@@ -231,7 +232,7 @@ public class PscDiscrepancyServiceUnitTest {
     @DisplayName("Test getDiscrepancy returns a discrepancy")
     void getDiscrepancyIsSuccessful() throws ServiceException {
         pscDiscrepancyEntity = createTestDiscrepancyEntity(DETAILS_DATA, ETAG, KIND);
-        pscDiscrepancy = createTestDiscrepancy(DETAILS_DATA, ETAG, KIND);
+        pscDiscrepancy = createTestDiscrepancy(DETAILS_DATA, ETAG, KIND, pscDiscrepancyTypes);
         Optional<PscDiscrepancyEntity> optionalEntity = Optional.of(pscDiscrepancyEntity);
 
         when(mockDiscrepancyRepo.findById(DISCREPANCY_ID)).thenReturn(optionalEntity);
@@ -291,7 +292,7 @@ public class PscDiscrepancyServiceUnitTest {
     @DisplayName("Test createDebugMapWithoutDiscrepancyObject returns a Map with discrepancy report id and discrepancy id entries")
     void createDebugMapWithoutDiscrepancyObjectReturnsMap() {
         Map<String, Object> returnedMap = pscDiscrepancyService.createDebugMapWithoutDiscrepancyObject("123", "456");
-        assertTrue(returnedMap.size() == 2);
+        assertEquals(2,  returnedMap.size());
         assertEquals("123", returnedMap.get(REPORT_ID));
         assertEquals("456", returnedMap.get(DISCREPANCY_ID));
 
@@ -301,15 +302,16 @@ public class PscDiscrepancyServiceUnitTest {
     @DisplayName("Test createDebugMapWithoutDiscrepancyObject returns a Map with discrepancy report id entry")
     void createDebugMapWithoutDiscrepancyObjectWithNullDiscrepancyDetailsId() {
         Map<String, Object> returnedMap = pscDiscrepancyService.createDebugMapWithoutDiscrepancyObject("123", null);
-        assertTrue(returnedMap.size() == 1);
+        assertEquals(1, returnedMap.size());
         assertEquals("123", returnedMap.get(REPORT_ID));
     }
 
-    private PscDiscrepancy createTestDiscrepancy(String details, String etag, String kind) {
+    private PscDiscrepancy createTestDiscrepancy(String details, String etag, String kind, List<String> pscDiscrepancyType) {
         PscDiscrepancy pscDiscrepancy = new PscDiscrepancy();
         pscDiscrepancy.setDetails(details);
         pscDiscrepancy.setEtag(etag);
         pscDiscrepancy.setKind(kind);
+        pscDiscrepancy.setPscDiscrepancyTypes(pscDiscrepancyType);
         return pscDiscrepancy;
     }
 
@@ -332,7 +334,7 @@ public class PscDiscrepancyServiceUnitTest {
 
     private Map<String, String> createLinks() {
         Links links = new Links();
-        Map<String, String> linksMap = new HashMap<String, String>();
+        Map<String, String> linksMap = new HashMap<>();
         linksMap.put("self", SELF_LINK);
         linksMap.put(PscDiscrepancyLinkKeys.PSC_DISCREPANCY_REPORT.toString(), PARENT_LINK);
         links.setLinks(linksMap);
