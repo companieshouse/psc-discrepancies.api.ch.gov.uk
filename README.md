@@ -31,7 +31,7 @@ The following are environment variables necessary to run the API:
 * _PSC_DISCREPANCIES_API_APPLICATION_NAME_: Used in structured logging to display the application the log line belongs to
 * _PSC_DISCREPANCIES_MONGODB_URL_: Points at the MongoDB instance for that environment
 * _PSC_DISCREPANCIES_DATABASE_: Refers to the database that holds the collections for the application data
-* _PSC_DISCREPANCY_REPORT_SUBMISSION_URI_: The link to the CHIPS REST interfaces submission for a PSC Discrepancy for the corresponding CHIPS environment
+* _PSC_DISCREPANCY_REPORT_SUBMISSION_URI_: The link to the CHIPS REST interfaces submission for a PSC Discrepancy for the corresponding CHIPS environment. This must be changed for local environments to ensure the journey completes successfully.
 
 ##### chs-configs/(environment)/global_env:
 
@@ -41,6 +41,8 @@ The following are environment variables necessary to run the API:
 #### Vagrant
 
 Installing and running this API in Vagrant requires an update of the `vagrant-development-v2` repository and then running `./clean.sh` and `./setup.sh`.
+
+CHS Configs must be updated with a value for `PSC_DISCREPANCY_REPORT_SUBMISSION_URI` according to the chips environment it should messasge. Documentation on how to find the correct values can be found here https://companieshouse.atlassian.net/wiki/spaces/TCE/pages/2704277768/Configuring+Development+Env+to+communicate+with+CHIPS
 
 To start this API in Vagrant, use the following command: `ubic start psc.psc-discrepancy-api`
 
