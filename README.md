@@ -42,6 +42,8 @@ The following are environment variables necessary to run the API:
 
 Installing and running this API in Vagrant requires an update of the `vagrant-development-v2` repository and then running `./clean.sh` and `./setup.sh`.
 
+CHS Configs must be updated with a value for `PSC_DISCREPANCY_REPORT_SUBMISSION_URI` according to the chips environment it should messasge. Documentation on how to find the correct values can be found here https://companieshouse.atlassian.net/wiki/spaces/TCE/pages/2704277768/Configuring+Development+Env+to+communicate+with+CHIPS
+
 To start this API in Vagrant, use the following command: `ubic start psc.psc-discrepancy-api`
 
 It is recommended to run this API in Vagrant rather than outside of Vagrant because of the necessary environment variables, which can be found in: `src/main/resources/application.properties`
