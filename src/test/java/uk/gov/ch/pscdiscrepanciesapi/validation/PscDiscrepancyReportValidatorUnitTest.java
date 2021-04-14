@@ -14,7 +14,8 @@ import uk.gov.companieshouse.service.rest.err.Err;
 import uk.gov.companieshouse.service.rest.err.Errors;
 
 @ExtendWith(MockitoExtension.class)
-public class PscDiscrepancyReportValidatorUnitTest {
+class PscDiscrepancyReportValidatorUnitTest {
+
     private static final String OBLIGED_ENTITY_ORGANISATION_NAME = "obliged_entity_organisation_name";
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "obliged_entity_contact_name";
     private static final String OBLIGED_ENTITY_EMAIL_LOCATION = "obliged_entity_email";
@@ -109,6 +110,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setObligedEntityEmail("updated_email@email.com");
         updatedReport.setEtag(ETAG);
+        updatedReport.setStatus(PscDiscrepancyReportValidatorUnitTest.VALID_STATUS);
 
         Errors errorsFromValidation = pscDiscrepancyReportValidator
                 .validateForUpdate(pscDiscrepancyReport, updatedReport);
@@ -119,6 +121,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - invalid etag")
     void validateUpdate_Unsuccessful_InvalidEtag() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
+        updatedReport.setStatus(PscDiscrepancyReportValidatorUnitTest.VALID_STATUS);
 
         Err nonMatchingEtag = Err.invalidBodyBuilderWithLocation("etag").withError(
                 "Etag does not match. etag in system: " + pscDiscrepancyReport.getEtag()
@@ -139,6 +142,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     void validateUpdate_Unsuccessful_InvalidEmailInvalidFormat() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
+        updatedReport.setStatus(PscDiscrepancyReportValidatorUnitTest.VALID_STATUS);
         updatedReport.setObligedEntityEmail(INVALID_EMAIL);
 
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
@@ -156,6 +160,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     void validateUpdate_Unsuccessful_InvalidEmailBlank() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
+        updatedReport.setStatus(PscDiscrepancyReportValidatorUnitTest.VALID_STATUS);
         updatedReport.setObligedEntityEmail("");
 
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_EMAIL_LOCATION)
@@ -208,6 +213,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     void validateUpdate_Unsuccessful_InvalidContactNameInvalidChar() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
+        updatedReport.setStatus(PscDiscrepancyReportValidatorUnitTest.VALID_STATUS);
         updatedReport.setObligedEntityContactName(INVALID_CONTACT_NAME);
 
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
@@ -225,6 +231,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     void validateUpdate_Unsuccessful_InvalidOrganisationName() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
+        updatedReport.setStatus(PscDiscrepancyReportValidatorUnitTest.VALID_STATUS);
         updatedReport.setObligedEntityOrganisationName(INVALID_ORGANISATION_NAME);
 
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_ORGANISATION_NAME)
@@ -243,6 +250,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
         updatedReport.setObligedEntityContactName("");
+        updatedReport.setStatus(PscDiscrepancyReportValidatorUnitTest.VALID_STATUS);
 
         Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_CONTACT_NAME)
                 .withError(OBLIGED_ENTITY_CONTACT_NAME + " must not be empty and must not only consist of whitespace").build();
@@ -259,6 +267,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     void validateUpdate_Unsuccessful_InvalidCompanyNumberNot8Chars() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
+        updatedReport.setStatus(PscDiscrepancyReportValidatorUnitTest.VALID_STATUS);
         updatedReport.setCompanyNumber(INVALID_COMPANY_NUMBER);
 
         Err error = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER_LOCATION)
@@ -276,6 +285,7 @@ public class PscDiscrepancyReportValidatorUnitTest {
     void validateUpdate_Unsuccessful_InvalidCompanyNumberBlank() {
         PscDiscrepancyReport updatedReport = new PscDiscrepancyReport();
         updatedReport.setEtag(ETAG);
+        updatedReport.setStatus(PscDiscrepancyReportValidatorUnitTest.VALID_STATUS);
         updatedReport.setCompanyNumber("");
 
         Err error = Err.invalidBodyBuilderWithLocation(COMPANY_INCORPORATION_NUMBER_LOCATION)
