@@ -84,6 +84,4 @@ public class PscSubmission {
         debugMap.put("submission", toString());
         return debugMap;
     }
-
-
 }

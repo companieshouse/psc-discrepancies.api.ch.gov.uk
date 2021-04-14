@@ -56,8 +56,7 @@ public class PscDiscrepancyController {
                     .createPscDiscrepancyDebugMap(pscDiscrepancyReportId, pscDiscrepancy);
             LOG.errorRequest(request, e, debugMap);
             // log wrapped cause exception too, as there is a bug in logger that cannot
-            // extract
-            // causes
+            // extract causes
             LOG.errorRequest(request, (Exception) e.getCause(), debugMap);
             pscDiscrepancytoReturn = responseFactory.createEmptyInternalServerError();
         }
