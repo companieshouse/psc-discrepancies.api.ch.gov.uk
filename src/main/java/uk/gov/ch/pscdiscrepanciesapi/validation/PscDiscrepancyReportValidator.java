@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
+import uk.gov.ch.pscdiscrepanciesapi.models.rest.ObligedEntityTypes;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancyReport;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.ReportStatus;
 import uk.gov.companieshouse.charset.CharSet;
@@ -42,7 +43,7 @@ public class PscDiscrepancyReportValidator extends Validators {
      * Validates that a pscDiscrepancyReport has all of its mandatory fields set
      * and that those fields that are set are not set to bad values.
      * 
-     * @param pscDiscrepancyReport
+     * @param pscDiscrepancyReport Report to be validated
      * @param errs An Err instance is added to this for each validation problem.
      */
     public Errors validate(PscDiscrepancyReport pscDiscrepancyReport, Errors errs) {
@@ -150,7 +151,20 @@ public class PscDiscrepancyReportValidator extends Validators {
      * @return Errors object containing any errors
      */
     private Errors validateObligedEntityType(Errors errors, String obligedEntityType) {
-        validateNotBlank(obligedEntityType, OBLIGED_ENTITY_TYPE, errors);
+        if(validateNotBlank(obligedEntityType, OBLIGED_ENTITY_TYPE, errors)){
+            try {
+                int type = Integer.parseInt(obligedEntityType);
+                if(ObligedEntityTypes.getEntityTypeFromId(type)==null){
+                    Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                            .withError(OBLIGED_ENTITY_TYPE + " does not match a valid obliged entity.").build();
+                    errors.addError(error);
+                }
+            } catch (NumberFormatException e) {
+                Err error = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                        .withError(OBLIGED_ENTITY_TYPE + " must be a valid integer.").build();
+                errors.addError(error);
+            }
+        }
         return errors;
     }
 
