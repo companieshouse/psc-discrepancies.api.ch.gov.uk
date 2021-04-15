@@ -81,9 +81,7 @@ public class PscDiscrepancyReportValidator extends Validators {
         if(updatedReport.getObligedEntityEmail() != null) {
             validateEmail(errData, updatedReport.getObligedEntityEmail());
         }
-        if(updatedReport.getStatus() != null) {
-            validateStatus(errData, updatedReport.getStatus());
-        }
+        validateStatus(errData, updatedReport.getStatus());
         if(updatedReport.getObligedEntityContactName() != null) {
             validateContactName(errData, updatedReport.getObligedEntityContactName());
         }
