@@ -26,7 +26,7 @@ public enum ObligedEntityTypes {
      * @param id integer to match to the valid obliged entity types.
      * @return entity type with matching id, or null.
      */
-    public static ObligedEntityTypes getEntityTypeFromId(Integer id){
+    public static ObligedEntityTypes getEntityTypeFromId(int id){
         for (ObligedEntityTypes entity : ObligedEntityTypes.values()){
             if( id == entity.id){
                 return entity;
