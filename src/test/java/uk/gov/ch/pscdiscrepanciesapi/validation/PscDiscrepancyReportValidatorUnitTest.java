@@ -29,7 +29,7 @@ class PscDiscrepancyReportValidatorUnitTest {
     private static final String VALID_OBLIGED_ENTITY_TYPE = "valid_oliged_entity_type";
     private static final String VALID_EMAIL = "valid_email@email.com";
     private static final String VALID_TELEPHONE_NUMBER = "08001234567";
-    private static final String VALID_TYPE = "obliged_entity_type";
+    private static final String VALID_TYPE = "1";
     private static final String VALID_COMPANY_NUMBER = "12345678";
     private static final String VALID_STATUS = "COMPLETE";
     private static final String VALID_CONTACT_NAME = "ValidContactName";
@@ -106,6 +106,36 @@ class PscDiscrepancyReportValidatorUnitTest {
             assertEquals(1, errorsFromValidation.size());
             assertTrue(errorsFromValidation.containsError(err));
         }
+
+        @Test
+        @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - Non integer obliged entity type")
+        void unsuccessful_NonIntObligedEntityType() {
+            Errors errors = new Errors();
+            Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                    .withError(OBLIGED_ENTITY_TYPE + " must be a valid integer.").build();
+
+            pscDiscrepancyReport.setObligedEntityType("test");
+            Errors errorsFromValidation =
+                    pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, errors);
+
+            assertEquals(1, errorsFromValidation.size());
+            assertTrue(errorsFromValidation.containsError(err));
+        }
+
+        @Test
+        @DisplayName("Validate unsuccessful creation of a PscDiscrepancyReport - Out of valid range obliged entity type")
+        void unsuccessful_TooLargeObligedEntityType() {
+            Errors errors = new Errors();
+            Err err = Err.invalidBodyBuilderWithLocation(OBLIGED_ENTITY_TYPE)
+                    .withError(OBLIGED_ENTITY_TYPE + " does not match a valid obliged entity.").build();
+
+            pscDiscrepancyReport.setObligedEntityType("0");
+            Errors errorsFromValidation =
+                    pscDiscrepancyReportValidator.validateForCreation(pscDiscrepancyReport, errors);
+
+                assertEquals(1, errorsFromValidation.size());
+                assertTrue(errorsFromValidation.containsError(err));
+            }
 
     }
 
@@ -336,6 +366,7 @@ class PscDiscrepancyReportValidatorUnitTest {
             assertTrue(errorsFromValidation.containsError(status));
             assertTrue(errorsFromValidation.containsError(email));
         }
+
         @Test
         @DisplayName("Validate unsuccessful update of a PscDiscrepancyReport - null status")
         void unsuccessful_NullStatus() {
