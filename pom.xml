@@ -32,7 +32,7 @@
 
         <spring-boot-dependencies.version>2.2.0.RELEASE</spring-boot-dependencies.version>
         <spring-boot-maven-plugin.version>2.2.0.RELEASE</spring-boot-maven-plugin.version>
-        <comons-io.version>2.6</comons-io.version>
+        <comons-io.version>2.7</comons-io.version>
 
         <!-- Maven -->
         <spring-boot-maven-plugin.version>2.2.0.RELEASE</spring-boot-maven-plugin.version>
