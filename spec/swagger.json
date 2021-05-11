@@ -552,9 +552,17 @@
       },
       "Discrepancy" : {
         "properties" : {
-          "discrepancy_reason" : {
+          "details" : {
             "type" : "string",
             "example" : "Name is incorrect"
+          },
+          "psc_name" : {
+            "type" : "string",
+            "example" : "Mrs Random Random"
+          },
+          "psc_date_of_birth" : {
+            "type" : "string",
+            "example" : "DD/MM/YYY"
           },
           "links" : {
             "type" : "object",
