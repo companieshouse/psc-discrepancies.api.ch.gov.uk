@@ -3,11 +3,11 @@ package uk.gov.ch.pscdiscrepanciesapi.common;
 import uk.gov.companieshouse.service.links.LinkKey;
 
 public enum PscDiscrepancyLinkKeys implements LinkKey {
-    PSC_DISCREPANCY_REPORT("psc-discrepancy-report");
+    PSC_DISCREPANCY_REPORT("psc_discrepancy_report");
 
     private String key;
 
-    private PscDiscrepancyLinkKeys(String key) {
+    PscDiscrepancyLinkKeys(String key) {
         this.key = key;
     }
 

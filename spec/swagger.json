@@ -503,27 +503,27 @@
       "DiscrepancyReport" : {
         "type" : "object",
         "properties" : {
-          "obliged-entity-type" : {
+          "obliged_entity_type" : {
             "type" : "string",
             "example" : "Financial institution"
           },
-          "obliged-entity-name" : {
+          "obliged_entity_organisation_name" : {
             "type" : "string",
             "example" : "Barclays Bank"
           },
-          "obliged-entity-contact-name" : {
+          "obliged_entity_contact_name" : {
             "type" : "string",
             "example" : "Joe Bloggs"
           },
-          "obliged-entity-email" : {
+          "obliged_entity_email" : {
             "type" : "string",
             "example" : "bob.holness@barclaysbank.com"
           },
-          "obliged-entity-telephone-number" : {
+          "obliged_entity_telephone_number" : {
             "type" : "string",
             "example" : "01234 567891"
           },
-          "company-number" : {
+          "company_number" : {
             "type" : "string",
             "example" : "02345678"
           },
@@ -552,7 +552,7 @@
       },
       "Discrepancy" : {
         "properties" : {
-          "discrepancy-reason" : {
+          "discrepancy_reason" : {
             "type" : "string",
             "example" : "Name is incorrect"
           },
@@ -562,7 +562,7 @@
               "self" : {
                 "type" : "string"
               },
-              "report" : {
+              "psc_discrepancy_report" : {
                 "type" : "string"
               }
             }
