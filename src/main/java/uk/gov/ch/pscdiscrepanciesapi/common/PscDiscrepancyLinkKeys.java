@@ -3,7 +3,12 @@ package uk.gov.ch.pscdiscrepanciesapi.common;
 import uk.gov.companieshouse.service.links.LinkKey;
 
 public enum PscDiscrepancyLinkKeys implements LinkKey {
-    PSC_DISCREPANCY_REPORT("psc_discrepancy_report");
+    // Code analysis wants to use the constant value here
+    //however that would be an illegal forward reference, and I cannot use the enum
+    //as annotations need constants. Therefore both are needed and neither can be removed.
+
+    PSC_DISCREPANCY_REPORT("psc_discrepancy_report");//NOSONAR
+    public static final String REPORT_LINK = "psc_discrepancy_report";
 
     private String key;
 
