@@ -24,10 +24,12 @@ class InterceptorConfigTest {
     @Mock
     InterceptorRegistry registry;
 
+    @Mock
+    InterceptorRegistration crudPermissionInterceptorRegistration;
+
     @Test
     void testThatConfigInterceptorAddsTheCrudAuthenticationInterceptorAddsSucessfully(){
         when(interceptorConfig.crudAuthenticationInterceptor()).thenReturn(crudAuthenticationInterceptor);
-        InterceptorRegistration crudPermissionInterceptorRegistration = Mockito.mock(InterceptorRegistration.class);
         doReturn(crudPermissionInterceptorRegistration).when(registry).addInterceptor(crudAuthenticationInterceptor);
         interceptorConfig.addInterceptors(registry);
         InOrder order = Mockito.inOrder(registry);
