@@ -12,7 +12,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class InterceptorConfigTest {
+class InterceptorConfigTest {
 
     @Spy
     @InjectMocks

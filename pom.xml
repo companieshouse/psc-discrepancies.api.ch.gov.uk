@@ -139,8 +139,6 @@
             <artifactId>api-security-java</artifactId>
             <version>0.3.5</version>
         </dependency>
-
-
     </dependencies>
 
     <build>
