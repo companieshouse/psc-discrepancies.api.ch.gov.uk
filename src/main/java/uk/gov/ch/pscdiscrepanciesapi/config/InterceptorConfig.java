@@ -8,7 +8,6 @@ import uk.gov.companieshouse.api.interceptor.CRUDAuthenticationInterceptor;
 
 import static uk.gov.companieshouse.api.util.security.Permission.Key.USER_PSC_DISCREPANCY_REPORT;
 
-
 @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {
 
