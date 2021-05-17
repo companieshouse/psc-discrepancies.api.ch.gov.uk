@@ -30,7 +30,7 @@ class InterceptorConfigTest {
     @Test
     void testThatConfigInterceptorAddsTheCrudAuthenticationInterceptorAddsSucessfully(){
         when(interceptorConfig.crudAuthenticationInterceptor()).thenReturn(crudAuthenticationInterceptor);
-        doReturn(crudPermissionInterceptorRegistration).when(registry).addInterceptor(crudAuthenticationInterceptor);
+        when(registry.addInterceptor(crudAuthenticationInterceptor)).thenReturn(crudPermissionInterceptorRegistration);
         interceptorConfig.addInterceptors(registry);
         InOrder order = Mockito.inOrder(registry);
         order.verify(registry).addInterceptor(crudAuthenticationInterceptor);
