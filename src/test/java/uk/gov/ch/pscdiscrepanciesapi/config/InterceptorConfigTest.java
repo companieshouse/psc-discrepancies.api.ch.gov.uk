@@ -15,13 +15,13 @@ class InterceptorConfigTest {
 
     @Spy
     @InjectMocks
-    InterceptorConfig interceptorConfig;
+    private InterceptorConfig interceptorConfig;
 
     @Mock
-    CRUDAuthenticationInterceptor crudAuthenticationInterceptor;
+    private CRUDAuthenticationInterceptor crudAuthenticationInterceptor;
 
     @Mock
-    InterceptorRegistry registry;
+    private InterceptorRegistry registry;
 
     @Test
     void testThatConfigInterceptorAddsTheCrudAuthenticationInterceptorAddsSucessfully(){
