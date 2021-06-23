@@ -32,6 +32,8 @@ import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyReportRepository
 import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyReportValidator;
 import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyValidator;
 import uk.gov.companieshouse.GenerateEtagUtil;
+import uk.gov.companieshouse.api.error.ApiErrorResponseException;
+import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.service.ServiceException;
@@ -54,18 +56,17 @@ public class PscDiscrepancyReportService {
 
     private final LinkFactory linkFactory;
     private final PscSubmissionSender pscSubmissionSender;
+    private final PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
+    private final PscDiscrepancyValidator pscDiscrepancyValidator;
+    private final EmailService emailService;
 
     @Autowired
-    private PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
-
-    @Autowired
-    private PscDiscrepancyValidator pscDiscrepancyValidator;
-
-    public PscDiscrepancyReportService(@Autowired PscDiscrepancyReportRepository pscDiscrepancyReportRepository,
-            @Autowired PscDiscrepancyReportMapper pscDiscrepancyReportMapper,
-            @Autowired PscSubmissionSender pscSubmissionSender, @Autowired PscDiscrepancyService pscDiscrepancyService,
-            @Autowired LinkFactory linkFactory, @Autowired PscDiscrepancyReportValidator pscDiscrepancyReportValidator,
-            @Autowired PscDiscrepancyValidator pscDiscrepancyValidator) {
+    public PscDiscrepancyReportService(PscDiscrepancyReportRepository pscDiscrepancyReportRepository,
+            PscDiscrepancyReportMapper pscDiscrepancyReportMapper,
+            PscSubmissionSender pscSubmissionSender,PscDiscrepancyService pscDiscrepancyService,
+            LinkFactory linkFactory,PscDiscrepancyReportValidator pscDiscrepancyReportValidator,
+            PscDiscrepancyValidator pscDiscrepancyValidator,
+            EmailService emailService) {
         this.pscDiscrepancyReportRepository = pscDiscrepancyReportRepository;
         this.pscDiscrepancyReportMapper = pscDiscrepancyReportMapper;
         this.pscSubmissionSender = pscSubmissionSender;
@@ -73,6 +74,7 @@ public class PscDiscrepancyReportService {
         this.linkFactory = linkFactory;
         this.pscDiscrepancyReportValidator = pscDiscrepancyReportValidator;
         this.pscDiscrepancyValidator = pscDiscrepancyValidator;
+        this.emailService = emailService;
     }
 
     public PscDiscrepancyReport findPscDiscrepancyReportById(String reportId) {
@@ -281,12 +283,18 @@ public class PscDiscrepancyReportService {
                 pscDiscrepancyValidator.validateOnSubmission(reportDiscrepancies.getData(), validationErrors);
                 reportToSubmit.setReport(storedReport);
                 reportToSubmit.setDiscrepancies(reportDiscrepancies.getData());
+                emailService.sendConfirmation(reportToSubmit);
                 reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, request.getSession().getId());
             }
+        } catch (ApiErrorResponseException e){
+            LOG.error("ERROR getting company name ", e);
+
         } catch (ServiceException ex) {
             LOG.error("ERROR Sending JSON to CHIPS Rest Interfaces ", ex);
         } catch (IOException e) {
             LOG.error("ERROR closing client when sending JSON to CHIPS Rest Interfaces ", e);
+        } catch (URIValidationException e) {
+            LOG.error("ERROR getting URI to format correctly", e);
         }
 
         try {

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,7 +14,12 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import com.mongodb.MongoException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,9 +30,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.mongodb.MongoException;
 import uk.gov.ch.pscdiscrepanciesapi.common.LinkFactory;
 import uk.gov.ch.pscdiscrepanciesapi.common.PscSubmissionSender;
 import uk.gov.ch.pscdiscrepanciesapi.mappers.PscDiscrepancyReportMapper;
@@ -39,6 +45,8 @@ import uk.gov.ch.pscdiscrepanciesapi.models.rest.ReportStatus;
 import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyReportRepository;
 import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyReportValidator;
 import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyValidator;
+import uk.gov.companieshouse.api.error.ApiErrorResponseException;
+import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.service.ServiceException;
 import uk.gov.companieshouse.service.ServiceResult;
 import uk.gov.companieshouse.service.ServiceResultStatus;
@@ -46,14 +54,13 @@ import uk.gov.companieshouse.service.rest.err.Err;
 import uk.gov.companieshouse.service.rest.err.Errors;
 
 @ExtendWith(MockitoExtension.class)
-public class PscDiscrepancyReportServiceUnitTest {
+class PscDiscrepancyReportServiceUnitTest {
     private static final String DISCREPANCY_DETAILS = "discrepancy";
     private static final String REQUEST_ID = "requestId_1";
     private static final String REPORT_ID = "reportId";
     private static final String SELF_LINK = "/parent/" + REPORT_ID;
     private static final String OBLIGED_ENTITY_EMAIL = "Obliged Entity Email";
-    private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION =
-            "obliged_entity_telephone_number";
+    private static final String OBLIGED_ENTITY_TELEPHONE_NUMBER_LOCATION = "obliged_entity_telephone_number";
     private static final String OBLIGED_ENTITY_CONTACT_NAME = "Obliged Entity Contact Name";
     private static final String STATUS = "Status";
     private static final String ETAG = "Etag";
@@ -71,36 +78,30 @@ public class PscDiscrepancyReportServiceUnitTest {
 
     @Mock
     private PscDiscrepancyReportMapper mockReportMapper;
-
     @Mock
     private PscDiscrepancyReportRepository mockReportRepo;
-
     @Mock
     private HttpServletRequest mockRequest;
-    
     @Mock
     private PscSubmissionSender mockSender;
-    
     @Mock
     private PscDiscrepancyService mockDiscrepancyService;
-    
     @Mock
     private PscDiscrepancyReportValidator mockReportDiscrepancyValidator;
-    
     @Mock
     private PscDiscrepancyValidator mockDiscrepancyValidator;
-    
     @Mock
     private LinkFactory mockLinkFactory;
+    @Mock
+    private EmailService mockEmailService;
 
+    @InjectMocks
     private PscDiscrepancyReportService pscDiscrepancyReportService;
 
     @BeforeEach
     void setUp() {
         pscDiscrepancyReport = new PscDiscrepancyReport();
         pscDiscrepancyReportEntity = new PscDiscrepancyReportEntity();
-        pscDiscrepancyReportService = new PscDiscrepancyReportService(mockReportRepo, mockReportMapper, mockSender,
-                mockDiscrepancyService, mockLinkFactory, mockReportDiscrepancyValidator, mockDiscrepancyValidator);
     }
 
     private void setupMockRequestWithMockSession() {
@@ -245,6 +246,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
         assertEquals(ReportStatus.INVALID.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
+        verifyNoInteractions(mockEmailService);
     }
 
     @Test
@@ -273,6 +275,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
         assertTrue(result.getErrors().containsError(error));
+        verifyNoInteractions(mockEmailService);
     }
 
     @Test
@@ -301,6 +304,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
         assertTrue(result.getErrors().containsError(error));
+        verifyNoInteractions(mockEmailService);
     }
 
     @Test
@@ -328,6 +332,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
         assertTrue(result.getErrors().containsError(error));
+        verifyNoInteractions(mockEmailService);
     }
 
     @Test
@@ -359,6 +364,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
         assertTrue(result.getErrors().containsError(error));
+        verifyNoInteractions(mockEmailService);
     }
 
     @Test
@@ -385,6 +391,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
         assertTrue(result.getErrors().containsError(error));
+        verifyNoInteractions(mockEmailService);
     }
 
     @Test
@@ -411,6 +418,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
         assertTrue(result.getErrors().containsError(error));
+        verifyNoInteractions(mockEmailService);
     }
 
     @Test
@@ -438,6 +446,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
         assertTrue(result.getErrors().containsError(error));
+        verifyNoInteractions(mockEmailService);
     }
 
     @Test
@@ -465,6 +474,7 @@ public class PscDiscrepancyReportServiceUnitTest {
                 reportWithUpdatesToApply, mockRequest);
         assertNotNull(result);
         assertEquals(ServiceResultStatus.VALIDATION_ERROR, result.getStatus());
+        verifyNoInteractions(mockEmailService);
     }
 
     @Test
@@ -529,6 +539,12 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
         assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
+        try {
+            verify(mockEmailService).sendConfirmation(expectedSubmission);
+            verifyNoMoreInteractions(mockEmailService);
+        } catch (ApiErrorResponseException | URIValidationException e) {
+            fail();
+        }
     }
 
     @Test
@@ -575,6 +591,12 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
         assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
+        try {
+            verify(mockEmailService).sendConfirmation(expectedSubmission);
+            verifyNoMoreInteractions(mockEmailService);
+        } catch (ApiErrorResponseException | URIValidationException e) {
+            fail();
+        }
     }
 
     @Test
@@ -620,6 +642,12 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
         assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
+        try {
+            verify(mockEmailService).sendConfirmation(expectedSubmission);
+            verifyNoMoreInteractions(mockEmailService);
+        } catch (ApiErrorResponseException | URIValidationException e) {
+            fail();
+        }
     }
 
     @Test
@@ -631,7 +659,7 @@ public class PscDiscrepancyReportServiceUnitTest {
         preexistingReportEntity.setData(preexistingReportEntityData);
         PscDiscrepancyReport preexistingReport = createReport(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
         doReturn(Optional.of(preexistingReportEntity)).when(mockReportRepo).findById(REPORT_ID);
-        doReturn(preexistingReport).when(mockReportMapper).entityToRest(eq(preexistingReportEntity));
+        doReturn(preexistingReport).when(mockReportMapper).entityToRest(preexistingReportEntity);
 
         PscDiscrepancyReportEntity mockSavedEntity = mock(PscDiscrepancyReportEntity.class);
         PscDiscrepancyReport savedReport = createReport(VALID_EMAIL, ReportStatus.COMPLETE.toString());
@@ -667,6 +695,12 @@ public class PscDiscrepancyReportServiceUnitTest {
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
         assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
+        try {
+            verify(mockEmailService).sendConfirmation(expectedSubmission);
+            verifyNoMoreInteractions(mockEmailService);
+        } catch (ApiErrorResponseException | URIValidationException e) {
+            fail();
+        }
     }
 
     private List<PscDiscrepancy> createDiscrepancies(String... discrepancies) {
