@@ -25,6 +25,7 @@ public class PscDiscrepancyMapperUnitTest {
     private static final String DISCREPANCY_DETAILS = "details";
     private static final String PSC_NAME = "Name";
     private static final String PSC_DOB = "12/85";
+    private static final String PSC_TYPE = "pscType";
     private static final Map<String, String> MAP_LINKS = new HashMap<>();
     private static final Links LINKS = new Links();
 
@@ -45,6 +46,7 @@ public class PscDiscrepancyMapperUnitTest {
         pscDiscrepancyData.setPscName(PSC_NAME);
         pscDiscrepancyData.setPscDateOfBirth(PSC_DOB);
         pscDiscrepancyData.setPscDiscrepancyTypes(pscDiscrepancyTypes);
+        pscDiscrepancyData.setPscType(PSC_TYPE);
         pscDiscrepancyData.setLinks(MAP_LINKS);
         pscDiscrepancyEntity.setData(pscDiscrepancyData);
 
@@ -56,6 +58,7 @@ public class PscDiscrepancyMapperUnitTest {
         pscDiscrepancy.setPscDiscrepancyTypes(pscDiscrepancyTypes);
         pscDiscrepancy.setPscDateOfBirth(PSC_DOB);
         pscDiscrepancy.setLinks(LINKS);
+        pscDiscrepancy.setPscType(PSC_TYPE);
     }
 
     @Test
@@ -69,6 +72,7 @@ public class PscDiscrepancyMapperUnitTest {
         assertEquals(pscDiscrepancy.getPscName(), result.getPscName());
         assertEquals(pscDiscrepancy.getPscDateOfBirth(), result.getPscDateOfBirth());
         assertEquals(pscDiscrepancy.getLinks(), result.getLinks());
+        assertEquals(pscDiscrepancy.getPscType(), result.getPscType());
         assertEquals(pscDiscrepancy.getPscDiscrepancyTypes(), result.getPscDiscrepancyTypes());
     }
 
@@ -83,6 +87,7 @@ public class PscDiscrepancyMapperUnitTest {
         assertEquals(pscDiscrepancyEntity.getData().getPscName(), result.getData().getPscName());
         assertEquals(pscDiscrepancyEntity.getData().getPscDateOfBirth(), result.getData().getPscDateOfBirth());
         assertEquals(pscDiscrepancyEntity.getData().getLinks(), result.getData().getLinks());
+        assertEquals(pscDiscrepancyEntity.getData().getPscType(), result.getData().getPscType());
         assertEquals(pscDiscrepancyEntity.getData().getPscDiscrepancyTypes(), result.getData().getPscDiscrepancyTypes());
     }
 

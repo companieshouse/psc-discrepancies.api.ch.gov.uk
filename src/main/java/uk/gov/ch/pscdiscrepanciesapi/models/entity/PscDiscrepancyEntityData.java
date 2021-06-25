@@ -26,6 +26,9 @@ public class PscDiscrepancyEntityData {
     @Field("links")
     private Map<String, String> links;
 
+    @Field("psc_type")
+    private String pscType;
+
     public String getKind() {
         return kind;
     }
@@ -76,5 +79,13 @@ public class PscDiscrepancyEntityData {
 
     public void setLinks(Map<String, String> links) {
         this.links = links;
+    }
+
+    public String getPscType() {
+        return pscType;
+    }
+
+    public void setPscType(String pscType) {
+        this.pscType = pscType;
     }
 }
