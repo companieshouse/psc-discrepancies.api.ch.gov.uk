@@ -2,8 +2,11 @@ package uk.gov.ch.pscdiscrepanciesapi.services;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +39,8 @@ import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.email_producer.EmailProducer;
+import uk.gov.companieshouse.email_producer.EmailSendingException;
+import uk.gov.companieshouse.email_producer.model.EmailData;
 
 @ExtendWith(MockitoExtension.class)
 class EmailServiceTest {
@@ -114,6 +119,36 @@ class EmailServiceTest {
         verify(mockEmailProducer, times(2)).sendEmail(emailDataCaptor.capture(), matches(REPORT_SUBMISSION_CONFIRMATION));
         Iterator<PscDiscrepancy> pscDiscrepancyListIter = pscDiscrepancyList.iterator();
         emailDataCaptor.getAllValues().forEach(emailData -> verifyParameters(pscDiscrepancyListIter.next(), emailData));// this could fail if executed in parallel
+    }
+
+    @Test
+    void test_sendConfirmation_throwsError_ifItDoesntSend()
+            throws ApiErrorResponseException, URIValidationException {
+        when(mockDiscrepancyOne.getPscName()).thenReturn(DISCREPANCY_ONE_NAME);
+        AtomicInteger counter = new AtomicInteger();
+        when(mockDiscrepancyOne.getPscDiscrepancyTypes()).thenReturn(Arrays.stream(ObligedEntityTypes.values())
+                .map(type -> String.valueOf(counter.incrementAndGet()))
+                .collect(Collectors.toList()));
+        when(mockDiscrepancyOne.getDetails()).thenReturn(DISCREPANCY_ONE_DETAILS);
+
+        List<PscDiscrepancy> pscDiscrepancyList = Lists.list(mockDiscrepancyOne, mockDiscrepancyTwo);
+
+        when(mockReport.getCompanyNumber()).thenReturn(COMPANY_NUMBER);
+        when(mockReport.getObligedEntityEmail()).thenReturn(EMAIL);
+        when(mockReport.getSubmissionReference()).thenReturn(REFERENCE_NUMBER);
+
+        when(mockSubmission.getReport()).thenReturn(mockReport);
+        when(mockSubmission.getDiscrepancies()).thenReturn(pscDiscrepancyList);
+
+        when(mockApiClient.company()).thenReturn(mockResourceHandler);
+        when(mockResourceHandler.get(anyString())).thenReturn(mockCompanyGet);
+        when(mockCompanyGet.execute()).thenReturn(mockApiResponse);
+        when(mockApiResponse.getData()).thenReturn(mockApiData);
+        when(mockApiData.getCompanyName()).thenReturn(COMPANY_NAME);
+
+        doThrow(new EmailSendingException("message", new Exception())).when(mockEmailProducer).sendEmail(any(EmailData.class), anyString());
+
+        assertThrows(EmailSendingException.class, ()-> emailService.sendConfirmation(mockSubmission));
     }
 
     private void verifyParameters(PscDiscrepancy discrepancy, ReportConfirmationEmailData emailData) {
