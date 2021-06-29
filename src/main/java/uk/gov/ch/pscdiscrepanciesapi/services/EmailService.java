@@ -2,8 +2,10 @@ package uk.gov.ch.pscdiscrepanciesapi.services;
 
 import avro.shaded.com.google.common.base.Optional;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
@@ -47,11 +49,11 @@ public class EmailService {
                 .execute();
 
         for(PscDiscrepancy pscDiscrepancy: submission.getDiscrepancies()){
-            sendEmailForPSCDescrepancy(submission.getReport(), pscDiscrepancy);
+            sendEmailForPSCDiscrepancy(submission.getReport(), pscDiscrepancy);
         }
     }
 
-    private void sendEmailForPSCDescrepancy(PscDiscrepancyReport report, PscDiscrepancy pscDiscrepancy) {
+    private void sendEmailForPSCDiscrepancy(PscDiscrepancyReport report, PscDiscrepancy pscDiscrepancy) {
         final ReportConfirmationEmailData emailData = new ReportConfirmationEmailData();
 
         emailData.setTo(report.getObligedEntityEmail());
@@ -65,7 +67,21 @@ public class EmailService {
         emailData.setReferenceNumber(report.getSubmissionReference());
         emailData.setPscMoreInformation(pscDiscrepancy.getDetails());
 
+        LOG.info("Sending Email", toHashMap(emailData));
+
         sendEmail(emailData, REPORT_SUBMISSION_CONFIRMATION);
+    }
+
+    private Map<String, Object> toHashMap(ReportConfirmationEmailData emailData) {
+        HashMap<String, Object> ret = new HashMap<>();
+        ret.put("COMPANY NAME", emailData.getCompanyName());
+        ret.put("COMPANY NUMBER", emailData.getCompanyNumber());
+        ret.put("PSC NAME", emailData.getPscName());
+        ret.put("PSC EXTRA INFO", emailData.getPscMoreInformation());
+        ret.put("REFERENCE NUMBER", emailData.getReferenceNumber());
+        ret.put("TO", emailData.getTo());
+        ret.put("SUBJECT", emailData.getSubject());
+        return ret;
     }
 
     private void sendEmail(EmailData emailData, String messageType) throws EmailSendingException {

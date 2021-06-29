@@ -8,8 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -85,7 +83,6 @@ class EmailServiceTest {
                 .map(type -> String.valueOf(counter.incrementAndGet()))
                 .collect(Collectors.toList()));
         when(mockDiscrepancyOne.getDetails()).thenReturn(DISCREPANCY_ONE_DETAILS);
-//        when(mockDiscrepancyOne.get()).thenReturn(DISCREPANCY_ONE_NAME);
         when(mockDiscrepancyTwo.getPscName()).thenReturn(DISCREPANCY_ONE_NAME);
         counter.set(0);
         when(mockDiscrepancyTwo.getPscDiscrepancyTypes()).thenReturn(Arrays.asList("4", "7"));
@@ -98,7 +95,6 @@ class EmailServiceTest {
         when(mockReport.getSubmissionReference()).thenReturn(REFERENCE_NUMBER);
 
         when(mockSubmission.getReport()).thenReturn(mockReport);
-//        when(mockSubmission.getRequestId()).thenReturn(REFERENCE_NUMBER);
         when(mockSubmission.getDiscrepancies()).thenReturn(pscDiscrepancyList);
 
         when(mockApiClient.company()).thenReturn(mockResourceHandler);
@@ -115,13 +111,6 @@ class EmailServiceTest {
     }
 
     private void verifyParameters(PscDiscrepancy discrepancy, ReportConfirmationEmailData emailData) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            System.out.println(mapper.writeValueAsString(emailData));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
         assertEquals(COMPANY_NUMBER, emailData.getCompanyNumber());
         assertEquals(EMAIL, emailData.getTo());
         assertEquals(REFERENCE_NUMBER, emailData.getReferenceNumber());
