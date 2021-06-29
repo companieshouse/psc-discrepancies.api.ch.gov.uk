@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ch.pscdiscrepanciesapi.PscDiscrepancyApiApplication;
 import uk.gov.ch.pscdiscrepanciesapi.models.email.ReportConfirmationEmailData;
@@ -20,44 +21,44 @@ import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.email_producer.EmailProducer;
 import uk.gov.companieshouse.email_producer.EmailSendingException;
-import uk.gov.companieshouse.email_producer.model.EmailData;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 
 @Service
 public class EmailService {
 
-    public static final String SUBJECT = "Confirmation of PSC Discrepancy Report";
-    private final EmailProducer emailProducer;
+    @Value("report_submission_email_subject")
+    public String subject;
+
     private static final String REPORT_SUBMISSION_CONFIRMATION = "psc_discrepancies_submission_confirmation";
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
-    private final ApiClient httpClient;
-    private ApiResponse<CompanyProfileApi> company;
 
     @Autowired
-    public EmailService( EmailProducer emailProducer, ApiClient httpClient) {
-        this.emailProducer = emailProducer;
-        this.httpClient = httpClient;
-    }
+    private ApiClient httpClient;
+    @Autowired
+    private EmailProducer emailProducer;
 
     public void sendConfirmation(PscSubmission submission)
             throws ApiErrorResponseException, URIValidationException {
 
-        company = httpClient
+        ApiResponse<CompanyProfileApi> company = httpClient
                 .company()
-                .get(String.format("/company/%s", submission.getReport().getCompanyNumber().toUpperCase(Locale.ROOT)))
+                .get(String.format("/company/%s",
+                        submission.getReport().getCompanyNumber().toUpperCase(Locale.ROOT)))
                 .execute();
 
         for(PscDiscrepancy pscDiscrepancy: submission.getDiscrepancies()){
-            sendEmailForPSCDiscrepancy(submission.getReport(), pscDiscrepancy);
+            sendEmailForPSCDiscrepancy(submission.getReport(), pscDiscrepancy, company);
         }
     }
 
-    private void sendEmailForPSCDiscrepancy(PscDiscrepancyReport report, PscDiscrepancy pscDiscrepancy) {
+    private void sendEmailForPSCDiscrepancy(PscDiscrepancyReport report,
+            PscDiscrepancy pscDiscrepancy,
+            ApiResponse<CompanyProfileApi> company) {
         final ReportConfirmationEmailData emailData = new ReportConfirmationEmailData();
 
         emailData.setTo(report.getObligedEntityEmail());
-        emailData.setSubject(SUBJECT);
+        emailData.setSubject(subject);
         emailData.setCompanyName(company.getData().getCompanyName());
         emailData.setCompanyNumber(report.getCompanyNumber());
         emailData.setPscName(pscDiscrepancy.getPscName());
@@ -84,12 +85,12 @@ public class EmailService {
         return ret;
     }
 
-    private void sendEmail(EmailData emailData, String messageType) throws EmailSendingException {
+    private void sendEmail(ReportConfirmationEmailData emailData, String messageType) {
         try {
             emailProducer.sendEmail(emailData, messageType);
-            LOG.info(String.format("Submitted %s email to Kafka", messageType));
+            LOG.info(String.format("Submitted %s email to Kafka for submission %s", messageType, emailData.getReferenceNumber()));
         } catch (EmailSendingException err) {
-            LOG.error("Error sending email", err);
+            LOG.error(String.format("Error sending email for submission %s", emailData.getReferenceNumber()), err);
             throw err;
         }
     }

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -21,6 +22,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ch.pscdiscrepanciesapi.models.email.ReportConfirmationEmailData;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.ObligedEntityTypes;
 import uk.gov.ch.pscdiscrepanciesapi.models.rest.PscDiscrepancy;
@@ -73,6 +75,10 @@ class EmailServiceTest {
     @Mock
     private CompanyProfileApi mockApiData;
 
+    @BeforeEach
+    public void injectIntoValueAnnotation(){
+        ReflectionTestUtils.setField(emailService, "subject", "Confirmation of PSC Discrepancy Report");
+    }
 
     @Test
     void test_sendConfirmation_sendsEmail_withCorrectValues_forAllPSCs ()
