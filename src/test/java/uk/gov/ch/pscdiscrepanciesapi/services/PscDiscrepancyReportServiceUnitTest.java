@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -280,7 +279,7 @@ class PscDiscrepancyReportServiceUnitTest {
 
     @Test
     @DisplayName("When updatePscDiscrepancy is supplied with an empty contact name, then it returns an invalid ServiceResult")
-    void updatePscDiscrepancyReport_EmptyContactName() throws ServiceException{
+    void updatePscDiscrepancyReport_EmptyContactName() throws ServiceException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
         PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL, ReportStatus.INCOMPLETE.toString());
         preexistingReportEntity.setData(preexistingReportEntityData);
@@ -497,7 +496,8 @@ class PscDiscrepancyReportServiceUnitTest {
 
     @Test
     @DisplayName("When a completed report is submitted to updatePscDiscrepancyReport, and the submit to chips succeeds, then the report is saved with a status of SUBMITTED")
-    void updatePscDiscrepancyReportSendReportSubmitted() throws ServiceException {
+    void updatePscDiscrepancyReportSendReportSubmitted()
+            throws ServiceException, ApiErrorResponseException, URIValidationException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
         PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
                 ReportStatus.INCOMPLETE.toString());
@@ -539,17 +539,14 @@ class PscDiscrepancyReportServiceUnitTest {
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
         assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
-        try {
-            verify(mockEmailService).sendConfirmation(expectedSubmission);
-            verifyNoMoreInteractions(mockEmailService);
-        } catch (ApiErrorResponseException | URIValidationException e) {
-            fail();
-        }
+        verify(mockEmailService).sendConfirmation(expectedSubmission);
+        verifyNoMoreInteractions(mockEmailService);
     }
 
     @Test
     @DisplayName("When a completed report is submitted to updatePscDiscrepancyReport, and the submit to chips fails, then the report is saved with a status of FAILED_TO_SUBMIT")
-    void updatePscDiscrepancyReportSendReportFailedToSubmit() throws ServiceException {
+    void updatePscDiscrepancyReportSendReportFailedToSubmit()
+            throws ServiceException, ApiErrorResponseException, URIValidationException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
         PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
                 ReportStatus.INCOMPLETE.toString());
@@ -591,17 +588,14 @@ class PscDiscrepancyReportServiceUnitTest {
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
         assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
-        try {
-            verify(mockEmailService).sendConfirmation(expectedSubmission);
-            verifyNoMoreInteractions(mockEmailService);
-        } catch (ApiErrorResponseException | URIValidationException e) {
-            fail();
-        }
+        verify(mockEmailService).sendConfirmation(expectedSubmission);
+        verifyNoMoreInteractions(mockEmailService);
     }
 
     @Test
     @DisplayName("When update leads to a report being sent to chips and the saving of the result of that sent throws a MongoEx, then that ex is swallowed.")
-    void updatePscDiscrepancyReportSendReportCatchesMongoEx() throws ServiceException {
+    void updatePscDiscrepancyReportSendReportCatchesMongoEx()
+            throws ServiceException, ApiErrorResponseException, URIValidationException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
         PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
                 ReportStatus.INCOMPLETE.toString());
@@ -642,17 +636,14 @@ class PscDiscrepancyReportServiceUnitTest {
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
         assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
-        try {
-            verify(mockEmailService).sendConfirmation(expectedSubmission);
-            verifyNoMoreInteractions(mockEmailService);
-        } catch (ApiErrorResponseException | URIValidationException e) {
-            fail();
-        }
+        verify(mockEmailService).sendConfirmation(expectedSubmission);
+        verifyNoMoreInteractions(mockEmailService);
     }
 
     @Test
     @DisplayName("When update leads to a report being sent to chips and the send throws a ServiceException, then the exception is swallowed and report status is saved as FAILED_TO_SUBMIT.")
-    void updatePscDiscrepancyReportSendReportCatchesServiceEx() throws ServiceException {
+    void updatePscDiscrepancyReportSendReportCatchesServiceEx()
+            throws ServiceException, ApiErrorResponseException, URIValidationException {
         PscDiscrepancyReportEntity preexistingReportEntity = new PscDiscrepancyReportEntity();
         PscDiscrepancyReportEntityData preexistingReportEntityData = createReportData(VALID_EMAIL,
                 ReportStatus.INCOMPLETE.toString());
@@ -695,12 +686,8 @@ class PscDiscrepancyReportServiceUnitTest {
         assertEquals(ServiceResultStatus.UPDATED, result.getStatus());
         assertEquals(ReportStatus.COMPLETE.toString(), savedReport.getStatus());
         assertSame(savedReport, result.getData());
-        try {
-            verify(mockEmailService).sendConfirmation(expectedSubmission);
-            verifyNoMoreInteractions(mockEmailService);
-        } catch (ApiErrorResponseException | URIValidationException e) {
-            fail();
-        }
+        verify(mockEmailService).sendConfirmation(expectedSubmission);
+        verifyNoMoreInteractions(mockEmailService);
     }
 
     private List<PscDiscrepancy> createDiscrepancies(String... discrepancies) {

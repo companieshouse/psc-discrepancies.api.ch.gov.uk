@@ -48,34 +48,23 @@ public class PscDiscrepancyReportService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
 
-    private final PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
-
-    private final PscDiscrepancyReportMapper pscDiscrepancyReportMapper;
-    
-    private final PscDiscrepancyService pscDiscrepancyService;
-
-    private final LinkFactory linkFactory;
-    private final PscSubmissionSender pscSubmissionSender;
-    private final PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
-    private final PscDiscrepancyValidator pscDiscrepancyValidator;
-    private final EmailService emailService;
-
     @Autowired
-    public PscDiscrepancyReportService(PscDiscrepancyReportRepository pscDiscrepancyReportRepository,
-            PscDiscrepancyReportMapper pscDiscrepancyReportMapper,
-            PscSubmissionSender pscSubmissionSender,PscDiscrepancyService pscDiscrepancyService,
-            LinkFactory linkFactory,PscDiscrepancyReportValidator pscDiscrepancyReportValidator,
-            PscDiscrepancyValidator pscDiscrepancyValidator,
-            EmailService emailService) {
-        this.pscDiscrepancyReportRepository = pscDiscrepancyReportRepository;
-        this.pscDiscrepancyReportMapper = pscDiscrepancyReportMapper;
-        this.pscSubmissionSender = pscSubmissionSender;
-        this.pscDiscrepancyService = pscDiscrepancyService;
-        this.linkFactory = linkFactory;
-        this.pscDiscrepancyReportValidator = pscDiscrepancyReportValidator;
-        this.pscDiscrepancyValidator = pscDiscrepancyValidator;
-        this.emailService = emailService;
-    }
+    private PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
+    @Autowired
+    private PscDiscrepancyReportMapper pscDiscrepancyReportMapper;
+    @Autowired
+    private PscDiscrepancyService pscDiscrepancyService;
+    @Autowired
+    private LinkFactory linkFactory;
+    @Autowired
+    private PscSubmissionSender pscSubmissionSender;
+    @Autowired
+    private PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
+    @Autowired
+    private PscDiscrepancyValidator pscDiscrepancyValidator;
+    @Autowired
+    private EmailService emailService;
+
 
     public PscDiscrepancyReport findPscDiscrepancyReportById(String reportId) {
 
@@ -95,8 +84,7 @@ public class PscDiscrepancyReportService {
      * @param request              Http request
      * 
      * @return ServiceResult object with created PSC discrepancy report
-     * 
-     * @throws ServiceException
+     *
      */
     public ServiceResult<PscDiscrepancyReport> createPscDiscrepancyReport(PscDiscrepancyReport pscDiscrepancyReport,
             HttpServletRequest request) throws ServiceException {
@@ -247,7 +235,7 @@ public class PscDiscrepancyReportService {
     /**
      * Create a debug map for structured logging
      * 
-     * @param pscDiscrepancyReport
+     * @param pscDiscrepancyReport report to create debug map of
      * 
      * @return Debug map
      */
@@ -294,7 +282,7 @@ public class PscDiscrepancyReportService {
         } catch (IOException e) {
             LOG.error("ERROR closing client when sending JSON to CHIPS Rest Interfaces ", e);
         } catch (URIValidationException e) {
-            LOG.error("ERROR getting URI to format correctly", e);
+            LOG.error("ERROR sending confirmation email to user: error getting URI to format correctly", e);
         }
 
         try {
