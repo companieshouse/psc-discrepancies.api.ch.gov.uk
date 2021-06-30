@@ -34,6 +34,7 @@ import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyValidator;
 import uk.gov.companieshouse.GenerateEtagUtil;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
+import uk.gov.companieshouse.email_producer.EmailSendingException;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.service.ServiceException;
@@ -271,18 +272,13 @@ public class PscDiscrepancyReportService {
                 pscDiscrepancyValidator.validateOnSubmission(reportDiscrepancies.getData(), validationErrors);
                 reportToSubmit.setReport(storedReport);
                 reportToSubmit.setDiscrepancies(reportDiscrepancies.getData());
-                emailService.sendConfirmation(reportToSubmit);
+                sendingEmail(reportToSubmit);
                 reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, request.getSession().getId());
             }
-        } catch (ApiErrorResponseException e){
-            LOG.error("ERROR getting company name ", e);
-
         } catch (ServiceException ex) {
             LOG.error("ERROR Sending JSON to CHIPS Rest Interfaces ", ex);
         } catch (IOException e) {
             LOG.error("ERROR closing client when sending JSON to CHIPS Rest Interfaces ", e);
-        } catch (URIValidationException e) {
-            LOG.error("ERROR sending confirmation email to user: error getting URI to format correctly", e);
         }
 
         try {
@@ -300,6 +296,16 @@ public class PscDiscrepancyReportService {
         } catch (MongoException mongoEx) {
             LOG.error("Error saving report with new status after attempting to submit report, with reportSent: "
                     + reportSent, mongoEx);
+        }
+    }
+
+    private void sendingEmail(PscSubmission reportToSubmit) {
+        try {
+            emailService.sendConfirmation(reportToSubmit);
+        } catch (EmailSendingException e){
+            LOG.error("ERROR sending confirmation email to user: ", e);
+        } catch (ApiErrorResponseException | URIValidationException e){
+            LOG.error("ERROR getting company name for email submission", e);
         }
     }
 }
