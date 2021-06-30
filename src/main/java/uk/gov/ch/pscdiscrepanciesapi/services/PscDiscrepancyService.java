@@ -38,6 +38,7 @@ public class PscDiscrepancyService {
     private static final String DISCREPANCY_DETAILS = "details";
     private static final String PSC_NAME = "psc_name";
     private static final String PSC_DOB = "psc_date_of_birth";
+    private static final String PSC_TYPE = "psc_type";
     private static final String DISCREPANCY_ID = "discrepancy-id";
     private static final String PSC_DISCREPANCY_TYPES = "psc_discrepancy_types";
     private static final String DISCREPANCY_REPORT_ID = "discrepancy-report-id";
@@ -202,6 +203,7 @@ public class PscDiscrepancyService {
         debugMap.put(PSC_NAME, pscDiscrepancy.getPscName());
         debugMap.put(PSC_DOB, pscDiscrepancy.getPscDateOfBirth());
         debugMap.put(PSC_DISCREPANCY_TYPES, pscDiscrepancy.getPscDiscrepancyTypes());
+        debugMap.put(PSC_TYPE, pscDiscrepancy.getPscType());
         return debugMap;
     }
     

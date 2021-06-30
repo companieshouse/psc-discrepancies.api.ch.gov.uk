@@ -19,6 +19,7 @@ public interface PscDiscrepancyMapper {
     @Mapping(source = "pscDiscrepancyEntity.data.pscDiscrepancyTypes", target = "pscDiscrepancyTypes")
     @Mapping(source = "pscDiscrepancyEntity.data.pscDateOfBirth", target = "pscDateOfBirth")
     @Mapping(source = "pscDiscrepancyEntity.data.links", target = "links.links")
+    @Mapping(source = "pscDiscrepancyEntity.data.pscType", target = "pscType")
 
     PscDiscrepancy entityToRest(PscDiscrepancyEntity pscDiscrepancyEntity);
 

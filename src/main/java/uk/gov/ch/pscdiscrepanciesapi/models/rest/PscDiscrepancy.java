@@ -19,6 +19,9 @@ public class PscDiscrepancy extends ApiObjectImpl {
     @JsonProperty("psc_discrepancy_types")
     private List<String> pscDiscrepancyTypes;
 
+    @JsonProperty("psc_type")
+    private String pscType;
+
     public String getDetails() {
         return details;
     }
@@ -51,6 +54,14 @@ public class PscDiscrepancy extends ApiObjectImpl {
         this.pscDateOfBirth = pscDateOfBirth;
     }
 
+    public String getPscType() {
+        return pscType;
+    }
+
+    public void setPscType(String pscType) {
+        this.pscType = pscType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -66,12 +77,13 @@ public class PscDiscrepancy extends ApiObjectImpl {
         return Objects.equals(details, that.details) &&
                 Objects.equals(pscName, that.pscName) &&
                 Objects.equals(pscDateOfBirth, that.pscDateOfBirth) &&
-                Objects.equals(pscDiscrepancyTypes, that.pscDiscrepancyTypes);
+                Objects.equals(pscDiscrepancyTypes, that.pscDiscrepancyTypes) &&
+                Objects.equals(pscType, that.pscType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), details, pscName, pscDateOfBirth, pscDiscrepancyTypes);
+        return Objects.hash(super.hashCode(), details, pscName, pscDateOfBirth, pscDiscrepancyTypes, pscType);
     }
 
     @Override
@@ -80,7 +92,8 @@ public class PscDiscrepancy extends ApiObjectImpl {
                 "details='" + details + '\'' +
                 ", pscName='" + pscName + '\'' +
                 ", pscDateOfBirth='" + pscDateOfBirth + '\'' +
-                ", pscDiscrepancyType=" + pscDiscrepancyTypes +
+                ", pscDiscrepancyType='" + pscDiscrepancyTypes + '\'' +
+                ", pscType=" + pscType +
                 '}';
     }
 }
