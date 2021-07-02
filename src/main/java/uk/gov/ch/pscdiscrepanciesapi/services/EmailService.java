@@ -27,7 +27,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Service
 public class EmailService {
 
-    @Value("report_submission_email_subject")
+    @Value("${report_submission_email_subject}")
     public String subject;
 
     private static final String REPORT_SUBMISSION_CONFIRMATION = "psc_discrepancies_submission_confirmation";
