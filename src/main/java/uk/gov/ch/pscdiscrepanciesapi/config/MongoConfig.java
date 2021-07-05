@@ -1,4 +1,4 @@
-package uk.gov.ch.pscdiscrepanciesapi;
+package uk.gov.ch.pscdiscrepanciesapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

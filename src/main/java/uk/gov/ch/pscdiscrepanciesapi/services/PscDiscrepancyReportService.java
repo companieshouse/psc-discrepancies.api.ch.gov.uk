@@ -32,6 +32,9 @@ import uk.gov.ch.pscdiscrepanciesapi.repositories.PscDiscrepancyReportRepository
 import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyReportValidator;
 import uk.gov.ch.pscdiscrepanciesapi.validation.PscDiscrepancyValidator;
 import uk.gov.companieshouse.GenerateEtagUtil;
+import uk.gov.companieshouse.api.error.ApiErrorResponseException;
+import uk.gov.companieshouse.api.handler.exception.URIValidationException;
+import uk.gov.companieshouse.email_producer.EmailSendingException;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.service.ServiceException;
@@ -46,34 +49,23 @@ public class PscDiscrepancyReportService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PscDiscrepancyApiApplication.APP_NAMESPACE);
 
-    private final PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
-
-    private final PscDiscrepancyReportMapper pscDiscrepancyReportMapper;
-    
-    private final PscDiscrepancyService pscDiscrepancyService;
-
-    private final LinkFactory linkFactory;
-    private final PscSubmissionSender pscSubmissionSender;
-
+    @Autowired
+    private PscDiscrepancyReportRepository pscDiscrepancyReportRepository;
+    @Autowired
+    private PscDiscrepancyReportMapper pscDiscrepancyReportMapper;
+    @Autowired
+    private PscDiscrepancyService pscDiscrepancyService;
+    @Autowired
+    private LinkFactory linkFactory;
+    @Autowired
+    private PscSubmissionSender pscSubmissionSender;
     @Autowired
     private PscDiscrepancyReportValidator pscDiscrepancyReportValidator;
-
     @Autowired
     private PscDiscrepancyValidator pscDiscrepancyValidator;
+    @Autowired
+    private EmailService emailService;
 
-    public PscDiscrepancyReportService(@Autowired PscDiscrepancyReportRepository pscDiscrepancyReportRepository,
-            @Autowired PscDiscrepancyReportMapper pscDiscrepancyReportMapper,
-            @Autowired PscSubmissionSender pscSubmissionSender, @Autowired PscDiscrepancyService pscDiscrepancyService,
-            @Autowired LinkFactory linkFactory, @Autowired PscDiscrepancyReportValidator pscDiscrepancyReportValidator,
-            @Autowired PscDiscrepancyValidator pscDiscrepancyValidator) {
-        this.pscDiscrepancyReportRepository = pscDiscrepancyReportRepository;
-        this.pscDiscrepancyReportMapper = pscDiscrepancyReportMapper;
-        this.pscSubmissionSender = pscSubmissionSender;
-        this.pscDiscrepancyService = pscDiscrepancyService;
-        this.linkFactory = linkFactory;
-        this.pscDiscrepancyReportValidator = pscDiscrepancyReportValidator;
-        this.pscDiscrepancyValidator = pscDiscrepancyValidator;
-    }
 
     public PscDiscrepancyReport findPscDiscrepancyReportById(String reportId) {
 
@@ -93,8 +85,7 @@ public class PscDiscrepancyReportService {
      * @param request              Http request
      * 
      * @return ServiceResult object with created PSC discrepancy report
-     * 
-     * @throws ServiceException
+     *
      */
     public ServiceResult<PscDiscrepancyReport> createPscDiscrepancyReport(PscDiscrepancyReport pscDiscrepancyReport,
             HttpServletRequest request) throws ServiceException {
@@ -245,7 +236,7 @@ public class PscDiscrepancyReportService {
     /**
      * Create a debug map for structured logging
      * 
-     * @param pscDiscrepancyReport
+     * @param pscDiscrepancyReport report to create debug map of
      * 
      * @return Debug map
      */
@@ -281,6 +272,7 @@ public class PscDiscrepancyReportService {
                 pscDiscrepancyValidator.validateOnSubmission(reportDiscrepancies.getData(), validationErrors);
                 reportToSubmit.setReport(storedReport);
                 reportToSubmit.setDiscrepancies(reportDiscrepancies.getData());
+                sendingEmail(reportToSubmit);
                 reportSent = pscSubmissionSender.send(reportToSubmit, httpClient, request.getSession().getId());
             }
         } catch (ServiceException ex) {
@@ -304,6 +296,16 @@ public class PscDiscrepancyReportService {
         } catch (MongoException mongoEx) {
             LOG.error("Error saving report with new status after attempting to submit report, with reportSent: "
                     + reportSent, mongoEx);
+        }
+    }
+
+    private void sendingEmail(PscSubmission reportToSubmit) {
+        try {
+            emailService.sendConfirmation(reportToSubmit);
+        } catch (EmailSendingException e){
+            LOG.error("ERROR sending confirmation email to user: ", e);
+        } catch (ApiErrorResponseException | URIValidationException e){
+            LOG.error("ERROR getting company name for email submission", e);
         }
     }
 }
