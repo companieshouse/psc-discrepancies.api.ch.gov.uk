@@ -40,6 +40,7 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <jib-maven-plugin.version>3.1.1</jib-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -113,7 +114,6 @@
             <artifactId>environment-reader-library</artifactId>
             <version>${environment-reader-library.version}</version>
         </dependency>
-        
 
         <!-- Unit Test Dependencies -->
         <dependency>
@@ -216,6 +216,11 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
