@@ -41,7 +41,6 @@
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <jib-maven-plugin.version>3.1.1</jib-maven-plugin.version>
-        <javax.servlet.version>3.1.0</javax.servlet.version>
     </properties>
 
     <dependencyManagement>
@@ -95,6 +94,12 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-sdk-manager-java-library</artifactId>
             <version>1.0.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
@@ -223,6 +228,11 @@
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>${jib-maven-plugin.version}</version>
+                <configuration>
+                    <to>
+                        <image>169942020521.dkr.ecr.eu-west-1.amazonaws.com/local/psc-discrepancies.api.ch.gov.uk</image>
+                    </to>
+                </configuration>
             </plugin>
         </plugins>
     </build>
